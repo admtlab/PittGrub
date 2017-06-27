@@ -11,13 +11,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const styles = StyleSheet.create({
     
     container: {
-      backgroundColor: '#607D8B',
       alignItems: 'center',
       zIndex: 10
     },
     logo: {
-      height: Metrics.images.logo,
-      width: Metrics.images.logo,
+      height: 200,
       resizeMode: 'contain',
     },
     banner: {
@@ -27,7 +25,6 @@ const styles = StyleSheet.create({
       paddingTop: 10,
       paddingBottom: 10,
       paddingLeft: 15,
-      marginTop: 30,
       backgroundColor: 'steelblue'
     
   },
@@ -50,25 +47,36 @@ const styles = StyleSheet.create({
   
 });
 
+const root = 'http://db10.cs.pitt.edu:8080/event'
+
+
+
 class Home extends React.Component {
   constructor (props) {
     super(props)
     const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
     
     this.state = {
+
         dataObjects: [
         {
-          title: 'Hello WOrld', 
+          title: 'Cathedral Pizzas', 
           startDate: new Date(), 
           endDate: new Date(),
           details: BACON_IPSUM , 
           serving: 3, 
           address: '123 Cathedral Drive',
           location_details: '3rd floor Room 12',
-          options: {
-            veg: true,
-            vegan: true
-          }
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
 
         },
         {
@@ -77,12 +85,83 @@ class Home extends React.Component {
           endDate: new Date(),
           details: BACON_IPSUM , 
           serving: 20, 
+          address: '456 Super Cool Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 2,
+              name: "Vegan",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+          ],
+          image: Images.restaurant1
+        },
+        {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
           address: '123 Cathedral Drive',
           location_details: '3rd floor Room 12',
-          options: {
-            veg: false,
-            vegan: false,
-          }
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
+        },
+        {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
+        },
+        {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
         }
       
       ]
@@ -91,6 +170,12 @@ class Home extends React.Component {
   
     
     this.renderRow = this.renderRow.bind(this)
+    this.fetchData = this.fetchData.bind(this)
+  }
+
+  componentDidMount() {
+    console.log('Fetching' + root);
+    this.fetchData(root);
   }
 
   renderRow(rowData) {
@@ -116,23 +201,39 @@ class Home extends React.Component {
     )
   }
 
+  fetchData(url) {
+    console.log('\n\nfetching data\n')
+    fetch(url)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log(responseJson)
+
+        this.setState({dataObjects: responseJson._embedded.events})
+
+      })
+      .catch(function(error) {
+        console.log(error);
+      })
+      .done();
+  }
+
   render () {
     return (
       
-      <View style={{backgroundColor: Colors.lightBackground}}>
-
-          
+      <View>
           <StatusBar
             backgroundColor="blue"
-            barStyle="light-content"
+            barStyle="dark-content"
+            hidden={true}
           />
           <View style={styles.container}>
             <Image source={Images.clearLogo} style={styles.logo} />
           </View>
-            <View style={styles.banner}>
-             <Text style={styles.bannerLabel}> My Events </Text>
-            </View>
-            <ScrollView style={{minHeight: 150, maxHeight: 150}}>
+
+          <View style={styles.banner}>
+             <Text style={styles.bannerLabel}> {'My Events ('+this.state.dataObjects.length+')'} </Text>
+          </View>
+            <ScrollView style={{ minHeight: 0, maxHeight: 150}}>
               <List containerStyle={{marginTop: 0}}>
                 {
                   this.state.dataObjects.map((l, i) => (
@@ -149,7 +250,7 @@ class Home extends React.Component {
             </ScrollView>
 
             <View style={styles.banner2}>
-             <Text style={styles.bannerLabel}> Recommended </Text>
+             <Text style={styles.bannerLabel}> {'Recommended ('+this.state.dataObjects.length+')'} </Text>
             </View>
             <ScrollView style={{minHeight: 150, maxHeight: 150}}>
               <List containerStyle={{marginTop: 0}}>

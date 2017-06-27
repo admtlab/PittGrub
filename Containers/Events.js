@@ -3,9 +3,11 @@ import { View, Text, ScrollView,  StyleSheet, StatusBar, TouchableOpacity } from
 import { connect } from 'react-redux'
 import Metrics from '../Styles/Metrics'
 import Colors from '../Styles/Colors'
-import Icon from 'react-native-vector-icons/Ionicons';
-import { List, ListItem } from 'react-native-elements'
-import ActionButton from 'react-native-action-button';
+import Icon from 'react-native-vector-icons/Ionicons'
+import { List, ListItem, SearchBar } from 'react-native-elements'
+import ActionButton from 'react-native-action-button'
+import Images from '../Styles/Images'
+import lib from '../library/scripts'
 // Styles
 
 
@@ -46,7 +48,6 @@ const styles = StyleSheet.create({
   },
  
   container: {
-   
     backgroundColor: Colors.facebook,
   },
  
@@ -54,12 +55,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 13,
     fontWeight: '300',
-  },
-  content: {
-    padding: 20,
-    backgroundColor: '#fff',
-    
-    
   },
   
 });
@@ -76,32 +71,113 @@ class Events extends React.Component {
     
     this.state = {
         dataObjects: [
-        {title: 'Coffee/Tea By Cathedral', time: '3:00pm - 4:00pm', details: BACON_IPSUM , amt: 3},
-        {title: 'Market Central Extra Pizzas', time: '9:15am - 1:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Spanish Conference Donuts', time: '2:00pm - 9:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Fish Tacos By WPU', time: '10:00am - 11:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Coffee/Tea By Cathedral', time: '3:00pm - 4:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Market Central Extra Pizzas', time: '9:15am - 1:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Spanish Conference Donuts', time: '2:00pm - 9:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Fish Tacos By WPU', time: '10:00am - 11:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Coffee/Tea By Cathedral', time: '3:00pm - 4:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Market Central Extra Pizzas', time: '9:15am - 1:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Spanish Conference Donuts', time: '2:00pm - 9:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Fish Tacos By WPU', time: '10:00am - 11:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Coffee/Tea By Cathedral', time: '3:00pm - 4:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Market Central Extra Pizzas', time: '9:15am - 1:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Spanish Conference Donuts', time: '2:00pm - 9:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Fish Tacos By WPU', time: '10:00am - 11:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Coffee/Tea By Cathedral', time: '3:00pm - 4:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Market Central Extra Pizzas', time: '9:15am - 1:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Spanish Conference Donuts', time: '2:00pm - 9:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Fish Tacos By WPU', time: '10:00am - 11:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Coffee/Tea By Cathedral', time: '3:00pm - 4:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Market Central Extra Pizzas', time: '9:15am - 1:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Spanish Conference Donuts', time: '2:00pm - 9:00pm', details: BACON_IPSUM, amt: 3},
-        {title: 'Fish Tacos By WPU', time: '10:00am - 11:00pm', details: BACON_IPSUM, amt: 3},
+          {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
+        },
+        {
+          title: 'Market Central Extra Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 20, 
+          address: '456 Super Cool Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 2,
+              name: "Vegan",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+          ],
+          image: Images.restaurant1
+        },
+        {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
+        },
+        {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
+        },
+        {
+          title: 'Cathedral Pizzas', 
+          startDate: new Date(), 
+          endDate: new Date(),
+          details: BACON_IPSUM , 
+          serving: 3, 
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+
+        }
+        
       
-      ]
+        ]
     
     }
   
@@ -111,10 +187,18 @@ class Events extends React.Component {
   
   renderRow (rowData, key) {
     return (
-        <TouchableOpacity style={{paddingBottom: 10}} key={key}>
+        <TouchableOpacity 
+          key={key}
+          onPress = {()=>this.props.navigation.navigate('EventDetail', {...rowData})}
+          >
           <View style={styles.row}>
             <Text style={styles.boldLabel}>{rowData.title}</Text>
-            <Text style={styles.subtitle}>{rowData.time}</Text>
+            <Text style={styles.subtitle}>
+                        { 
+                          lib._convertHoursMin(rowData.startDate)+' - '+
+                          lib._convertHoursMin(rowData.endDate)
+                        }
+            </Text>
           </View>
           <View style={styles.rowContentContainer} >
           
@@ -122,7 +206,7 @@ class Events extends React.Component {
           </View>
             <View style={{
               position: 'absolute',
-              paddingLeft: 330,
+              paddingLeft: Metrics.screenWidth - 30,
               paddingTop: 10,
               backgroundColor: Colors.transparent,
             }}>
@@ -144,9 +228,12 @@ class Events extends React.Component {
     return (
         <View>
             <ScrollView>
-                <StatusBar hidden={true} />
-
-                <List container>
+                <SearchBar
+                  lightTheme
+                  containerStyle={{backgroundColor: '#fff'}}
+                  placeholder='Search Event...' />
+                
+                <List style={{padding: 0, margin: 0}}>
                 {
                     this.state.dataObjects.map((rowData, i) => (
                     this.renderRow(rowData, i)

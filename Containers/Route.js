@@ -6,6 +6,7 @@ import Home from './Home'
 import Events from './Events'
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
+import Profile from './Profile'
 
 export const HomeNav = StackNavigator({
   Home: {
@@ -38,7 +39,7 @@ export const EventNav = StackNavigator({
   EventDetail: {
     screen: EventDetail,
     navigationOptions: ({navigation}) => ({
-      title: 'navigation.state.params.title'
+      title: 'Event Details'
     })
   }
 })
@@ -60,7 +61,7 @@ export const Tabs = TabNavigator({
   },
   },
   ProfileTab: {
-    screen: Home,
+    screen: Profile,
     navigationOptions: {
       tabBarLabel: 'Profile',
       tabBarIcon: ({ tintColor }) => <Icon name="account-circle" size={35} color={tintColor} />,

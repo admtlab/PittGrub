@@ -27,7 +27,58 @@
     var month = date.getMonth();
     var day = date.getDate();
     return month + '/' +day+' 🕰️ '+lib._convertHoursMin(date)
+  },
+
+  _convertDate_getMonthDay: (date) => {
+    var month = date.getMonth();
+    var day = date.getDate();
+    return month + '/' +day;
+  },
+
+  _mapFoodPreferencesToArray: (array) => {
+      // id = 0 - vegetarian
+      // id = 1 - vegan
+      // id = 2 - gluten free
+      // id = 3 - no peanuts
+      var arr = Array(4).fill(false);
+      for(foodPrefObj of array) {
+        arr[foodPrefObj.id] = true;
+      }
+      return arr;
+  },
+
+  _mapArraytoFoodPreferenceObjects: (array) => {
+      var obj = 
+      [ 
+        {
+            id: 0,
+            name: 'Vegetarian',
+            description: 'No meat'
+        },
+        {
+            id: 1,
+            name: 'Vegan',
+            description: 'No dairy, no meat'
+        },
+        {
+            id: 2,
+            name: 'Gluten-free',
+            description: 'not a real thing'
+        },
+        {
+            id: 3,
+            name: 'No peanuts',
+            description: 'No peanuts...'
+        }
+      ]
+      var arr = Array();
+      for(i = 0; i < array.length; i++) {
+        var index = arr[i];
+        arr.push(obj[index])
+      }
+      return arr
   }
+ 
  }
 
  export default lib

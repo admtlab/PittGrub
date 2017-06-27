@@ -53,25 +53,28 @@ export default class CreateEventView extends React.Component {
    
 
     this.state = {
-      vegetarian: false,
       vegan: false,
-      servingSize: 0,
+      vegetarian: false,
       isDateTimePickerStartVisible: false,
       isDateTimePickerEndVisible: false,
       startDate: new Date(),
-      endDate: new Date()
-
+      endDate: new Date(),
+      organization: '',
+      title: '',
+      location_details: '',
+      address: '',
+      serving: 0,
+      description: ''
     }
+
     this._showDateTimePickerEnd = this._showDateTimePickerEnd.bind(this);
     this._hideDateTimePickerEnd = this._hideDateTimePickerEnd.bind(this);
     this._showDateTimePickerStart = this._showDateTimePickerStart.bind(this);
     this._hideDateTimePickerStart = this._hideDateTimePickerStart.bind(this);
     this._handleStartDatePicked = this._handleStartDatePicked.bind(this);
     this._handleEndDatePicked = this._handleEndDatePicked.bind(this);
-    // this._convertHoursMin = this._convertHoursMin.bind(this);
-    // this._convertDate = this._convertDate.bind(this)
-    // this._formatHour = this._formatHour.bind(this)
-    // this._formatMinute = this._formatMinute.bind(this)
+    this._postEvent = this._postEvent.bind(this);
+
   }
 
   _showDateTimePickerStart = () => this.setState({ isDateTimePickerStartVisible: true });
@@ -93,35 +96,33 @@ export default class CreateEventView extends React.Component {
     this.setState({ endDate: date })
   }
 
-//   _formatMinute = (minute) => {
-//     if(minute < 10) {
-//         return '0'+minute
-//     } else return minute
-//   }
 
-//   _formatHour = (hour) => {
-//     if(hour == 0) {
-//         return 12
-//     } else return hour
-//   }
+  _mapFoodPreferences = () => {
+    
+  }
 
-//   _convertDate = (date) => {
-//     var month = date.getMonth();
-//     var day = date.getDate();
-//     return month + '/' +day+' 🕰️ '+this._convertHoursMin(date)
-//   }
 
-//   _convertHoursMin = (date) => {
-//       var hour = date.getHours();
-//       var min = date.getMinutes();
-//       var time = 'am'
-//       if(hour > 12) {
-//           hour = hour - 12;
-//           time = 'pm'
-//       }
-//       return this._formatHour(hour) + ':' + this._formatMinute(min) + ' ' + time
-//   }
- 
+  _postEvent = (url) => {
+    fetch(url, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+       title: this.state.title,
+       details: this.state.description,
+       organization: this.state.organization,
+       address: this.state.address,
+       location: this.state.location_details,
+       servings: this.state.serving,
+       startDate: this.state.startDate,
+       endDate: this.state.endDate,
+      
+    })
+    })
+  }
+  
   render() {
     return (
       <ScrollView style={styles.viewContainer}>
@@ -131,6 +132,7 @@ export default class CreateEventView extends React.Component {
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. Best Tacos In Town'}
           maxLength={20}
+          onChangeText={(text) => this.setState({title: text})}
         />
 
         <FormLabel labelStyle={styles.textLabel}>Organization</FormLabel>
@@ -138,6 +140,7 @@ export default class CreateEventView extends React.Component {
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. University of Pittsburgh'}
           maxLength={20}
+          onChangeText={(text) => this.setState({organization: text})}
         />
 
         <FormLabel labelStyle={styles.textLabel}>Address</FormLabel>
@@ -145,6 +148,7 @@ export default class CreateEventView extends React.Component {
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. 4200 Fifth Ave, Pittsburgh, PA 15260'}
           maxLength={20}
+          onChangeText={(text) => this.setState({address: text})}
         />
 
          <FormLabel labelStyle={styles.textLabel}>Location Details</FormLabel>
@@ -152,6 +156,7 @@ export default class CreateEventView extends React.Component {
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. 4th floor, Room 125'}
           maxLength={20}
+          onChangeText={(text) => this.setState({location_details: text})}
         />
 
         <FormLabel labelStyle={styles.textLabel}>Event Description</FormLabel>
@@ -161,6 +166,7 @@ export default class CreateEventView extends React.Component {
           placeholderTextColor="#bdc6cf"
           placeholder={'E.g. Fish, chicken, bacon, sushi tacos! You name it we got it! '}
           maxLength={150}
+          onChangeText={(text) => this.setState({description: text})}
         />
         <FormLabel labelStyle={styles.textLabel}>Available Servings</FormLabel>
         <FormInput
@@ -168,6 +174,7 @@ export default class CreateEventView extends React.Component {
           keyboardType='number-pad'
           placeholder={'E.g. 25 people'}
           maxLength={3}
+          onChangeText={(text) => this.setState({serving: text})}
           />
         <DateTimePicker
                 isVisible={this.state.isDateTimePickerStartVisible}
@@ -211,7 +218,7 @@ export default class CreateEventView extends React.Component {
         </Grid>
 
 
-        <FormLabel labelStyle={styles.textLabel}>Available Options </FormLabel>
+        <FormLabel labelStyle={styles.textLabel}>Food Preferences</FormLabel>
       
         <CheckBox
           title='Vegetarian'
@@ -239,7 +246,10 @@ export default class CreateEventView extends React.Component {
           backgroundColor='#009688'
           borderRadius= {10}
           containerViewStyle={styles.submitButton}
-          onPress={()=>{this.props.navigation.goBack(null)}}
+          onPress={()=>{
+            this._postEvent('http://db10.cs.pitt.edu:8080/event')
+            this.props.navigation.goBack(null)
+            }}
           />
       </ScrollView>
     );
