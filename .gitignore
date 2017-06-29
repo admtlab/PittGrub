@@ -36,6 +36,9 @@ buck-out
 /ReactAndroid/src/main/jni/prebuilt/lib/x86/
 /ReactAndroid/src/main/gen
 
+# iOS
+/ios/
+
 # Android
 .idea
 .gradle
