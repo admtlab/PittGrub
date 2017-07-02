@@ -290,7 +290,34 @@ export default class CreateEventView extends React.Component {
             />
           </TouchableHighlight>
         </View>
-        <View style={{paddingBottom: -10}}>
+
+        <Grid>
+          <Col>
+            <Button
+              containerViewStyle={{padding: 0, margin: 0}}
+              title='CANCEL'
+              backgroundColor='#de342f'
+              borderRadius={10}
+              containerViewStyle={styles.submitButton}
+              onPress={() => {
+                this.props.navigation.goBack(null)
+            }}/>
+          </Col>
+          <Col>
+            <Button
+              containerViewStyle={{padding: 0, margin: 0}}
+              title='SUBMIT'
+              backgroundColor='#009688'
+              borderRadius={10}
+              containerViewStyle={styles.submitButton}
+              onPress={() => {
+                this._postEvent('http://db10.cs.pitt.edu:8080/event')
+                this.props.navigation.goBack(null)
+            }}/>
+          </Col>
+        </Grid>
+
+        {/*<View style={{paddingBottom: -10}}>
           <Button
             style={{paddingBottom: -10}}
             large
@@ -311,7 +338,7 @@ export default class CreateEventView extends React.Component {
             onPress={() => {
               this.props.navigation.goBack(null)
             }}/>
-        </View>
+        </View>*/}
       </ScrollView>
     );
   }
