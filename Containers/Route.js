@@ -7,12 +7,14 @@ import Events from './Events'
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
 import Profile from './Profile'
+import Metrics from '../Styles/Metrics'
 
 export const HomeNav = StackNavigator({
   Home: {
     screen: Home,
     navigationOptions: {
-      title: 'Home'
+      title: 'Home',
+      header: false
     }
   },
   EventDetail: {
@@ -27,7 +29,7 @@ export const EventNav = StackNavigator({
   Events: {
     screen: Events,
     navigationOptions: {
-      title: 'All Events',
+      title: 'Events'
     },
   },
   CreateEvent: {
@@ -49,7 +51,7 @@ export const Tabs = TabNavigator({
     screen: HomeNav,
     navigationOptions: {
       tabBarLabel: 'Home',
-      tabBarIcon: ({ tintColor }) => <Icon name="home" size={35} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Icon name="home" size={Metrics.tabBarIconHeight} color={tintColor} />,
       
     },
   },
@@ -57,22 +59,20 @@ export const Tabs = TabNavigator({
     screen: EventNav,
     navigationOptions: {
       tabBarLabel: 'Events',
-      tabBarIcon: ({ tintColor }) => <Icon name="event-note" size={35} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Icon name="event-note" size={Metrics.tabBarIconHeight} color={tintColor} />,
   },
   },
   ProfileTab: {
     screen: Profile,
     navigationOptions: {
       tabBarLabel: 'Profile',
-      tabBarIcon: ({ tintColor }) => <Icon name="account-circle" size={35} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Icon name="account-circle" size={Metrics.tabBarIconHeight} color={tintColor} />,
     }
   }
   }, {
     tabBarOptions: {
       style: {
-        paddingTop: 10,
-        height: 60
+        height: Metrics.tabBarHeight
       }
     },
-  
 });

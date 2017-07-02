@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   },
   viewContainer: {
     backgroundColor: '#fff',
+    marginTop: 20,
     width: Metrics.screenWidth,
     height: Metrics.screenHeight - Metrics.tabBarHeight,
     zIndex: 100
@@ -121,8 +122,7 @@ class Profile extends React.Component {
         <FormInput secureTextEntry={true}/>*/}
 
         <Button
-          large
-          title='SUBMIT'
+          title='UPDATE'
           backgroundColor='#009688'
           borderRadius={10}
           containerViewStyle={styles.submitButton}
