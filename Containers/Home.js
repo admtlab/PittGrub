@@ -222,9 +222,10 @@ class Home extends React.Component {
       
       <View>
           <StatusBar
-            backgroundColor="blue"
-            barStyle="dark-content"
-            hidden={true}
+            backgroundColor="red"
+            containerStyle={{minHeight: 80}}
+            //barStyle="light-content"
+            hidden={false}
           />
           <View style={styles.container}>
             <Image source={Images.clearLogo} style={styles.logo} />
@@ -252,7 +253,7 @@ class Home extends React.Component {
             <View style={styles.banner2}>
              <Text style={styles.bannerLabel}> {'Recommended ('+this.state.dataObjects.length+')'} </Text>
             </View>
-            <ScrollView style={{minHeight: 150, maxHeight: 150}}>
+            <ScrollView style={{minHeight: 0, maxHeight: 202}}>
               <List containerStyle={{marginTop: 0}}>
                 {
                   this.state.dataObjects.map((l, i) => (
