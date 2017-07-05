@@ -83,6 +83,11 @@ class Events extends React.Component {
           organization: '',
           organizer_id: '',
           foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
           ],
           image: Images.kitchen
         },
@@ -121,11 +126,6 @@ class Events extends React.Component {
           organization: '',
           organizer_id: '',
           foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
           ],
           image: Images.kitchen
 

@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: 'snow',
-
   },
 });
 
@@ -52,7 +51,6 @@ class Home extends React.Component {
     const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
 
     this.state = {
-
       dataObjects: [
         {
           title: 'Cathedral Pizzas',
@@ -214,7 +212,7 @@ class Home extends React.Component {
           <Image source={Images.clearLogo} style={styles.logo} />
         </View>
 
-        <ScrollView style={{ maxHeight: Metrics.screenHeight - 200 - Metrics.tabBarHeight }}>
+        <ScrollView style={{ maxHeight: Metrics.screenHeight - 200 - Metrics.tabBarHeight, paddingBottom: 200 + Metrics.tabBarHeight }}>
           <View style={styles.banner}>
             <Text style={styles.bannerLabel}> {'My Events (' + this.state.dataObjects.length + ')'} </Text>
           </View>
