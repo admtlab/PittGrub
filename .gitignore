@@ -1,4 +1,5 @@
 # Xcode
+build/
 !**/*.xcodeproj
 !**/*.pbxproj
 !**/*.xcworkspacedata
@@ -36,15 +37,12 @@ buck-out
 /ReactAndroid/src/main/jni/prebuilt/lib/x86/
 /ReactAndroid/src/main/gen
 
-# iOS
-/ios/
-
 # Android
+build/
 .idea
 .gradle
 local.properties
 *.iml
-/android/
 
 # NPM
 npm-debug.*
@@ -57,7 +55,7 @@ node_modules
 # Expo
 .expo/
 
-# OS X
+# macOS
 .DS_Store
 
 # Test generated files
