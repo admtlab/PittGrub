@@ -51,6 +51,123 @@ class Home extends React.Component {
     const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
 
     this.state = {
+      recommendedObjects: [
+        {
+          title: 'Cathedral Pizzas',
+          startDate: new Date(),
+          endDate: new Date(),
+          details: BACON_IPSUM,
+          serving: 3,
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            }
+          ],
+          image: Images.kitchen
+        },
+        {
+          title: 'Market Central Extra Pizzas',
+          startDate: new Date(),
+          endDate: new Date(),
+          details: BACON_IPSUM,
+          serving: 20,
+          address: '456 Super Cool Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 2,
+              name: "Vegan",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+          ],
+          image: Images.restaurant1
+        },
+        {
+          title: 'Free donuts',
+          startDate: new Date(),
+          endDate: new Date(),
+          details: BACON_IPSUM,
+          serving: 3,
+          address: '123 Cathedral Drive',
+          location_details: '3rd floor Room 12',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+          ],
+          // image: Images.kitchen
+        },
+        {
+          title: 'Market Central Stir Fry',
+          startDate: new Date(),
+          endDate: new Date(),
+          details: BACON_IPSUM,
+          serving: 3,
+          address: 'Market Central',
+          location_details: 'Ground floor of Towers lobby',
+          organization: '',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 1,
+              name: 'Gluten Free',
+              description: 'No gluten (including wheat, barley, or rye).'
+            },
+            {
+              id: 2,
+              name: "Vegan",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+          ],
+          // image: Images.kitchen
+        },
+        {
+          title: 'Coffee',
+          startDate: new Date(),
+          endDate: new Date(),
+          details: BACON_IPSUM,
+          serving: 3,
+          address: 'Willia Pitt Union',
+          location_details: 'Outside of WPU lobby',
+          organization: 'CS Club',
+          organizer_id: '',
+          foodPreferences: [
+            {
+              id: 1,
+              name: 'Gluten Free',
+              description: 'No gluten (including wheat, barley, or rye).'
+            },
+            {
+              id: 2,
+              name: "Vegan",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+            {
+              id: 3,
+              name: "Vegetarian",
+              description: "No meat, which includes red meat, poultry, and seafood"
+            },
+          ],
+          // image: Images.kitchen
+        },
+      ], 
       dataObjects: [
         {
           title: 'Cathedral Pizzas',
@@ -96,7 +213,7 @@ class Home extends React.Component {
           image: Images.restaurant1
         },
         {
-          title: 'Cathedral Pizzas',
+          title: 'Free donuts',
           startDate: new Date(),
           endDate: new Date(),
           details: BACON_IPSUM,
@@ -106,52 +223,47 @@ class Home extends React.Component {
           organization: '',
           organizer_id: '',
           foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
           ],
-          image: Images.kitchen
+          // image: Images.kitchen
         },
-        {
-          title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: Images.kitchen
-        },
-        {
-          title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: Images.kitchen
-        }
+        // {
+        //   title: 'Cathedral Pizzas',
+        //   startDate: new Date(),
+        //   endDate: new Date(),
+        //   details: BACON_IPSUM,
+        //   serving: 3,
+        //   address: '123 Cathedral Drive',
+        //   location_details: '3rd floor Room 12',
+        //   organization: '',
+        //   organizer_id: '',
+        //   foodPreferences: [
+        //     {
+        //       id: 3,
+        //       name: "Vegetarian",
+        //       description: "No meat, which includes red meat, poultry, and seafood"
+        //     }
+        //   ],
+        //   image: Images.kitchen
+        // },
+        // {
+        //   title: 'Cathedral Pizzas',
+        //   startDate: new Date(),
+        //   endDate: new Date(),
+        //   details: BACON_IPSUM,
+        //   serving: 3,
+        //   address: '123 Cathedral Drive',
+        //   location_details: '3rd floor Room 12',
+        //   organization: '',
+        //   organizer_id: '',
+        //   foodPreferences: [
+        //     {
+        //       id: 3,
+        //       name: "Vegetarian",
+        //       description: "No meat, which includes red meat, poultry, and seafood"
+        //     }
+        //   ],
+        //   image: Images.kitchen
+        // }
       ]
     }
     this.renderRow = this.renderRow.bind(this)
@@ -232,12 +344,12 @@ class Home extends React.Component {
           {/*</ScrollView>*/}
 
           <View style={styles.banner2}>
-            <Text style={styles.bannerLabel}> {'Recommended (' + this.state.dataObjects.length + ')'} </Text>
+            <Text style={styles.bannerLabel}> {'Recommended (' + this.state.recommendedObjects.length + ')'} </Text>
           </View>
           {/*<ScrollView style={{minHeight: 0, maxHeight: 202}}>*/}
           <List containerStyle={{ marginTop: 0 }}>
             {
-              this.state.dataObjects.map((l, i) => (
+              this.state.recommendedObjects.map((l, i) => (
                 <TouchableOpacity
                   onPress={() => this.props.navigation.navigate('EventDetail', { ...l })}
                   key={i}>
