@@ -93,7 +93,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          image: Images.restaurant1
+          image: Images.restaurant
         },
         {
           title: 'Free donuts',
@@ -210,7 +210,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          image: Images.restaurant1
+          image: Images.kitchen
         },
         {
           title: 'Free donuts',
@@ -224,7 +224,7 @@ class Home extends React.Component {
           organizer_id: '',
           foodPreferences: [
           ],
-          // image: Images.kitchen
+          image: Images.restaurant
         },
         // {
         //   title: 'Cathedral Pizzas',

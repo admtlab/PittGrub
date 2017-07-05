@@ -74,7 +74,17 @@ class Profile extends React.Component {
           checkedColor='#009688'
         />
 
-        <View style={{
+        <CheckBox
+            title='Vegan'
+            checked={this.state.vegan}
+            onPress={() => {
+              this.setState({ vegan: !this.state.vegan })
+            }}
+            containerStyle={styles.checkboxContainer}          
+            checkedColor='#009688'
+          />
+
+        {/*<View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           borderColor: '#ededed',
@@ -112,7 +122,7 @@ class Profile extends React.Component {
               source={Images.info}
             />
           </TouchableHighlight>
-        </View>
+        </View>*/}
         {/*<FormLabel labelStyle={styles.title}>Change Password</FormLabel>
         <FormLabel>Old Password</FormLabel>
         <FormInput secureTextEntry={true}/>
