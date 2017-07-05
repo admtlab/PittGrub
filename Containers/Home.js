@@ -231,10 +231,10 @@ class Home extends React.Component {
             <Image source={Images.clearLogo} style={styles.logo} />
           </View>
 
-          <View style={styles.banner}>
-             <Text style={styles.bannerLabel}> {'My Events ('+this.state.dataObjects.length+')'} </Text>
-          </View>
-            <ScrollView style={{ minHeight: 0, maxHeight: 150}}>
+            <ScrollView style={{ maxHeight: Metrics.screenHeight - 200 - Metrics.tabBarHeight}}>
+              <View style={styles.banner}>
+                <Text style={styles.bannerLabel}> {'My Events ('+this.state.dataObjects.length+')'} </Text>
+              </View>
               <List containerStyle={{marginTop: 0}}>
                 {
                   this.state.dataObjects.map((l, i) => (
@@ -248,12 +248,12 @@ class Home extends React.Component {
                   ))
                 }
               </List>
-            </ScrollView>
+            {/*</ScrollView>*/}
 
             <View style={styles.banner2}>
              <Text style={styles.bannerLabel}> {'Recommended ('+this.state.dataObjects.length+')'} </Text>
             </View>
-            <ScrollView style={{minHeight: 0, maxHeight: 202}}>
+            {/*<ScrollView style={{minHeight: 0, maxHeight: 202}}>*/}
               <List containerStyle={{marginTop: 0}}>
                 {
                   this.state.dataObjects.map((l, i) => (
