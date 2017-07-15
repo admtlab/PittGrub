@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { AppRegistry } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 
@@ -51,22 +52,36 @@ export const Tabs = TabNavigator({
     screen: HomeNav,
     navigationOptions: {
       tabBarLabel: 'Home',
-      tabBarIcon: ({ tintColor }) => <Icon name="home" size={Metrics.tabBarIconHeight} color={tintColor} />,
-      
+      tabBarIcon: ({ tintColor }) =>
+        <Icon
+          name="home"
+          size={Metrics.tabBarIconHeight}
+          color={tintColor}
+        />,
     },
   },
   EventsTab: {
     screen: EventNav,
     navigationOptions: {
       tabBarLabel: 'Events',
-      tabBarIcon: ({ tintColor }) => <Icon name="event-note" size={Metrics.tabBarIconHeight} color={tintColor} />,
-  },
+      tabBarIcon: ({ tintColor }) =>
+        <Icon
+          name="event-note"
+          size={Metrics.tabBarIconHeight}
+          color={tintColor}
+        />,
+    },
   },
   ProfileTab: {
     screen: Profile,
     navigationOptions: {
       tabBarLabel: 'Profile',
-      tabBarIcon: ({ tintColor }) => <Icon name="account-circle" size={Metrics.tabBarIconHeight} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) =>
+        <Icon
+          name="account-circle"
+          size={Metrics.tabBarIconHeight}
+          color={tintColor}
+        />,
     }
   }
   }, {
@@ -75,4 +90,21 @@ export const Tabs = TabNavigator({
         height: Metrics.tabBarHeight
       }
     },
-});
+  }
+);
+
+// export default () =>
+//   <Tabs
+//     ref={(ref) => { this.nav = ref; }}
+//     onNavigationStateChange={(prevState, currState) => {
+//       console.log("STATE SWITCH");
+//       const getCurrentRouteName = (navigationState) => {
+//         console.log("getting current route name")
+//         if (!navigationState) return null;
+//         const route = navigationState.routes[navigationState.index];
+//         if (route.routes) return getCurrentRouteName(route);
+//         return route.routeName;
+//       };
+//       global.currentRoute = getCurrentRouteName(currentState);
+//     }}
+//   />;

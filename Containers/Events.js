@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
+import { RefreshControl, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import Metrics from '../Styles/Metrics'
 import Colors from '../Styles/Colors'
@@ -71,6 +71,7 @@ class Events extends React.Component {
     const VEGGIE_IPSUM = 'Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic. Gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato. Dandelion cucumber earthnut pea peanut soko zucchini.'
 
     this.state = {
+      refreshing: false,
       dataObjects: [
         {
           title: 'Cathedral Pizzas',
@@ -173,7 +174,42 @@ class Events extends React.Component {
       ]
     }
 
-    this.renderRow = this.renderRow.bind(this)
+    this.renderRow = this.renderRow.bind(this);
+    this.getEvents = this.getEvents.bind(this);
+  }
+
+  _onRefresh() {
+    this.setState({refreshing: true});
+    this.getEvents().then(() => {
+      this.setState({refreshing: false});
+      console.log('refreshed events');
+    });
+  }
+
+  _eventsNav = () => {
+    console.log('In events tab!');
+  }
+
+  testnav = () => {
+    console.log('in events');
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.screenProps.route_index === 1) {
+      this.testnav();
+    }
+  }
+
+  getEvents() {
+    return fetch('http://localhost:8080/event', { method: 'GET' })
+    .then((response) => response.json())
+    .then((responseData) => {
+      console.log("Fetched events");
+      console.log(responseData);
+    })
+    .catch((error) => {
+      console.log('failed fetch');
+    });
   }
 
   renderRow(rowData, key) {
@@ -203,7 +239,6 @@ class Events extends React.Component {
           <Icon name="ios-arrow-forward" size={20} color={'snow'} />
         </View>
       </TouchableOpacity>
-
     )
   }
 
@@ -214,7 +249,14 @@ class Events extends React.Component {
   render() {
     return (
       <View>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh.bind(this)}
+            />
+          }
+        >
           <SearchBar
             lightTheme
             containerStyle={{ backgroundColor: '#fff' }}

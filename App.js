@@ -4,10 +4,17 @@ import { Tabs } from './Containers/Route'
 import Home from './Containers/Home'
 
 export default class App extends React.Component {
-
+  _onNavigationStateChange = (prevState, newState) => {
+    this.setState({...this.state, route_index: newState.index});
+  }
   render() {
     return (
-      <Tabs />
+      <Tabs 
+        onNavigationStateChange = {(prevState, newState) => {
+          this._onNavigationStateChange(prevState, newState);
+        }}
+        screenProps = { this.state }
+      />
     );
   }
 }

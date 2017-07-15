@@ -36,6 +36,17 @@ class Profile extends React.Component {
       vegan: false
     }
   }
+
+  testnav = () => {
+    console.log('in profile');
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.screenProps.route_index === 2) {
+      this.testnav();
+    }
+  }
+
   render() {
     return (
       <ScrollView style={styles.viewContainer}>

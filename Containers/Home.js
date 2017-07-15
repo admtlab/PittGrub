@@ -1,5 +1,5 @@
 import React from 'react'
-import { StatusBar, ScrollView, Text, Image, View, TouchableOpacity, StyleSheet } from 'react-native'
+import { RefreshControl, StatusBar, ScrollView, Text, Image, View, TouchableOpacity, StyleSheet } from 'react-native'
 import Metrics from '../Styles/Metrics'
 import Colors from '../Styles/Colors'
 import Images from '../Styles/Images'
@@ -51,6 +51,7 @@ class Home extends React.Component {
     const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
 
     this.state = {
+      refreshing: false,
       recommendedObjects: [
         {
           title: 'Cathedral Pizzas',
@@ -270,9 +271,13 @@ class Home extends React.Component {
     this.fetchData = this.fetchData.bind(this)
   }
 
+  _onRefresh() {
+    console.log('refreshing home');
+  }
+
   componentDidMount() {
     console.log('Fetching' + root);
-    this.fetchData(root);
+    // this.fetchData(root);
   }
 
   renderRow(rowData) {
@@ -295,6 +300,16 @@ class Home extends React.Component {
         </View>
       </TouchableOpacity>
     )
+  }
+
+  testnav = () => {
+    console.log('in home');
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.screenProps.route_index === 0) {
+      this.testnav();
+    }
   }
 
   fetchData(url) {
@@ -324,7 +339,13 @@ class Home extends React.Component {
           <Image source={Images.clearLogo} style={styles.logo} />
         </View>
 
-        <ScrollView style={{ maxHeight: Metrics.screenHeight - 200 - Metrics.tabBarHeight, paddingBottom: 200 + Metrics.tabBarHeight }}>
+        <ScrollView style={{ maxHeight: Metrics.screenHeight - 200 - Metrics.tabBarHeight, paddingBottom: 200 + Metrics.tabBarHeight }}
+        refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh.bind(this)}
+            />
+          }>
           <View style={styles.banner}>
             <Text style={styles.bannerLabel}> {'My Events (' + this.state.dataObjects.length + ')'} </Text>
           </View>
