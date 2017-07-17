@@ -1,6 +1,13 @@
 {
   "expo": {
-    "sdkVersion": "17.0.0"
-  },
-  "privacy": "unlisted"
+    "name": "PittGrub",
+    "version": "0.2.0",
+    // "icon": "",
+    "loading": {
+      "backgroundImage": "./assets/iPhone6plus-5.5-Portrait.png",
+      "hideExponentText": true
+    },
+    "sdkVersion": "18.0.0",
+    "privacy": "unlisted"
+  }
 }
