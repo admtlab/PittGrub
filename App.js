@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View } from 'react-native';
 import { Tabs } from './Containers/Route'
 import Home from './Containers/Home'
 
@@ -27,7 +27,7 @@ export default class App extends React.Component {
 
   componentWillMount() {
     sleep(3000);
-    this.state.isReady;
+    this.state.isReady = true;
     // setTimeout(function() {
     // }, 5000);
   }

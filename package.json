@@ -8,6 +8,7 @@
     "react-test-renderer": "16.0.0-alpha.6"
   },
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+  "//": "./App.js",
   "scripts": {
     "start": "react-native-scripts start",
     "eject": "react-native-scripts eject",
@@ -22,9 +23,9 @@
     "expo": "^17.0.0",
     "react": "16.0.0-alpha.6",
     "react-native": "^0.44.0",
-    "react-native-action-button": "^2.6.10",
+    "react-native-action-button": "^2.7.2",
     "react-native-elements": "^0.13.0",
-    "react-native-modal-datetime-picker": "^4.6.0",
+    "react-native-modal-datetime-picker": "^4.8.0",
     "react-navigation": "^1.0.0-beta.11"
   }
 }
