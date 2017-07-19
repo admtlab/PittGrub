@@ -55,6 +55,9 @@ node_modules
 # Expo
 .expo/
 
+# Config
+config-*.json
+
 # macOS
 .DS_Store
 
