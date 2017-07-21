@@ -2,11 +2,11 @@ import React from 'react';
 
 import {View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput} from 'react-native'
 import {ListItem, Icon, Card, Button, FormLabel, Grid, Col } from 'react-native-elements'
-import Metrics from '../Styles/Metrics'
-import Colors from '../Styles/Colors'
-import Images from '../Styles/Images'
+import metrics from '../config/metrics'
+import colors from '../config/styles'
+import images from '../config/images'
 import { NavigationActions } from 'react-navigation'
-import lib from '../library/scripts'
+import lib from '../lib/scripts'
 
 const styles = StyleSheet.create({
     description_text: {

@@ -3,12 +3,12 @@ import React from 'react';
 
 import { View, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
-import Metrics from '../Styles/Metrics'
-import Colors from '../Styles/Colors'
+import metrics from '../config/metrics'
+import colors from '../config/styles'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import { NavigationActions } from 'react-navigation'
-import lib from '../library/scripts'
-import Images from '../Styles/Images'
+import lib from '../lib/scripts'
+import images from '../config/images'
 
 // styles
 const styles = StyleSheet.create({
@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
   },
   viewContainer: {
     backgroundColor: '#fff',
-    width: Metrics.screenWidth,
-    height: Metrics.screenHeight - Metrics.tabBarHeight,
+    width: metrics.screenWidth,
+    height: metrics.screenHeight - metrics.tabBarHeight,
     zIndex: 100
   },
   textLabel: {
@@ -286,7 +286,7 @@ export default class CreateEventView extends React.Component {
               alignItems: 'flex-end'}}>
             <Image
               resizeMode='center'
-              source={Images.info}
+              source={images.info}
             />
           </TouchableHighlight>
         </View>

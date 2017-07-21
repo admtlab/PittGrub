@@ -1,9 +1,9 @@
 import React from 'react'
 import { Switch, ScrollView, Text, Image, View, TouchableHighlight, StyleSheet } from 'react-native'
 import { Button, CheckBox, FormLabel, FormInput} from 'react-native-elements'
-import Metrics from '../Styles/Metrics'
-import Colors from '../Styles/Colors'
-import Images from '../Styles/Images'
+import metrics from '../config/metrics'
+import colors from '../config/styles'
+import images from '../config/images'
 import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
   viewContainer: {
     backgroundColor: '#fff',
     marginTop: 20,
-    width: Metrics.screenWidth,
-    height: Metrics.screenHeight - Metrics.tabBarHeight,
+    width: metrics.screenWidth,
+    height: metrics.screenHeight - metrics.tabBarHeight,
     zIndex: 100
   }
 });
@@ -130,7 +130,7 @@ class Profile extends React.Component {
             }}>
             <Image
               resizeMode='center'
-              source={Images.info}
+              source={images.info}
             />
           </TouchableHighlight>
         </View>*/}

@@ -1,8 +1,8 @@
 import React from 'react'
 import { RefreshControl, StatusBar, ScrollView, Text, Image, View, TouchableOpacity, StyleSheet } from 'react-native'
-import Metrics from '../Styles/Metrics'
-import Colors from '../Styles/Colors'
-import Images from '../Styles/Images'
+import metrics from '../config/metrics'
+import colors from '../config/styles'
+import images from '../config/images'
 import { List, ListItem } from 'react-native-elements'
 import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   banner: {
-    width: Metrics.screenWidth,
+    width: metrics.screenWidth,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     paddingTop: 10,
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'steelblue'
   },
   banner2: {
-    width: Metrics.screenWidth,
+    width: metrics.screenWidth,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     paddingTop: 10,
@@ -70,7 +70,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             }
           ],
-          image: Images.kitchen
+          image: images.kitchen
         },
         {
           title: 'Market Central Extra Pizzas',
@@ -94,7 +94,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          image: Images.restaurant
+          image: images.restaurant
         },
         {
           title: 'Free donuts',
@@ -108,7 +108,7 @@ class Home extends React.Component {
           organizer_id: '',
           foodPreferences: [
           ],
-          // image: Images.kitchen
+          // image: images.kitchen
         },
         {
           title: 'Market Central Stir Fry',
@@ -137,7 +137,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          // image: Images.kitchen
+          // image: images.kitchen
         },
         {
           title: 'Coffee',
@@ -166,7 +166,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          // image: Images.kitchen
+          // image: images.kitchen
         },
       ], 
       dataObjects: [
@@ -187,7 +187,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             }
           ],
-          image: Images.kitchen
+          image: images.kitchen
         },
         {
           title: 'Market Central Extra Pizzas',
@@ -211,7 +211,7 @@ class Home extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          image: Images.kitchen
+          image: images.kitchen
         },
         {
           title: 'Free donuts',
@@ -225,7 +225,7 @@ class Home extends React.Component {
           organizer_id: '',
           foodPreferences: [
           ],
-          image: Images.restaurant
+          image: images.restaurant
         },
         // {
         //   title: 'Cathedral Pizzas',
@@ -244,7 +244,7 @@ class Home extends React.Component {
         //       description: "No meat, which includes red meat, poultry, and seafood"
         //     }
         //   ],
-        //   image: Images.kitchen
+        //   image: images.kitchen
         // },
         // {
         //   title: 'Cathedral Pizzas',
@@ -263,7 +263,7 @@ class Home extends React.Component {
         //       description: "No meat, which includes red meat, poultry, and seafood"
         //     }
         //   ],
-        //   image: Images.kitchen
+        //   image: images.kitchen
         // }
       ]
     }
@@ -336,10 +336,10 @@ class Home extends React.Component {
           hidden={false}
         />
         <View style={styles.container}>
-          <Image source={Images.clearLogo} style={styles.logo} />
+          <Image source={images.clearLogo} style={styles.logo} />
         </View>
 
-        <ScrollView style={{ maxHeight: Metrics.screenHeight - 200 - Metrics.tabBarHeight, paddingBottom: 200 + Metrics.tabBarHeight }}
+        <ScrollView style={{ maxHeight: metrics.screenHeight - 200 - metrics.tabBarHeight, paddingBottom: 200 + metrics.tabBarHeight }}
         refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}

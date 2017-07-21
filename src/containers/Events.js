@@ -1,15 +1,14 @@
 import React from 'react'
 import { RefreshControl, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
-import { connect } from 'react-redux'
-import Metrics from '../Styles/Metrics'
-import Colors from '../Styles/Colors'
+import metrics from '../config/metrics'
+import { colors } from '../config/styles'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { List, ListItem, SearchBar } from 'react-native-elements'
 import ActionButton from 'react-native-action-button'
-import Images from '../Styles/Images'
-import lib from '../library/scripts'
+import images from '../config/images'
+import lib from '../lib/scripts'
 
-// Styles
+// styles
 const styles = StyleSheet.create({
   actionButtonIcon: {
     fontSize: 20,
@@ -22,7 +21,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flex: 1,
-    backgroundColor: Colors.facebook2,
+    backgroundColor: colors.facebook2,
     justifyContent: 'flex-start',
     flexDirection: 'column',
     paddingLeft: 20,
@@ -38,16 +37,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'snow',
     textAlign: 'left',
-    marginVertical: Metrics.smallMargin
+    marginVertical: metrics.smallMargin
   },
   label: {
     textAlign: 'left',
-    color: Colors.snow,
-    marginBottom: Metrics.smallMargin
+    color: colors.snow,
+    marginBottom: metrics.smallMargin
   },
 
   container: {
-    backgroundColor: Colors.facebook,
+    backgroundColor: colors.facebook,
   },
 
   headerText: {
@@ -90,7 +89,7 @@ class Events extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             }
           ],
-          image: Images.kitchen
+          image: images.kitchen
         },
         {
           title: 'Market Central Food Tasting',
@@ -114,7 +113,7 @@ class Events extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             },
           ],
-          image: Images.restaurant
+          image: images.restaurant
         },
         {
           title: 'Cathedral Pizzas',
@@ -128,7 +127,7 @@ class Events extends React.Component {
           organizer_id: '',
           foodPreferences: [
           ],
-          image: Images.kitchen
+          image: images.kitchen
 
         },
         {
@@ -148,7 +147,7 @@ class Events extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             }
           ],
-          image: Images.kitchen
+          image: images.kitchen
 
         },
         {
@@ -168,7 +167,7 @@ class Events extends React.Component {
               description: "No meat, which includes red meat, poultry, and seafood"
             }
           ],
-          image: Images.kitchen
+          image: images.kitchen
 
         }
       ]
@@ -232,9 +231,9 @@ class Events extends React.Component {
         </View>
         <View style={{
           position: 'absolute',
-          paddingLeft: Metrics.screenWidth - 30,
+          paddingLeft: metrics.screenWidth - 30,
           paddingTop: 10,
-          backgroundColor: Colors.transparent,
+          backgroundColor: colors.transparent,
         }}>
           <Icon name="ios-arrow-forward" size={20} color={'snow'} />
         </View>

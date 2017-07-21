@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { AppRegistry } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
@@ -8,7 +8,7 @@ import Events from './Events'
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
 import Profile from './Profile'
-import Metrics from '../Styles/Metrics'
+import Metrics from '../config/metrics'
 
 export const HomeNav = StackNavigator({
   Home: {
