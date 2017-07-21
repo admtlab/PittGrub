@@ -3,7 +3,7 @@ import React from 'react';
 import {View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput} from 'react-native'
 import {ListItem, Icon, Card, Button, FormLabel, Grid, Col } from 'react-native-elements'
 import metrics from '../config/metrics'
-import colors from '../config/styles'
+import { colors } from '../config/styles'
 import images from '../config/images'
 import { NavigationActions } from 'react-navigation'
 import lib from '../lib/scripts'
@@ -62,7 +62,7 @@ export default class EventDetail extends React.Component {
     render() {
         var food_arr = this.props.navigation.state.params.foodPreferences
         return (
-            <ScrollView style={{backgroundColor: Colors.lightBackground}}>
+            <ScrollView style={{backgroundColor: colors.lightBackground}}>
                 <Card
                     image={this.props.navigation.state.params.image}>
                     <Text style={styles.title_text}>
@@ -80,13 +80,13 @@ export default class EventDetail extends React.Component {
                     <Text style={styles.header_text}>Location</Text>
                     <Text style={styles.normal}>{this.props.navigation.state.params.address}</Text>
                     <Text style={styles.header_text}>Details</Text>
-                    <Text style={styles.normal}>{this.props.navigation.state.params.location_details}</Text>
+                    <Text style={styles.normal}>{this.props.navigation.state.params.location}</Text>
     
                     <Text style={styles.header_text}>Date and Time</Text>
                     <Text style={styles.normal}>{
-                        lib._convertDate_getMonthDay(this.props.navigation.state.params.startDate)+'  '+
-                        lib._convertHoursMin(this.props.navigation.state.params.startDate)+' ~ '+
-                        lib._convertHoursMin(this.props.navigation.state.params.endDate)
+                        lib._convertDate_getMonthDay(this.props.navigation.state.params.start_date)+'  '+
+                        lib._convertHoursMin(this.props.navigation.state.params.start_date)+' ~ '+
+                        lib._convertHoursMin(this.props.navigation.state.params.end_date)
                         }
                     </Text>
                 

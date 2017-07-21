@@ -1,5 +1,5 @@
 import React from 'react'
-import { RefreshControl, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
+import { RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
 import metrics from '../config/metrics'
 import { colors } from '../config/styles'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -69,17 +69,22 @@ class Events extends React.Component {
 
     const VEGGIE_IPSUM = 'Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic. Gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato. Dandelion cucumber earthnut pea peanut soko zucchini.'
 
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1.id !== r2.id
+    });
+
     this.state = {
-      refreshing: false,
+      refreshing: false,                              // state is refreshing
+      events: ds.cloneWithRows(['row1', 'row2']),     // mutable events list
       dataObjects: [
         {
           title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
+          start_date: new Date(),
+          end_date: new Date(),
           details: BACON_IPSUM,
           serving: 3,
           address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
+          location: '3rd floor Room 12',
           organization: '',
           organizer_id: '',
           foodPreferences: [
@@ -93,12 +98,12 @@ class Events extends React.Component {
         },
         {
           title: 'Market Central Food Tasting',
-          startDate: new Date(),
-          endDate: new Date(),
+          start_date: new Date(),
+          end_date: new Date(),
           details: VEGGIE_IPSUM,
           serving: 20,
           address: '456 Super Cool Drive',
-          location_details: '3rd floor Room 12',
+          location: '3rd floor Room 12',
           organization: '',
           organizer_id: '',
           foodPreferences: [
@@ -117,12 +122,12 @@ class Events extends React.Component {
         },
         {
           title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
+          start_date: new Date(),
+          end_date: new Date(),
           details: BACON_IPSUM,
           serving: 3,
           address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
+          location: '3rd floor Room 12',
           organization: '',
           organizer_id: '',
           foodPreferences: [
@@ -132,12 +137,12 @@ class Events extends React.Component {
         },
         {
           title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
+          start_date: new Date(),
+          end_date: new Date(),
           details: BACON_IPSUM,
           serving: 3,
           address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
+          location: '3rd floor Room 12',
           organization: '',
           organizer_id: '',
           foodPreferences: [
@@ -152,12 +157,12 @@ class Events extends React.Component {
         },
         {
           title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
+          start_date: new Date(),
+          end_date: new Date(),
           details: BACON_IPSUM,
           serving: 3,
           address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
+          location: '3rd floor Room 12',
           organization: '',
           organizer_id: '',
           foodPreferences: [
@@ -178,10 +183,12 @@ class Events extends React.Component {
   }
 
   _onRefresh() {
-    this.setState({refreshing: true});
+    this.setState({ refreshing: true });
     this.getEvents().then(() => {
-      this.setState({refreshing: false});
+      this.setState({ refreshing: false });
+
       console.log('refreshed events');
+      console.log(this.state.events instanceof Array);
     });
   }
 
@@ -201,14 +208,20 @@ class Events extends React.Component {
 
   getEvents() {
     return fetch('http://localhost:8080/event', { method: 'GET' })
-    .then((response) => response.json())
-    .then((responseData) => {
-      console.log("Fetched events");
-      console.log(responseData);
-    })
-    .catch((error) => {
-      console.log('failed fetch');
-    });
+      .then((response) => response.json())
+      .then((responseData) => {
+        console.log("Successfully fetched events");
+        console.log(responseData['_embedded']['events']);
+        const events = responseData['_embedded']['events'];
+        this.setState({ events: ds.cloneWithRows(events) });
+      })
+      .catch((error) => {
+        console.log('failed fetch');
+      });
+  }
+
+  componentWillMount() {
+    this.getEvents();
   }
 
   renderRow(rowData, key) {
@@ -220,8 +233,8 @@ class Events extends React.Component {
           <Text style={styles.boldLabel}>{rowData.title}</Text>
           <Text style={styles.subtitle}>
             {
-              lib._convertHoursMin(rowData.startDate) + ' - ' +
-              lib._convertHoursMin(rowData.endDate)
+              lib._convertHoursMin(rowData.start_date) + ' - ' +
+              lib._convertHoursMin(rowData.end_date)
             }
           </Text>
         </View>
@@ -254,13 +267,12 @@ class Events extends React.Component {
               refreshing={this.state.refreshing}
               onRefresh={this._onRefresh.bind(this)}
             />
-          }
-        >
+          }>
           <SearchBar
             lightTheme
             containerStyle={{ backgroundColor: '#fff' }}
-            placeholder='Search Event...' />
-
+            placeholder='Search Event...'
+          />
           <List style={{ padding: 0, margin: 0 }}>
             {
               this.state.dataObjects.map((rowData, i) => (
