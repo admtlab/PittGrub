@@ -69,13 +69,12 @@ class Events extends React.Component {
 
     const VEGGIE_IPSUM = 'Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic. Gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato. Dandelion cucumber earthnut pea peanut soko zucchini.'
 
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1.id !== r2.id
-    });
-
     this.state = {
       refreshing: false,                              // state is refreshing
-      events: ds.cloneWithRows(['row1', 'row2']),     // mutable events list
+      eventSource: new ListView.DataSource({
+        rowHasChanged: (r1, r2) => r1.id !== r2.id
+      }),
+      loaded: false,
       dataObjects: [
         {
           title: 'Cathedral Pizzas',
@@ -184,12 +183,9 @@ class Events extends React.Component {
 
   _onRefresh() {
     this.setState({ refreshing: true });
-    this.getEvents().then(() => {
-      this.setState({ refreshing: false });
-
-      console.log('refreshed events');
-      console.log(this.state.events instanceof Array);
-    });
+    this.getEvents();
+    this.setState({ refreshing: false });    
+    console.log('refreshed events');
   }
 
   _eventsNav = () => {
@@ -206,6 +202,7 @@ class Events extends React.Component {
     }
   }
 
+  // fetch event data from server
   getEvents() {
     return fetch('http://localhost:8080/event', { method: 'GET' })
       .then((response) => response.json())
@@ -213,15 +210,46 @@ class Events extends React.Component {
         console.log("Successfully fetched events");
         console.log(responseData['_embedded']['events']);
         const events = responseData['_embedded']['events'];
-        this.setState({ events: ds.cloneWithRows(events) });
+        this.setState({
+          eventSource: this.state.eventSource.cloneWithRows(events),
+          loaded: true
+        });
       })
       .catch((error) => {
         console.log('failed fetch');
-      });
+      })
+      .done();
   }
 
   componentWillMount() {
     this.getEvents();
+  }
+
+  renderEvent(event) {
+    return(
+      <TouchableOpacity
+        onPress={() => this.props.navigation.navigate('EventDetail', { ...event })}>
+        <View style={styles.row}>
+          <Text style={styles.boldLabel}>{event.title}</Text>
+          <Text style={styles.subtitle}> {
+            lib._convertHoursMin(new Date(event.start_date)) + ' - ' +
+            lib._convertHoursMin(new Date(event.end_date))}
+          </Text>
+        </View>
+        <View style={styles.rowContentContainer}>
+          <Text style={styles.headerText}>{event.details}
+          </Text>
+        </View>
+        <View style={{
+          position: 'absolute',
+          paddingLeft: metrics.screenWidth - 30,
+          paddingTop: 10,
+          backgroundColor: colors.transparent,
+        }}>
+          <Icon name="ios-arrow-forward" size={20} color={'snow'} />
+        </View>
+      </TouchableOpacity>
+    )
   }
 
   renderRow(rowData, key) {
@@ -272,6 +300,12 @@ class Events extends React.Component {
             lightTheme
             containerStyle={{ backgroundColor: '#fff' }}
             placeholder='Search Event...'
+          />
+          <ListView
+            removeClippedSubviews={false} // forces list to render
+            dataSource={this.state.eventSource}
+            renderRow={(row) => this.renderEvent(row)}
+            style={{padding: 0, margin: 0}}
           />
           <List style={{ padding: 0, margin: 0 }}>
             {

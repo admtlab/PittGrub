@@ -84,9 +84,9 @@ export default class EventDetail extends React.Component {
     
                     <Text style={styles.header_text}>Date and Time</Text>
                     <Text style={styles.normal}>{
-                        lib._convertDate_getMonthDay(this.props.navigation.state.params.start_date)+'  '+
-                        lib._convertHoursMin(this.props.navigation.state.params.start_date)+' ~ '+
-                        lib._convertHoursMin(this.props.navigation.state.params.end_date)
+                        lib._convertDate_getMonthDay(new Date(this.props.navigation.state.params.start_date))+'  '+
+                        lib._convertHoursMin(new Date(this.props.navigation.state.params.start_date))+' ~ '+
+                        lib._convertHoursMin(new Date(this.props.navigation.state.params.end_date))
                         }
                     </Text>
                 
@@ -94,8 +94,7 @@ export default class EventDetail extends React.Component {
                    
                     <Text style={styles.header_text}>Food Preferences</Text>
                     {
-                        
-                        this.props.navigation.state.params.foodPreferences.map((obj, i) => {
+                        this.props.navigation.state.params['foodPreferences'].map((obj, i) => {
                             return (
                                 <View key={i} style={{
                                     paddingTop: 5,
