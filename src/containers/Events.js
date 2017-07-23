@@ -226,6 +226,7 @@ class Events extends React.Component {
   }
 
   renderEvent(event) {
+    console.log(this.state.events[0].start_date);
     return(
       <TouchableOpacity
         onPress={() => this.props.navigation.navigate('EventDetail', { ...event })}>
@@ -249,7 +250,7 @@ class Events extends React.Component {
           <Icon name="ios-arrow-forward" size={20} color={'snow'} />
         </View>
       </TouchableOpacity>
-    )
+    );
   }
 
   renderRow(rowData, key) {
@@ -302,7 +303,7 @@ class Events extends React.Component {
             placeholder='Search Event...'
           />
           <ListView
-            removeClippedSubviews={false} // forces list to render
+            removeClippedSubviews={false}       // forces list to render
             dataSource={this.state.eventSource}
             renderRow={(row) => this.renderEvent(row)}
             style={{padding: 0, margin: 0}}
