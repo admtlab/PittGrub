@@ -8,6 +8,7 @@
       "backgroundImage": "./assets/splash/iPhone6plus-5.5-Portrait.png",
       "hideExponentText": true
     },
+    "orientation": "portrait",
     "sdkVersion": "18.0.0",
     "privacy": "unlisted"
   }
