@@ -14,8 +14,9 @@ export const HomeNav = StackNavigator({
   Home: {
     screen: Home,
     navigationOptions: {
-      title: 'Home',
-      header: false
+      title: 'PittGrub',
+      headerBackTitle: 'Home',
+      // header: false
     }
   },
   EventDetail: {

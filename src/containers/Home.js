@@ -335,11 +335,11 @@ class Home extends React.Component {
           //barStyle="light-content"
           hidden={false}
         />
-        <View style={styles.container}>
+        {/* <View style={styles.container}>
           <Image source={images.clearLogo} style={styles.logo} />
-        </View>
+        </View> */}
 
-        <ScrollView style={{ maxHeight: metrics.screenHeight - 200 - metrics.tabBarHeight, paddingBottom: 200 + metrics.tabBarHeight }}
+        <ScrollView style={{ maxHeight: metrics.screenHeight - metrics.tabBarHeight, paddingBottom: 200 + metrics.tabBarHeight }}
         refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
