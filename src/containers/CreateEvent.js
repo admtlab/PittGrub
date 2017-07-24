@@ -130,7 +130,6 @@ export default class CreateEventView extends React.Component {
         end_date: this.state.endDate,
         food_preferences: foodprefs,
       })
-    console.log('body: \n' + body)
     fetch(createEventURL, {
       method: 'POST',
       headers: {

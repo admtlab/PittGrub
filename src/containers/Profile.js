@@ -147,10 +147,10 @@ class Profile extends React.Component {
       })
       .then(() => {
         console.log('global user id is: ' + global.user_id);
-        // Alert.alert(
-        //   'Success',
-        //   'Logged in as id: ' + global.user_id,
-        //   {text: 'OK'});
+        Alert.alert(
+          'Success',
+          'Logged in as id: ' + global.user_id,
+          {text: 'OK'});
         console.log('registering for push notifications');
         registerForPushNotifications();
       })

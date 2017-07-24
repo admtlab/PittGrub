@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { AppRegistry, StyleSheet, Text, View } from 'react-native';
+import { AppState, Alert, AppRegistry, StyleSheet, Text, View } from 'react-native';
 import { Tabs } from './containers/Route'
 import { Permissions, Notifications } from 'expo';
 import Home from './containers/Home'
@@ -67,12 +67,31 @@ export default class App extends React.Component {
 
   componentWillMount() {
     sleep(3000);
-    this.state.isReady = true;
+    this.setState({ isReady: true, appState: 'active'});
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', state => {
+      this.setState({ appState: state });
+      console.log('AppState is ', state);
+    });
   }
 
   _handleNotification = (notification) => {
     this.setState({notification: notification});
+    if (this.state.appState == 'active') {
+      Alert.alert(
+          'New event: ' + notification.title,
+          'body: ' + notification.body + '  data: ' + notification.data,
+          {text: 'OK'});
+        Notifications.scheduleLocalNotificationAsync(this.state.notification, {time: Date().getTime()+5000})
+    } else {
+      Notifications.presentLocalNotificationAsync(this.state.notification);
+    }
+    Notifications.getBadgeNumberAsync()
+      .then((badgeCount) => 
+        Notifications.setBadgeNumberAsync(badgeCount+1));
   }
 
   render() {
