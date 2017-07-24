@@ -31,6 +31,7 @@
     "react-native-elements": "^0.13.0",
     "react-native-maps": "^0.15.3",
     "react-native-modal-datetime-picker": "^4.8.0",
-    "react-navigation": "^1.0.0-beta.12"
+    "react-navigation": "^1.0.0-beta.12",
+    "websql": "^0.4.4"
   }
 }
