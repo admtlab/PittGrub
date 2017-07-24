@@ -11,7 +11,7 @@ import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 import images from '../config/images';
 
-const createEventURL = 'http://' + settings.server.url + '/events';
+const createEventURL = settings.server.url + '/events';
 
 // styles
 const styles = StyleSheet.create({
@@ -325,8 +325,8 @@ export default class CreateEventView extends React.Component {
               borderRadius={10}
               containerViewStyle={styles.submitButton}
               onPress={() => {
-                this._postEvent('http://db10.cs.pitt.edu:8080/event')
-                this.props.navigation.goBack(null)
+                this._postEvent();
+                this.props.navigation.goBack(null);
             }}/>
           </Col>
         </Grid>

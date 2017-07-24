@@ -5,7 +5,7 @@ import { NavigationActions } from 'react-navigation'
 import { Tabs } from '../containers/Route'
 import settings from '../config/settings';
 
-const LOGIN_ENDPOINT = 'http://' + settings.server.url + '/login';
+const LOGIN_ENDPOINT = settings.server.url + '/login';
 
 export default class Login extends React.Component {
   constructor(props) {

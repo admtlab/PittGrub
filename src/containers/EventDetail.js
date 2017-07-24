@@ -8,7 +8,7 @@ import settings from '../config/settings';
 import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 
-const server = 'http://' + settings.server.url;
+const server = settings.server.url;
 
 const styles = StyleSheet.create({
     description_text: {

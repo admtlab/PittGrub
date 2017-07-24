@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const LOGIN_ENDPOINT = 'http://' + settings.server.url + '/login';
+const LOGIN_ENDPOINT = settings.server.url + '/login';
 
 const TOKEN_ENDPOINT = settings.server.url + '/token';
 

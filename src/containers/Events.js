@@ -1,12 +1,15 @@
 import React from 'react'
 import { RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
 import metrics from '../config/metrics'
+import settings from '../config/settings';
 import { colors } from '../config/styles'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { List, ListItem, SearchBar } from 'react-native-elements'
 import ActionButton from 'react-native-action-button'
 import images from '../config/images'
 import lib from '../lib/scripts'
+
+const eventsURL = settings.server.url + '/events';
 
 // styles
 const styles = StyleSheet.create({
@@ -104,7 +107,7 @@ class Events extends React.Component {
 
   // fetch event data from server
   getEvents() {
-    return fetch('http://localhost:8080/events', { method: 'GET' })
+    return fetch(eventsURL, { method: 'GET' })
       .then((response) => response.json())
       .then((responseData) => {
         console.log("Successfully fetched events");
@@ -117,6 +120,7 @@ class Events extends React.Component {
       })
       .catch((error) => {
         console.log('failed fetch');
+        console.log(error);
       })
       .done();
   }

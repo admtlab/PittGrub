@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const recommendedURL = 'http://' + settings.server.url + '/events/recommended/';
-const acceptedURL = 'http://' + settings.server.url + '/events/accepted/';
+const recommendedURL = settings.server.url + '/events/recommended/';
+const acceptedURL = settings.server.url + '/events/accepted/';
 
 class Home extends React.Component {
   constructor(props) {
@@ -405,6 +405,7 @@ class Home extends React.Component {
       })
       .catch((error) => {
         console.log('failed fetching recommended');
+        console.log(error);
       }).done();
 
       // get accepted
@@ -418,7 +419,8 @@ class Home extends React.Component {
         console.log('set accepted source')        
       })
       .catch((error) => {
-        console.log('failed fetching accepted')
+        console.log('failed fetching accepted');
+        console.log(error);
       }).done();
 
       // done loading
