@@ -85,13 +85,13 @@ export default class App extends React.Component {
           'New event: ' + notification.title,
           'body: ' + notification.body + '  data: ' + notification.data,
           {text: 'OK'});
-        Notifications.scheduleLocalNotificationAsync(this.state.notification, {time: Date().getTime()+5000})
+        // Notifications.scheduleLocalNotificationAsync(this.state.notification, {time: Date().getTime()+5000});
     } else {
       Notifications.presentLocalNotificationAsync(this.state.notification);
     }
-    Notifications.getBadgeNumberAsync()
-      .then((badgeCount) => 
-        Notifications.setBadgeNumberAsync(badgeCount+1));
+    // Notifications.getBadgeNumberAsync()
+    //   .then((badgeCount) => 
+    //     Notifications.setBadgeNumberAsync(badgeCount+1));
   }
 
   render() {

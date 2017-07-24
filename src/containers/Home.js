@@ -88,7 +88,7 @@ const acceptedURL = settings.server.url + '/events/accepted/';
 
 class Home extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
 
     this.state = {
