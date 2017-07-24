@@ -471,7 +471,7 @@ class Home extends React.Component {
           <Image source={images.clearLogo} style={styles.logo} />
         </View> */}
 
-        <ScrollView style={{ maxHeight: metrics.screenHeight - metrics.tabBarHeight, paddingBottom: 200 + metrics.tabBarHeight }}
+        <ScrollView style={{ maxHeight: metrics.screenHeight - metrics.tabBarHeight, paddingBottom: 150 + metrics.tabBarHeight, marginBottom: metrics.tabBarHeight + 100 }}
         refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
@@ -532,6 +532,7 @@ class Home extends React.Component {
             removeClippedSubviews={false}       // forces list to render
             dataSource={this.state.recommendedSource}
             renderRow={(row) => this.renderEvent(row)}
+            enableEmptySections={true}
           />
         </ScrollView>
       </View>

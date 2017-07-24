@@ -3,12 +3,15 @@ import React from 'react';
 
 import { View, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
-import metrics from '../config/metrics'
-import colors from '../config/styles'
-import DateTimePicker from 'react-native-modal-datetime-picker'
-import { NavigationActions } from 'react-navigation'
-import lib from '../lib/scripts'
-import images from '../config/images'
+import metrics from '../config/metrics';
+import colors from '../config/styles';
+import settings from '../config/settings';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import { NavigationActions } from 'react-navigation';
+import lib from '../lib/scripts';
+import images from '../config/images';
+
+const createEventURL = 'http://' + settings.server.url + '/events';
 
 // styles
 const styles = StyleSheet.create({
@@ -106,24 +109,35 @@ export default class CreateEventView extends React.Component {
   }
 
 
-  _postEvent = (url) => {
-    fetch(url, {
+  _postEvent = () => {
+    let foodprefs = [];
+    if (this.state.glutenFree)
+      foodprefs.push(1);
+    if (this.state.dairyFree)
+      foodprefs.push(2);
+    if (this.state.vegetarian)
+      foodprefs.push(3);
+    if (this.state.vegan)
+      foodprefs.push(4);
+
+    body = JSON.stringify({
+        title: this.state.title,
+        details: this.state.description,
+        address: this.state.address,
+        location: this.state.location_details,
+        servings: parseInt(this.state.serving),
+        start_date: this.state.startDate,
+        end_date: this.state.endDate,
+        food_preferences: foodprefs,
+      })
+    console.log('body: \n' + body)
+    fetch(createEventURL, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        title: this.state.title,
-        details: this.state.description,
-        organization: this.state.organization,
-        address: this.state.address,
-        location: this.state.location_details,
-        servings: this.state.serving,
-        startDate: this.state.startDate,
-        endDate: this.state.endDate,
-
-      })
+      body: body
     })
   }
 

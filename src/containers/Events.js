@@ -189,7 +189,7 @@ class Events extends React.Component {
   render() {
     return (
       <View>
-        <ScrollView style={{ maxHeight: metrics.screenHeight - metrics.tabBarHeight, paddingBottom: 150 + metrics.tabBarHeight}}
+        <ScrollView
           refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
@@ -208,8 +208,8 @@ class Events extends React.Component {
             style={{padding: 0, margin: 0}}
           />
         </ScrollView>
-        {global.user_id !== undefined && global.user_id == 1 &&
-          <ActionButton buttonColor="rgba(231,76,60,1)">
+         {global.user_id !== undefined && global.user_id == 1 && 
+          <ActionButton style={{marginTop: -10}} buttonColor="rgba(231,76,60,1)">
             <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
               this.props.navigation.navigate('CreateEvent');
             }}>
