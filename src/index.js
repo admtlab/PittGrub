@@ -3,16 +3,53 @@
 import React from 'react';
 import { AppRegistry, StyleSheet, Text, View } from 'react-native';
 import { Tabs } from './containers/Route'
+import { Permissions, Notifications } from 'expo';
 import Home from './containers/Home'
+import Login from './containers/Login';
+import Profile from './containers/Profile';
+import settings from './config/settings';
+import sleep from './lib/sleep';
 
 
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
+const TOKEN_ENDPOINT = settings.server.url + '/users/token';
+
+async function registerForPushNotifications() {
+  console.log('check existing status');
+  const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
+  let finalStatus = existingStatus;
+
+  // prompt for permission if not determined
+  console.log('not granted');  
+  if (existingStatus !== 'granted') {
+    const { status } = await Permissions.askAsync(Permissions.REMOTE_NOTIFICATIONS);
+    finalStatus = status;
   }
+
+  // stop here if permission not granted
+  console.log('stop');  
+  if (finalStatus !== 'granted') {
+    return;
+  }
+
+  // get token
+  console.log('get token');  
+  let token = await Notifications.getExponentPushTokenAsync();
+
+  // POST token to server
+  console.log('post to server');  
+  return fetch(TOKEN_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      token: token,
+      user: global.user_id,
+    }),
+  });
+
+  console.log('Token: ' + token);
 }
 
 export default class App extends React.Component {
@@ -20,6 +57,7 @@ export default class App extends React.Component {
     super();
     this.state = {
       isReady: false,
+      notification: {},
     }
   }
 
@@ -30,18 +68,20 @@ export default class App extends React.Component {
   componentWillMount() {
     sleep(3000);
     this.state.isReady = true;
+    this._notificationSubscription = Notifications.addListener(this._handleNotification);
   }
 
-  // componentDidMount() {
-  // }
+  _handleNotification = (notification) => {
+    this.setState({notification: notification});
+  }
 
   render() {
-    return (
+    return(
       <Tabs 
         onNavigationStateChange = {(prevState, newState) => {
           this._onNavigationStateChange(prevState, newState);
         }}
-        screenProps = { this.state }  
+        screenProps = { this.state }
       />
     );
   }

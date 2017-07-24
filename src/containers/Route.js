@@ -2,13 +2,13 @@ import React from 'react';
 import { AppRegistry } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
-
 import Home from './Home'
 import Events from './Events'
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
 import Profile from './Profile'
 import Metrics from '../config/metrics'
+
 
 export const HomeNav = StackNavigator({
   Home: {
@@ -84,14 +84,15 @@ export const Tabs = TabNavigator({
           color={tintColor}
         />,
     }
-  }
+  }}, {
+    initialRouteName: 'ProfileTab'
   }, {
     tabBarOptions: {
       style: {
         height: Metrics.tabBarHeight
       }
     },
-  }
+  },
 );
 
 // export default () =>

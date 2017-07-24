@@ -74,107 +74,7 @@ class Events extends React.Component {
       eventSource: new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1.id !== r2.id
       }),
-      loaded: false,
-      dataObjects: [
-        {
-          title: 'Cathedral Pizzas',
-          start_date: new Date(),
-          end_date: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: images.kitchen
-        },
-        {
-          title: 'Market Central Food Tasting',
-          start_date: new Date(),
-          end_date: new Date(),
-          details: VEGGIE_IPSUM,
-          serving: 20,
-          address: '456 Super Cool Drive',
-          location: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 2,
-              name: "Vegan",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-          ],
-          image: images.restaurant
-        },
-        {
-          title: 'Cathedral Pizzas',
-          start_date: new Date(),
-          end_date: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-          ],
-          image: images.kitchen
-
-        },
-        {
-          title: 'Cathedral Pizzas',
-          start_date: new Date(),
-          end_date: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: images.kitchen
-
-        },
-        {
-          title: 'Cathedral Pizzas',
-          start_date: new Date(),
-          end_date: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: images.kitchen
-
-        }
-      ]
+      loaded: false
     }
 
     this.renderRow = this.renderRow.bind(this);
@@ -204,7 +104,7 @@ class Events extends React.Component {
 
   // fetch event data from server
   getEvents() {
-    return fetch('http://localhost:8080/event', { method: 'GET' })
+    return fetch('http://localhost:8080/events', { method: 'GET' })
       .then((response) => response.json())
       .then((responseData) => {
         console.log("Successfully fetched events");
@@ -226,7 +126,6 @@ class Events extends React.Component {
   }
 
   renderEvent(event) {
-    console.log(this.state.events[0].start_date);
     return(
       <TouchableOpacity
         onPress={() => this.props.navigation.navigate('EventDetail', { ...event })}>
@@ -290,7 +189,7 @@ class Events extends React.Component {
   render() {
     return (
       <View>
-        <ScrollView
+        <ScrollView style={{ maxHeight: metrics.screenHeight - metrics.tabBarHeight, paddingBottom: 150 + metrics.tabBarHeight}}
           refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
@@ -308,13 +207,6 @@ class Events extends React.Component {
             renderRow={(row) => this.renderEvent(row)}
             style={{padding: 0, margin: 0}}
           />
-          <List style={{ padding: 0, margin: 0 }}>
-            {
-              this.state.dataObjects.map((rowData, i) => (
-                this.renderRow(rowData, i)
-              ))
-            }
-          </List>
         </ScrollView>
         <ActionButton buttonColor="rgba(231,76,60,1)">
           <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {

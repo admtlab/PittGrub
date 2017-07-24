@@ -1,12 +1,14 @@
 import React from 'react';
+import { View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { ListItem, Icon, Card, Button, FormLabel, Grid, Col } from 'react-native-elements';
+import metrics from '../config/metrics';
+import { colors } from '../config/styles';
+import images from '../config/images';
+import settings from '../config/settings';
+import { NavigationActions } from 'react-navigation';
+import lib from '../lib/scripts';
 
-import {View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput} from 'react-native'
-import {ListItem, Icon, Card, Button, FormLabel, Grid, Col } from 'react-native-elements'
-import metrics from '../config/metrics'
-import { colors } from '../config/styles'
-import images from '../config/images'
-import { NavigationActions } from 'react-navigation'
-import lib from '../lib/scripts'
+const server = 'http://' + settings.server.url;
 
 const styles = StyleSheet.create({
     description_text: {
@@ -94,7 +96,7 @@ export default class EventDetail extends React.Component {
                    
                     <Text style={styles.header_text}>Food Preferences</Text>
                     {
-                        this.props.navigation.state.params['foodPreferences'].map((obj, i) => {
+                        this.props.navigation.state.params['food_preferences'].map((obj, i) => {
                             return (
                                 <View key={i} style={{
                                     paddingTop: 5,
@@ -119,8 +121,16 @@ export default class EventDetail extends React.Component {
                         buttonStyle={{borderRadius: 10}}
                         onPress={
                             () => {
-                                console.log('Pressed');
-                                return this.props.navigation.goBack(null)
+                                console.log('Signed up for ' + this.props.navigation.state.params.id);
+                                global.refresh = true;
+                                fetch(server + '/events/' + this.props.navigation.state.params.id + '/accept/' + global.user_id, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'application/json',
+                                    }
+                                });
+                                return this.props.navigation.goBack(null);
                             }
                             }
                         title='SIGN ME UP' />
