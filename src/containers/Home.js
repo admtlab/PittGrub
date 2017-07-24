@@ -451,11 +451,9 @@ class Home extends React.Component {
     fetch(url)
       .then((response) => response.json())
       .then((responseJson) => {
-        console.log(responseJson)
         this.setState({ dataObjects: responseJson._embedded.events })
       })
       .catch(function (error) {
-        console.log(error);
       })
       .done();
   }
@@ -527,7 +525,7 @@ class Home extends React.Component {
           </List> */}
 
           {/* new */}
-          <View style={styles.banner}>
+          <View style={styles.banner2}>
             <Text style={styles.bannerLabel}> {'Recommended (' + this.state.recommendedSource.getRowCount() + ')'}</Text>
           </View>
           <ListView

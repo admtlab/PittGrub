@@ -208,13 +208,14 @@ class Events extends React.Component {
             style={{padding: 0, margin: 0}}
           />
         </ScrollView>
-        <ActionButton buttonColor="rgba(231,76,60,1)">
-          <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
-            this.props.navigation.navigate('CreateEvent');
-          }}>
-            <Icon name="md-create" style={styles.actionButtonIcon} />
-          </ActionButton.Item>
-        </ActionButton>
+        {global.user_id !== undefined && global.user_id == 1 &&
+          <ActionButton buttonColor="rgba(231,76,60,1)">
+            <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
+              this.props.navigation.navigate('CreateEvent');
+            }}>
+              <Icon name="md-create" style={styles.actionButtonIcon} />
+            </ActionButton.Item>
+          </ActionButton>}
       </View>
     )
   }
