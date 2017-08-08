@@ -39,6 +39,7 @@ export default class Login extends React.Component {
       }).done(() => {
         console.log('global user id is: ' + global.user_id);
         console.log('navigating to tabs');
+        this.props.navigation.navigate('Tab');
       });
     }
   }

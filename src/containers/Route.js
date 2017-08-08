@@ -4,6 +4,7 @@ import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import Home from './Home'
 import Events from './Events'
+import Login from './Login'
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
 import Profile from './Profile'
@@ -13,11 +14,11 @@ import Metrics from '../config/metrics'
 export const HomeNav = StackNavigator({
   Home: {
     screen: Home,
-    navigationOptions: {
+    navigationOptions:({navigation}) => ({
       title: 'PittGrub',
       headerBackTitle: 'Home',
       // header: false
-    }
+    })
   },
   EventDetail: {
     screen: EventDetail,
@@ -85,7 +86,7 @@ export const Tabs = TabNavigator({
         />,
     }
   }}, {
-    initialRouteName: 'ProfileTab'
+    // initialRouteName: 'ProfileTab'
   }, {
     tabBarOptions: {
       style: {
@@ -94,6 +95,29 @@ export const Tabs = TabNavigator({
     },
   },
 );
+
+export class TabScreen extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  _onNavigationStateChange = (prevState, newState) => {
+    this.setState({...this.state, route_index: newState.index});
+  }
+
+  render() {
+    return(
+      <Tabs 
+        onNavigationStateChange = {(prevState, newState) => {
+          this._onNavigationStateChange(prevState, newState);
+        }}
+        screenProps = { this.state }
+      />
+    );
+  };
+}
+
+
 
 // export default () =>
 //   <Tabs

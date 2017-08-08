@@ -81,7 +81,6 @@ export default class CreateEventView extends React.Component {
     this._handleStartDatePicked = this._handleStartDatePicked.bind(this);
     this._handleEndDatePicked = this._handleEndDatePicked.bind(this);
     this._postEvent = this._postEvent.bind(this);
-
   }
 
   _showDateTimePickerStart = () => this.setState({ isDateTimePickerStartVisible: true });
