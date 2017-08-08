@@ -152,7 +152,7 @@ class SignupScreen extends React.Component {
               <TextInput
                 style={styles.input}
                 marginLeft={60}
-                placeholder = "Enter a New Password"
+                placeholder = "Pick a Secure Password"
                 placeholderTextColor = '#333'
                 inputStyle={{fontSize: 20}}
                 returnKeyType = "next"
@@ -234,7 +234,9 @@ class LoginScreen extends React.Component {
         global.jwt_expires = responseData['expires'];
         global.user_id = responseData['user']['id'];
         global.activated = responseData['user']['active'];
-        if (!responseData['active']) {
+      })
+      .then(() => {
+        if (!global.activated) {
           this.props.navigation.navigate('Activation');
         } else {
           this.props.navigation.navigate('Home');
