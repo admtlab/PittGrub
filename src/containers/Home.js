@@ -8,6 +8,7 @@ import lib from '../lib/scripts';
 import { List, ListItem } from 'react-native-elements'
 import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons';
+import registerForPushNotifications from '../';
 
 
 const styles = StyleSheet.create({
@@ -470,6 +471,7 @@ class Home extends React.Component {
     if (!this.state.loaded) {
       this.getEvents();
     }
+    registerForPushNotifications();
     return (
       <View>
         <StatusBar
