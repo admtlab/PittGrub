@@ -479,8 +479,8 @@ class ActivationScreen extends React.Component {
         if (response.ok) {
           activateUser();
           console.log('user successfully activated');
+          registerForPushNotifications();          
           this.props.navigation.navigate('Home');
-          registerForPushNotifications();
         }
       })
       .catch((error) => {

@@ -471,7 +471,7 @@ class Home extends React.Component {
     if (!this.state.loaded) {
       this.getEvents();
     }
-    registerForPushNotifications();
+    // registerForPushNotifications();
     return (
       <View>
         <StatusBar
