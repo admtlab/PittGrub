@@ -125,6 +125,7 @@ export default class EventDetail extends React.Component {
               global.refresh = true;
               AsyncStorage.getItem('user')
                 .then((user) => {
+                  user = JSON.parse(user);
                   fetch(server + '/events/' + this.props.navigation.state.params.id + '/accept/' + user.id, {
                     method: 'POST',
                     headers: {

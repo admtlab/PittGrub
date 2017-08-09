@@ -112,6 +112,7 @@ class Events extends React.Component {
       .then((response) => response.json())
       .then((responseData) => {
         console.log("Successfully fetched events");
+        console.log(responseData);
         const events = responseData['_embedded']['events'];
         this.setState({
           eventSource: this.state.eventSource.cloneWithRows(events),
