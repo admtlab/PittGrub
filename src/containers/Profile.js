@@ -4,6 +4,8 @@ import {
   Switch,
   ScrollView,
   Text,
+  Linking,
+  WebView,
   Image,
   View,
   TouchableHighlight,
@@ -61,48 +63,8 @@ const styles = StyleSheet.create({
 });
 
 const LOGIN_ENDPOINT = settings.server.url + '/login';
-
 const TOKEN_ENDPOINT = settings.server.url + '/token';
-
-async function registerForPushNotifications() {
-  console.log('check existing status');
-  const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
-  let finalStatus = existingStatus;
-
-  // prompt for permission if not determined
-  console.log('not granted');  
-  if (existingStatus !== 'granted') {
-    const { status } = await Permissions.askAsync(Permissions.REMOTE_NOTIFICATIONS);
-    finalStatus = status;
-  }
-
-  // stop here if permission not granted
-  console.log('stop');
-  console.log('status: ' + finalStatus);
-  if (finalStatus !== 'granted') {
-    return;
-  }
-
-  // get token
-  console.log('get token');  
-  let token = await Notifications.getExponentPushTokenAsync();
-
-  // POST token to server
-  console.log('post to server');  
-  return fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: token,
-      user: global.user_id,
-    }),
-  });
-
-  console.log('Token: ' + token);
-}
+const FEEDBACK_LINK = 'pittgrub.org';
 
 class Profile extends React.Component {
   constructor(props) {
@@ -128,72 +90,9 @@ class Profile extends React.Component {
     }
   }
 
-  login() {
-    if (this.state.email !== '' && this.state.password !== '') {
-      fetch(LOGIN_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: this.state.email,
-          password: this.state.password,
-        }),
-      })
-      .then((response) => response.json())
-      .then((responseData) => {
-        global.user_id = responseData['user'];
-      })
-      .then(() => {
-        console.log('global user id is: ' + global.user_id);
-        Alert.alert(
-          'Success',
-          'Logged in as id: ' + global.user_id,
-          {text: 'OK'});
-        console.log('registering for push notifications');
-        registerForPushNotifications();
-      })
-      .catch((error) => {
-        console.log('failed login');
-      }).done(() =>{
-      });
-    }
-  }
-
   render() {
     return (
       <ScrollView style={styles.viewContainer}>
-        {/* Login config */}
-        <FormLabel labelStyle={styles.title}>Login</FormLabel>
-        <TextInput
-          style={styles.input}
-          placeholder='Email'
-          inputStyle={{ color: '#607D8B', fontSize: 15 }}
-          returnKeyType="next"
-          keyboardType='email-address'
-          autoCorrect={false}
-          autoCapitalize="none"
-          onChangeText={(text) => this.setState({ email: text })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          inputStyle={{ color: '#607D8B', fontSize: 15 }}
-          returnKeyType="go"
-          onChangeText={(text) => this.setState({ password: text })}>
-        </TextInput>
-        <Button
-          title='LOGIN'
-          backgroundColor='#009688'
-          borderRadius={10}
-          containerViewStyle={styles.submitButton}
-          onPress={() => {
-            this.login();
-          }}
-        />
-
         {/* Food preference settings */}
         <FormLabel labelStyle={styles.title}>Food Preferences</FormLabel>
         <Text

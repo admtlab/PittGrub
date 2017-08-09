@@ -1,5 +1,5 @@
 import React from 'react'
-import { Alert, RefreshControl, StatusBar, ScrollView, Text, Image, ListView, View, TouchableOpacity, StyleSheet } from 'react-native'
+import { AsyncStorage, Alert, RefreshControl, StatusBar, ScrollView, Text, Image, ListView, View, TouchableOpacity, StyleSheet } from 'react-native'
 import metrics from '../config/metrics'
 import { colors } from '../config/styles'
 import images from '../config/images'
@@ -329,6 +329,7 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
+    global.refresh = true;
   }
 
   renderRow(rowData) {
@@ -392,42 +393,47 @@ class Home extends React.Component {
   }
 
   getEvents() {
-    if (global.user_id !== undefined) {
-      // get recommended
-      fetch(recommendedURL+global.user_id, { method: 'GET' })
-      .then((response) => response.json())
-      .then((responseData) => {
-        console.log("Fetched recommended events");
-        var events = responseData['_embedded']['events'];
-        console.log('read recommended events');
-        this.setState({recommendedSource: this.state.recommendedSource.cloneWithRows(events)});
-        console.log('set recommended source')        
-      })
-      .catch((error) => {
-        console.log('failed fetching recommended');
-        console.log(error);
-      }).done();
+    AsyncStorage.getItem('user')
+    .then((user) => {
+      user = JSON.parse(user);
+      console.log('getting home events');
+      if (user !== undefined && user !== null) {
+        // get recommended
+        fetch(recommendedURL+user.id, { method: 'GET' })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("Fetched recommended events");
+          var events = responseData['_embedded']['events'];
+          console.log('read recommended events');
+          this.setState({recommendedSource: this.state.recommendedSource.cloneWithRows(events)});
+          console.log('set recommended source')        
+        })
+        .catch((error) => {
+          console.log('failed fetching recommended');
+          console.log(error);
+        }).done();
 
-      // get accepted
-      fetch(acceptedURL+global.user_id, { method: 'GET' })
-      .then((response) => response.json())
-      .then((responseData) => {
-        console.log("fetched accepted events");
-        var events = responseData['_embedded']['events'];
-        console.log('read accepted events')
-        this.setState({acceptedSource: this.state.acceptedSource.cloneWithRows(events)});
-        console.log('set accepted source')        
-      })
-      .catch((error) => {
-        console.log('failed fetching accepted');
-        console.log(error);
-      }).done();
+        // get accepted
+        fetch(acceptedURL+user.id, { method: 'GET' })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("fetched accepted events");
+          var events = responseData['_embedded']['events'];
+          console.log('read accepted events')
+          this.setState({acceptedSource: this.state.acceptedSource.cloneWithRows(events)});
+          console.log('set accepted source')        
+        })
+        .catch((error) => {
+          console.log('failed fetching accepted');
+          console.log(error);
+        }).done();
 
-      // done loading
-      this.setState({ loaded: true });
+        // done loading
+        this.setState({ loaded: true });
 
-      return;
-    }
+        return;
+      }
+    });
   }
 
   testnav = () => {
@@ -461,6 +467,9 @@ class Home extends React.Component {
   }
 
   render() {
+    if (!this.state.loaded) {
+      this.getEvents();
+    }
     return (
       <View>
         <StatusBar
@@ -502,11 +511,16 @@ class Home extends React.Component {
           <View style={styles.banner}>
             <Text style={styles.bannerLabel}> {'My Events (' + this.state.acceptedSource.getRowCount() + ')'}</Text>
           </View>
-          <ListView
-            removeClippedSubviews={false}       // forces list to render
-            dataSource={this.state.acceptedSource}
-            renderRow={(row) => this.renderEvent(row)}
-          />
+          {this.state.acceptedSource.getRowCount() == 0 &&
+            <Text fontSize={18}>You have not signed up for any events yet. Check out what's available!</Text>
+          }
+          {this.state.acceptedSource.getRowCount() > 0 &&
+            <ListView
+              removeClippedSubviews={false}       // forces list to render
+              dataSource={this.state.acceptedSource}
+              renderRow={(row) => this.renderEvent(row)}
+            />
+          }
 
           {/* old */}          
           {/* <View style={styles.banner2}>
@@ -530,12 +544,17 @@ class Home extends React.Component {
           <View style={styles.banner2}>
             <Text style={styles.bannerLabel}> {'Recommended (' + this.state.recommendedSource.getRowCount() + ')'}</Text>
           </View>
-          <ListView
-            removeClippedSubviews={false}       // forces list to render
-            dataSource={this.state.recommendedSource}
-            renderRow={(row) => this.renderEvent(row)}
-            enableEmptySections={true}
-          />
+          {this.state.recommendedSource.getRowCount() == 0 &&
+            <Text fontSize={18}>There are no events currently. You will be notified for newly added events!</Text>
+          }
+          {this.state.recommendedSource.getRowCount() >= 0 &&
+            <ListView
+              removeClippedSubviews={false}       // forces list to render
+              dataSource={this.state.recommendedSource}
+              renderRow={(row) => this.renderEvent(row)}
+              enableEmptySections={true}
+            />
+          }
         </ScrollView>
       </View>
     )

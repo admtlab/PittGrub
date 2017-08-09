@@ -1,5 +1,5 @@
 import React from 'react'
-import { RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
+import { AsyncStorage, RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
 import metrics from '../config/metrics'
 import settings from '../config/settings';
 import { colors } from '../config/styles'
@@ -77,7 +77,8 @@ class Events extends React.Component {
       eventSource: new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1.id !== r2.id
       }),
-      loaded: false
+      loaded: false,
+      createButton: false,      
     }
 
     this.renderRow = this.renderRow.bind(this);
@@ -211,7 +212,7 @@ class Events extends React.Component {
             style={{padding: 0, margin: 0}}
           />
         </ScrollView>
-         {global.user_id !== undefined && global.user_id == 1 && 
+         {global.admin && 
           <ActionButton style={{marginTop: -10}} buttonColor="rgba(231,76,60,1)">
             <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
               this.props.navigation.navigate('CreateEvent');

@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Animated, AppState, Alert, AppRegistry, Image, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { ActivityIndicator, AsyncStorage, Animated, AppState, Alert, AppRegistry, Image, ImageBackground, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 import { Button, Col, FormLabel, FormInput, Grid} from 'react-native-elements';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 // import { Tabs } from './containers/Route'
@@ -16,11 +16,35 @@ import metrics from './config/metrics';
 import sleep from './lib/sleep';
 
 
-const TOKEN_ENDPOINT = settings.server.url + '/users/token';
+const TOKEN_ENDPOINT = settings.server.url + '/token';
 const SIGNUP_ENDPOINT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
 
+
+async function getToken() {
+  const token = await AsyncStorage.getItem('jwt');
+  return JSON.parse(token);
+}
+
+async function storeToken(token) {
+  await AsyncStorage.setItem('jwt', JSON.stringify(token));
+}
+
+async function getUser() {
+  const user = await AsyncStorage.getItem('user');
+  return JSON.parse(user);
+}
+
+async function storeUser(userId, activated, admin) {
+  const user = JSON.stringify({id: userId, activated: activated, admin: admin});
+  await AsyncStorage.setItem('user', user);
+}
+
+async function activateUser() {
+  const activated = JSON.stringify({activated: true});
+  await AsyncStorage.mergeItem('user', activated);
+}
 
 async function registerForPushNotifications() {
   console.log('check existing status');
@@ -35,7 +59,8 @@ async function registerForPushNotifications() {
   }
 
   // stop here if permission not granted
-  console.log('stop');  
+  console.log('stop');
+  console.log('status: ' + finalStatus);
   if (finalStatus !== 'granted') {
     return;
   }
@@ -45,22 +70,81 @@ async function registerForPushNotifications() {
   let token = await Notifications.getExponentPushTokenAsync();
 
   // POST token to server
-  console.log('post to server');  
-  return fetch(TOKEN_ENDPOINT, {
+  console.log('post to server');
+  getUser()
+  .then((user) => {
+    return fetch(TOKEN_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: token,
+        user: user.id,
+      }),
+    });
+
+    console.log('Token: ' + token);
+  });
+}
+
+// async function registerForPushNotifications() {
+//   console.log('check existing status');
+//   const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
+//   let finalStatus = existingStatus;
+
+//   // prompt for permission if not determined
+//   console.log('not granted');  
+//   if (existingStatus !== 'granted') {
+//     const { status } = await Permissions.askAsync(Permissions.REMOTE_NOTIFICATIONS);
+//     finalStatus = status;
+//   }
+
+//   // stop here if permission not granted
+//   console.log('stop');  
+//   if (finalStatus !== 'granted') {
+//     return;
+//   }
+
+//   // get token
+//   console.log('get token');  
+//   let token = await Notifications.getExponentPushTokenAsync();
+
+//   // POST token to server
+//   console.log('post to server');  
+//   return fetch(TOKEN_ENDPOINT, {
+//     method: 'POST',
+//     headers: {
+//       'Accept': 'application/json',
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//       token: token,
+//       user: await getUser().id,
+//     }),
+//   });
+
+//   console.log('Token: ' + token);
+// }
+
+function fetchToken(email, password) {
+  fetch(LOGIN_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      token: token,
-      user: global.user_id,
+      email: email,
+      password: password,
     }),
+  })
+  .then((response) => response.json())
+  .then((responseData) => {
+    storeToken({token: responseData['token'], expires: responseData['expires']});
   });
-
-  console.log('Token: ' + token);
 }
-
 
 class AppScreen extends React.Component {
   render() {
@@ -80,6 +164,7 @@ class SignupScreen extends React.Component {
     super();
     this.state = {
       loading: false,
+      alreadyExists: false,
       email: '',
       password: '',
       confirmPassword: '',
@@ -89,6 +174,7 @@ class SignupScreen extends React.Component {
 
   signup() {
     if (this.state.email !== '' && this.state.password !== '') {
+      let activated = false;
       fetch(SIGNUP_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -102,17 +188,31 @@ class SignupScreen extends React.Component {
       })
       .then((response) => response.json())
       .then((responseData) => {
-        console.log(responseData);
-        global.user_id = responseData['id'];
-        global.activated = responseData['active'];
-        console.log('user_id: ' + global.user_id);
-        console.log('activated: ' + global.activated);
+        if (responseData.status !== undefined && responseData.status == 400) {
+          const message = responseData['message'];
+          console.log(message);
+          if (message.startsWith('User already exists')) {
+            this.setState({ alreadyExists: true });
+          }
+        } else {
+          console.log(responseData);
+          this.setState({ alreadyExists: false });
+          const userId = responseData['id'];
+          const admin = responseData['admin'];
+          activated = responseData['active'];
+          global.admin = admin;          
+          storeUser(userId, activated, admin)
+          .then(() => {
+            fetchToken(this.state.email, this.state.password);
+          });
+        }
       })
       .then(() => {
         this.setState({ loading: false });
-        if (global.activated) {
+        if (activated) {
           this.props.navigation.navigate('Home');
-        } else {
+          registerForPushNotifications();
+        } else if (!this.state.alreadyExists) {
           this.props.navigation.navigate('Activation');
         }
       })
@@ -152,6 +252,7 @@ class SignupScreen extends React.Component {
               <TextInput
                 style={styles.input}
                 marginLeft={60}
+                secureTextEntry
                 placeholder = "Pick a Secure Password"
                 placeholderTextColor = '#333'
                 inputStyle={{fontSize: 20}}
@@ -184,18 +285,21 @@ class SignupScreen extends React.Component {
                     backgroundColor='rgb(247, 229, 59)'
                     onPress={() => {
                       this.setState({ loading: true });
-                      this.signup()
+                      this.signup();
                     }}
                     style={{width: 150, height: 80, alignItems: 'center'}} />
                 </Col>
                </Grid>}
                 {this.state.loading &&
                   <ActivityIndicator
-                    color='#fff' />
+                    color='#fff'
+                    marginTop={300} />
                 }
             </View>
               {this.state.alreadyExists && 
-                <Text fontSize={18} color='purple'>Email already in use</Text>
+                <View>
+                  <Text fontSize={18} color='purple' backgroundColor='rgba(0,0,0,0)' marginTop={200} >Email already in use</Text>
+                </View>
               }
           </Image>
       </View>
@@ -215,6 +319,7 @@ class LoginScreen extends React.Component {
 
   login() {
     if (this.state.email !== '' && this.state.password !== '') {
+      let activated = false;
       fetch(LOGIN_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -228,20 +333,33 @@ class LoginScreen extends React.Component {
       })
       .then((response) => response.json())
       .then((responseData) => {
-        console.log(responseData);
-        this.setState({ loading: false });
-        global.jwt = responseData['token'];
-        global.jwt_expires = responseData['expires'];
-        global.user_id = responseData['user']['id'];
-        global.activated = responseData['user']['active'];
+        if (responseData.status !== undefined && responseData.status >= 400) {
+          const message = responseData['message'];
+          console.log(message);
+        } else {
+          console.log('in login');
+          console.log(responseData);
+          this.setState({ loading: false });
+          activated = responseData['user']['active'];
+          storeToken({token: responseData['token'], expires: responseData['expires']});
+          storeUser(responseData['user']['id'], activated, responseData['user']['admin']);
+          global.admin = responseData['user']['admin'];
+        }
       })
       .then(() => {
-        if (!global.activated) {
-          this.props.navigation.navigate('Activation');
-        } else {
+        if (activated) {
           this.props.navigation.navigate('Home');
+          registerForPushNotifications();
+        } else {
+          this.props.navigation.navigate('Activation');
         }
-      });
+      })
+      .catch((error) => {
+        console.log('error loggin in');
+      })
+      .done(() => {
+        this.setState({ loading: false });
+      })
     }
   }
 
@@ -341,6 +459,7 @@ class ActivationScreen extends React.Component {
   constructor() {
     super();
     this.state = {
+      loading: false,
       activationCode: ''
     };
   }
@@ -356,13 +475,19 @@ class ActivationScreen extends React.Component {
           activation: this.state.activationCode,
         }),
       })
-      .then(() => {
-        global.activated = true;
-        console.log('user successfully activated');
-        this.props.navigation.navigate('Home');
+      .then((response) => {
+        if (response.ok) {
+          activateUser();
+          console.log('user successfully activated');
+          this.props.navigation.navigate('Home');
+          registerForPushNotifications();
+        }
       })
       .catch((error) => {
         console.log('failed activation');
+      })
+      .done(() => {
+        this.setState({ loading: false })
       });
   }
 
@@ -390,21 +515,39 @@ class ActivationScreen extends React.Component {
             value={this.state.activationCode}
           />
           <Text height={0}>{'\n'}</Text>
-          <Button
-            title="ENTER"
-            raised
-            fontSize={18}
-            color='#333333'
-            height={10}
-            paddingHorizontal={0}
-            backgroundColor='rgb(247, 229, 59)'
-            containerStyle={{backgroundColor: 'rgb(247, 229, 59)'}}
-            onPress={() => {
-              if (this.state.activationCode !== '' && this.state.activationCode.length == 6) {
-                this.activateUser()
-              }
-            }}
-            style={{alignItems: 'center'}} />
+          {!this.state.loading &&          
+            <Grid>
+              <Col style={{height: 0}}>
+                <Button
+                  title="RESEND"
+                  large
+                  raised
+                  fontSize={20}
+                  color='#333333'
+                  backgroundColor='rgb(247, 229, 59)'
+                  onPress={() => this.props.navigation.goBack(null)}
+                  style={{width: 150, height: 80, alignItems: 'center'}} />
+              </Col>
+              <Col style={{height: 0}}>
+                <Button
+                  title="ENTER"
+                  large
+                  raised
+                  fontSize={20}
+                  color='#333333'
+                  backgroundColor='rgb(247, 229, 59)'
+                  onPress={() => {
+                    if (this.state.activationCode !== '' && this.state.activationCode.length == 6) {
+                      this.setState({ loading: true });
+                      this.activateUser();
+                    }
+                  }}
+                  style={{width: 150, height: 80, alignItems: 'center'}} />
+              </Col>
+            </Grid>}
+          {this.state.loading &&
+            <ActivityIndicator color='#fff' />
+          }
         </Image>
       </View>
     );
@@ -419,12 +562,24 @@ class WelcomeScreen extends React.Component {
     }
   }
   render() {
-    if (global.user_id !== undefined && global.activated == false) {
-      // must activate
-      this.props.navigation.navigate('Activation');
-    } else if (global.user_id !== undefined && global.activated && global.jwt !== undefined) {
-      this.props.navigation.navigate('Home');
-    }
+    getUser()
+    .then((user) => {
+      if (user !== null && user !== undefined) {
+        if (user.activated) {
+          getToken()
+          .then((token) => {
+            if (token !== null && token !== undefined) {
+              console.log('navigate to home');
+              this.props.navigation.navigate('Home');
+            }
+          })
+        } else if (user.activated !== null && user.activated !== undefined) {
+          console.log('navigate to activation');
+          console.log(user);
+          this.props.navigation.navigate('Activation');
+        }
+      }
+    });
     // must log in or sign up
       return(
         <View
@@ -495,7 +650,7 @@ const AppNav = StackNavigator({
     }),
   },
 }, {
-  mode: 'modal',
+  mode: 'card',
   headerMode: 'none',
   transitionConfig: () => {
     transitionSpec: {
@@ -522,6 +677,8 @@ class App extends React.Component {
     sleep(3000);
     this.setState({ isReady: true, appState: 'active'});
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
+    storeToken(null);
+    storeUser(null);
   }
 
   componentDidMount() {
@@ -549,9 +706,7 @@ class App extends React.Component {
 
   render() {
     // const { navigate } = this.props.navigation;
-    return(
-      <AppNav />
-    );
+    return(<AppNav />);
   }
 }
 
