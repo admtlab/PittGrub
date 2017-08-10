@@ -588,7 +588,7 @@ class WelcomeScreen extends React.Component {
             source={images.enter}
             style={{flex: 1, width: metrics.width, height: metrics.height, resizeMode: 'cover'}}>
             <Grid>
-              <Col style={{marginTop: 400, height: 0}}>
+              <Col style={{marginTop: 400, height: 0, backgroundColor: 'transparent'}}>
                 <Button
                   title="SIGN UP"
                   large
@@ -596,20 +596,23 @@ class WelcomeScreen extends React.Component {
                   fontSize={20}
                   color='#333333'
                   height={80}
+                  borderRadius={10}
                   backgroundColor='rgb(247, 229, 59)'
                   onPress={() => this.props.navigation.navigate('Signup')}
                   style={{width: 150, height: 80, alignItems: 'center'}} />
               </Col>
-              <Col style={{marginTop: 400, paddingHorizontal: 10, height: 0}}>
+              <Col style={{marginTop: 400, height: 0, backgroundColor: 'transparent'}}>
                 <Button
                   title="LOG IN"
                   large
                   raised
                   fontSize={20}
+                  borderRadius={10}
                   color='#333333'
+                  width={200}
                   backgroundColor='rgb(247, 229, 59)'
                   onPress={() => this.props.navigation.navigate('Login')}
-                  style={{width: 150, height: 80, alignItems: 'center'}} />
+                  style={{height: 80, alignItems: 'center'}} />
               </Col>
             </Grid>
             </Image>
