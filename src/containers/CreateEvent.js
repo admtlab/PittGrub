@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 
-import { View, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
+import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
 import metrics from '../config/metrics';
 import colors from '../config/styles';
@@ -10,8 +10,10 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 import images from '../config/images';
+import { ImagePicker } from 'expo';
 
 const createEventURL = settings.server.url + '/events';
+const { width, height } = Dimensions.get('window')
 
 // styles
 const styles = StyleSheet.create({
@@ -58,6 +60,7 @@ export default class CreateEventView extends React.Component {
     super(props);
 
     this.state = {
+      image: null,
       glutenFree: false,
       dairyFree: false,
       vegetarian: false,
@@ -71,7 +74,8 @@ export default class CreateEventView extends React.Component {
       location_details: '',
       address: '',
       serving: 0,
-      description: ''
+      description: '',
+      eventId: null
     }
 
     this._showDateTimePickerEnd = this._showDateTimePickerEnd.bind(this);
@@ -81,6 +85,8 @@ export default class CreateEventView extends React.Component {
     this._handleStartDatePicked = this._handleStartDatePicked.bind(this);
     this._handleEndDatePicked = this._handleEndDatePicked.bind(this);
     this._postEvent = this._postEvent.bind(this);
+    this._getImage = this._getImage.bind(this);
+    this._postImage = this._postImage.bind(this);
   }
 
   _showDateTimePickerStart = () => this.setState({ isDateTimePickerStartVisible: true });
@@ -107,7 +113,6 @@ export default class CreateEventView extends React.Component {
 
   }
 
-
   _postEvent = () => {
     let foodprefs = [];
     if (this.state.glutenFree)
@@ -120,15 +125,16 @@ export default class CreateEventView extends React.Component {
       foodprefs.push(4);
 
     body = JSON.stringify({
-        title: this.state.title,
-        details: this.state.description,
-        address: this.state.address,
-        location: this.state.location_details,
-        servings: parseInt(this.state.serving),
-        start_date: this.state.startDate,
-        end_date: this.state.endDate,
-        food_preferences: foodprefs,
-      })
+      title: this.state.title,
+      details: this.state.description,
+      address: this.state.address,
+      location: this.state.location_details,
+      servings: parseInt(this.state.serving),
+      start_date: this.state.startDate,
+      end_date: this.state.endDate,
+      food_preferences: foodprefs,
+    });
+
     fetch(createEventURL, {
       method: 'POST',
       headers: {
@@ -137,11 +143,80 @@ export default class CreateEventView extends React.Component {
       },
       body: body
     })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      return json.id;
+    })
+    .then((eventId) => {
+      console.log('POSTing image to event: ' + eventId);
+      this._postImage(eventId);
+    })
+    .catch((error) => {
+      console.log('Error: ' + error);
+    });
+  }
+
+  _getImage = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: false,
+    });
+    console.log(result);
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    }
+  }
+
+  _postImage = (eventId) => {
+    if (this.state.image == null) {
+      return;
+    }
+
+    let imageEndpoint = createEventURL+'/'+eventId+'/images';
+
+    let formData = new FormData();
+    formData.append('image', {
+      uri: this.state.image,
+      name: 'photo.jpeg',
+      type: 'image/jpeg'
+    });
+
+    fetch(createEventURL+'/'+eventId+'/images', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data'
+      },
+      body: formData
+    })
+    .then((response) => {
+      return response.json()
+    })
+    .then((json) => {
+      console.log('image id: ' + json);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
 
   render() {
     return (
       <ScrollView style={styles.viewContainer}>
+        {this.state.image == null &&
+          <Button
+            raised
+            icon={{ name: 'camera', size: 18 }}
+            containerStyle={{ backgroundColor: 'transparent' }}
+            buttonStyle={{ backgroundColor: 'red', borderRadius: 10 }}
+            textStyle={{ textAlign: 'center' }}
+            title={'Add photo'}
+            onPress={this._getImage}
+          />}
+        {this.state.image !== null &&
+          <Image source={{ uri: this.state.image }}
+            style={{ width: width, height: width }} />}
 
         <FormLabel labelStyle={styles.textLabel}>Event Title</FormLabel>
         <FormInput
@@ -265,18 +340,19 @@ export default class CreateEventView extends React.Component {
         />
 
         <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            backgroundColor: '#fff',
-            borderColor: '#ededed',
-            borderWidth: 1,
-            padding: 10,
-            borderRadius: 3,
-            margin: 5,
-            marginRight: 10,
-            marginLeft: 10}}>
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          backgroundColor: '#fff',
+          borderColor: '#ededed',
+          borderWidth: 1,
+          padding: 10,
+          borderRadius: 3,
+          margin: 5,
+          marginRight: 10,
+          marginLeft: 10
+        }}>
           <CheckBox
-            style={{backgroundColor: '#fff'}}
+            style={{ backgroundColor: '#fff' }}
             title='Vegan'
             checked={this.state.vegan}
             onPress={() => {
@@ -287,7 +363,7 @@ export default class CreateEventView extends React.Component {
               }
             }}
             checkedColor='#009688'
-            //containerStyle={styles.checkboxContainer}
+          //containerStyle={styles.checkboxContainer}
           />
           <TouchableHighlight
             style={{
@@ -295,7 +371,8 @@ export default class CreateEventView extends React.Component {
               alignContent: 'center',
               marginTop: -4,
               justifyContent: 'center',
-              alignItems: 'flex-end'}}>
+              alignItems: 'flex-end'
+            }}>
             <Image
               resizeMode='center'
               source={images.info}
@@ -306,18 +383,18 @@ export default class CreateEventView extends React.Component {
         <Grid>
           <Col>
             <Button
-              containerViewStyle={{padding: 0, margin: 0}}
+              containerViewStyle={{ padding: 0, margin: 0 }}
               title='CANCEL'
               backgroundColor='#de342f'
               borderRadius={10}
               containerViewStyle={styles.submitButton}
               onPress={() => {
                 this.props.navigation.goBack(null)
-            }}/>
+              }} />
           </Col>
           <Col>
             <Button
-              containerViewStyle={{padding: 0, margin: 0}}
+              containerViewStyle={{ padding: 0, margin: 0 }}
               title='SUBMIT'
               backgroundColor='#009688'
               borderRadius={10}
@@ -325,7 +402,7 @@ export default class CreateEventView extends React.Component {
               onPress={() => {
                 this._postEvent();
                 this.props.navigation.goBack(null);
-            }}/>
+              }} />
           </Col>
         </Grid>
 

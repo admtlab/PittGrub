@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { AsyncStorage, Dimensions, Image, View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { ListItem, Icon, Card, Button, FormLabel, Grid, Col } from 'react-native-elements';
 import metrics from '../config/metrics';
 import { colors } from '../config/styles';
@@ -9,6 +9,7 @@ import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 
 const server = settings.server.url;
+const { width, height } = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   description_text: {
@@ -46,9 +47,10 @@ export default class EventDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      image: null,
     }
     this._renderFoodPreferences = this._renderFoodPreferences.bind(this)
+    this._getEventImage = this._getEventImage.bind(this);
   }
 
   _renderFoodPreferences(foodName, i) {
@@ -61,12 +63,35 @@ export default class EventDetail extends React.Component {
 
   }
 
+  _getEventImage = () => {
+    const eventId = this.props.navigation.state.params.id;
+    const imageEndpoint = settings.server.url + '/events/' + eventId + '/images/';
+    fetch(imageEndpoint, {
+      method: 'GET',
+    })
+    .then((response) => {
+      return response.json()
+    })
+    .then((json) => {
+      console.log('image id: ' + json);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
   render() {
-    var food_arr = this.props.navigation.state.params.foodPreferences
+    const eventId = this.props.navigation.state.params.id;
+    const imageEndpoint = settings.server.url + '/events/' + eventId + '/images/';
+    var food_arr = this.props.navigation.state.params.foodPreferences;
+    console.log('state: ' + this.state);
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground }}>
-        <Card
-          image={this.props.navigation.state.params.image}>
+        {/* <Card> */}
+          <Image source={{uri: imageEndpoint}}
+            style={{height: width}} />
+          {/* </Card> */}
+        <Card>
           <Text style={styles.title_text}>
             {this.props.navigation.state.params.title}
           </Text>
@@ -74,9 +99,6 @@ export default class EventDetail extends React.Component {
           <Text style={styles.description_text}>
             {this.props.navigation.state.params.details}
           </Text>
-
-
-
         </Card>
         <Card>
           <Text style={styles.header_text}>Location</Text>
