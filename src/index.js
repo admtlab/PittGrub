@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, AsyncStorage, Animated, AppState, Alert, AppRegistry, Image, ImageBackground, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { ActivityIndicator, AsyncStorage, Animated, AppState, Alert, AppRegistry, Dimensions, Image, ImageBackground, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 import { Button, Col, FormLabel, FormInput, Grid} from 'react-native-elements';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 // import { Tabs } from './containers/Route'
@@ -21,6 +21,7 @@ const SIGNUP_ENDPOINT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
 
+var { width, height } = Dimensions.get('window')
 
 async function getToken() {
   const token = await AsyncStorage.getItem('jwt');
@@ -36,8 +37,8 @@ async function getUser() {
   return JSON.parse(user);
 }
 
-async function storeUser(userId, activated, admin) {
-  const user = JSON.stringify({id: userId, activated: activated, admin: admin});
+async function storeUser(user) {
+  user = JSON.stringify(user);
   await AsyncStorage.setItem('user', user);
 }
 
@@ -234,7 +235,7 @@ class SignupScreen extends React.Component {
         style={{flex: 1}}>
           <Image
             source={images.enter}
-            style={{flex: 1, width: metrics.width, height: metrics.height, resizeMode: 'cover'}}>
+            style={{flex: 1, width: width, height: height, resizeMode: 'cover'}}>
             {this.props.children}
             <View>
               <TextInput
@@ -342,7 +343,7 @@ class LoginScreen extends React.Component {
           this.setState({ loading: false });
           activated = responseData['user']['active'];
           storeToken({token: responseData['token'], expires: responseData['expires']});
-          storeUser(responseData['user']['id'], activated, responseData['user']['admin']);
+          storeUser(responseData['user']);
           global.admin = responseData['user']['admin'];
         }
       })
@@ -366,10 +367,7 @@ class LoginScreen extends React.Component {
   render() {
     return(
       <View
-        style={{flex: 1}}>
-          <Image
-            source={images.enter}
-            style={{flex: 1, width: metrics.width, height: metrics.height, resizeMode: 'cover'}}>
+        style={{flex: 1, backgroundColor: '#333333'}}>
             {this.props.children}
             <TextInput
               style={styles.input}
@@ -448,8 +446,7 @@ class LoginScreen extends React.Component {
                 <ActivityIndicator 
                   color='#fff'
                 />
-              */}
-          </Image>        
+              */}   
       </View>
     );
   };
@@ -497,7 +494,7 @@ class ActivationScreen extends React.Component {
         style={{flex: 1}}>
           <Image
             source={images.enter}
-            style={{flexGrow: 1, width: metrics.width, height: metrics.height, resizeMode: 'cover', alignContent: 'center', alignItems: 'center'}}>
+            style={{flexGrow: 1, width: width, height: height, resizeMode: 'cover', alignContent: 'center', alignItems: 'center'}}>
             {this.props.children}
           <TextInput
             style={styles.input}
@@ -586,7 +583,7 @@ class WelcomeScreen extends React.Component {
           style={{flex: 1}}>
           <Image
             source={images.enter}
-            style={{flex: 1, width: metrics.width, height: metrics.height, resizeMode: 'cover'}}>
+            style={{flex: 1, width: width, height: height, resizeMode: 'cover'}}>
             <Grid>
               <Col style={{marginTop: 400, height: 0, backgroundColor: 'transparent'}}>
                 <Button
