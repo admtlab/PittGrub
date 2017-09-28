@@ -195,6 +195,16 @@ class Profile extends React.Component {
             null
           }}
         />
+        <FormLabel labelStyle={styles.title}>Account</FormLabel>
+        <Button
+          title='LOG OUT'
+          backgroundColor='rgba(231,76,60,1)'
+          borderRadius={10}
+          containerViewStyle={styles.submitButton}
+          onPress={() => {
+            null
+          }}
+        />
       </ScrollView>
     );
   }
