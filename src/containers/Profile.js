@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   Alert,
+  AsyncStorage,
   Switch,
   ScrollView,
   Text,
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
 
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const TOKEN_ENDPOINT = settings.server.url + '/token';
+const PREFERENCES_ENDPOINT = settings.server.url + '/users/preferences';
 const FEEDBACK_LINK = 'pittgrub.org';
 
 class Profile extends React.Component {
@@ -78,6 +80,9 @@ class Profile extends React.Component {
       vegetarian: false,
       vegan: false,
     }
+
+    this.getPreferences();
+
   }
 
   testnav = () => {
@@ -88,6 +93,58 @@ class Profile extends React.Component {
     if (newProps.screenProps.route_index === 2) {
       this.testnav();
     }
+  }
+
+  updatePreferences() {
+    var preferences = [];
+    if (this.state.glutenFree) {
+      preferences.push(1);
+    }
+    if (this.state.dairyFree) {
+      preferences.push(2);
+    }
+    if (this.state.vegetarian) {
+      preferences.push(3);
+    }
+    if (this.state.vegan) {
+      preferences.push(4);
+    }
+    fetch(PREFERENCES_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + AsyncStorage.getItem('token')
+      },
+      body: JSON.stringify(preferences)
+    })
+    .then((response) => {
+      console.log('response');
+      console.log(response.status);
+    })
+    .catch((error) => {
+      console.log('Error: ' + error);
+    });
+  }
+
+  getPreferences() {
+    AsyncStorage.getItem('user')
+    .then((user) => {
+      user = JSON.parse(user);
+      let foodPrefs = user.food_preferences;
+      if (foodPrefs.includes(1)) {
+        this.setState({ glutenFree: true });
+      }
+      if (foodPrefs.includes(2)) {
+        this.setState({ dairyFree: true });
+      }
+      if (foodPrefs.includes(3)) {
+        this.setState({ vegetarian: true });
+      }
+      if (foodPrefs.includes(4)) {
+        this.setState({ vegan: true });
+      }
+    });
   }
 
   render() {
@@ -192,7 +249,7 @@ class Profile extends React.Component {
           borderRadius={10}
           containerViewStyle={styles.submitButton}
           onPress={() => {
-            null
+            this.updatePreferences();
           }}
         />
         <FormLabel labelStyle={styles.title}>Account</FormLabel>
@@ -202,7 +259,9 @@ class Profile extends React.Component {
           borderRadius={10}
           containerViewStyle={styles.submitButton}
           onPress={() => {
-            null
+            console.log('Logging out');
+            AsyncStorage.removeItem('jwt');
+            AsyncStorage.removeItem('user');
           }}
         />
       </ScrollView>
