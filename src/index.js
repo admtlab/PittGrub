@@ -176,6 +176,8 @@ class SignupScreen extends React.Component {
   signup() {
     if (this.state.email !== '' && this.state.password !== '') {
       let activated = false;
+      let accepted = false;
+      let status = '';
       fetch(SIGNUP_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -201,6 +203,7 @@ class SignupScreen extends React.Component {
           const userId = responseData['id'];
           const admin = responseData['admin'];
           activated = responseData['active'];
+          status = responseData['status'];
           global.admin = admin;          
           storeUser(userId, activated, admin)
           .then(() => {
@@ -210,10 +213,12 @@ class SignupScreen extends React.Component {
       })
       .then(() => {
         this.setState({ loading: false });
-        if (activated) {
+        if (status !== "ACCEPTED") {
+          this.props.navigation.navigate('Waiting');
+        } else if (activated) {
           this.props.navigation.navigate('Home');
-          registerForPushNotifications();
         } else if (!this.state.alreadyExists) {
+          registerForPushNotifications();
           this.props.navigation.navigate('Activation');
         }
       })
@@ -321,6 +326,7 @@ class LoginScreen extends React.Component {
   login() {
     if (this.state.email !== '' && this.state.password !== '') {
       let activated = false;
+      let status = '';
       fetch(LOGIN_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -342,17 +348,20 @@ class LoginScreen extends React.Component {
           console.log(responseData);
           this.setState({ loading: false });
           activated = responseData['user']['active'];
+          status = responseData['user']['status'];
           storeToken({token: responseData['token'], expires: responseData['expires']});
           storeUser(responseData['user']);
           global.admin = responseData['user']['admin'];
         }
       })
       .then(() => {
-        if (activated) {
-          this.props.navigation.navigate('Home');
-          registerForPushNotifications();
-        } else {
+        if (!activated) {
+          registerForPushNotifications();          
           this.props.navigation.navigate('Activation');
+        } else if (status !== "ACCEPTED") {
+          this.props.navigation.navigate('Waiting');
+        } else {
+          this.props.navigation.navigate('Home');
         }
       })
       .catch((error) => {
@@ -474,11 +483,20 @@ class ActivationScreen extends React.Component {
       })
       .then((response) => {
         if (response.ok) {
+          let status = '';
           activateUser();
           console.log('user successfully activated');
-          registerForPushNotifications();          
-          this.props.navigation.navigate('Home');
-        }
+          registerForPushNotifications();
+          getUser()
+            .then((user) => {
+              status = user.status;
+              if (status !== "ACCEPTED") {
+                this.props.navigation.navigate('Waiting');
+              } else {
+                this.props.navigation.navigate('Home');
+              }      
+            });
+          }
       })
       .catch((error) => {
         console.log('failed activation');
@@ -546,6 +564,33 @@ class ActivationScreen extends React.Component {
             <ActivityIndicator color='#fff' />
           }
         </Image>
+      </View>
+    );
+  }
+}
+
+class WaitingScreen extends React.Component {
+  constructor() {
+    super();
+    this.state = { };
+  }
+
+  render() {
+    return(
+      <View
+        style={{flex: 1, backgroundColor: '#333333'}}>
+          <Text height={0}
+          style={{color: 'white', paddingTop: 40}}>{"You account is pending approval. We will notify you when you have been accepted. Thanks for signing up for PittGrub!"}</Text>
+          <Button
+            title="BACK"
+            large
+            raised
+            fontSize={20}
+            color='#333333'
+            height={80}
+            backgroundColor='rgb(247, 229, 59)'
+            onPress={() => this.props.navigation.goBack(null)}
+            style={{width: 150, height: 80, alignItems: 'center'}} />
       </View>
     );
   }
@@ -641,6 +686,12 @@ const AppNav = StackNavigator({
     screen: ActivationScreen,
     navigationOptions: ({ navigation }) => ({
       title: 'Activation'
+    }),
+  },
+  Waiting: {
+    screen: WaitingScreen,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Waiting for Acceptance'
     }),
   },
   Home: {
