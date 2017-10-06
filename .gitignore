@@ -1,6 +1,9 @@
 # JetBrains
 .idea/
 
+# Config
+*config.json
+
 # Xcode
 build/
 !**/*.xcodeproj
@@ -57,9 +60,6 @@ node_modules
 
 # Expo
 .expo/
-
-# Config
-config-*.json
 
 # macOS
 .DS_Store
