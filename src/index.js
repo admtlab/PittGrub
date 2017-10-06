@@ -4,16 +4,17 @@ import React from 'react';
 import { ActivityIndicator, AsyncStorage, Animated, AppState, Alert, AppRegistry, Dimensions, Image, ImageBackground, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 import { Button, Col, FormLabel, FormInput, Grid} from 'react-native-elements';
 import { TabNavigator, StackNavigator } from 'react-navigation';
-// import { Tabs } from './containers/Route'
 import { Permissions, Notifications } from 'expo';
+import Welcome from './containers/Welcome';
 import Home from './containers/Home'
 import Login from './containers/Login';
 import Profile from './containers/Profile';
-import Tabs, { TabScreen } from './containers/Route';
+import { AppNav } from './containers/Route';
 import settings from './config/settings';
 import images from './config/images';
 import metrics from './config/metrics';
 import sleep from './lib/sleep';
+import { registerForPushNotifications, handleNotification } from './lib/notifications';
 
 
 const TOKEN_ENDPOINT = settings.server.url + '/token';
@@ -47,48 +48,48 @@ async function activateUser() {
   await AsyncStorage.mergeItem('user', activated);
 }
 
-async function registerForPushNotifications() {
-  console.log('check existing status');
-  const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
-  let finalStatus = existingStatus;
+// async function registerForPushNotifications() {
+//   console.log('check existing status');
+//   const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
+//   let finalStatus = existingStatus;
 
-  // prompt for permission if not determined
-  console.log('not granted');  
-  if (existingStatus !== 'granted') {
-    const { status } = await Permissions.askAsync(Permissions.REMOTE_NOTIFICATIONS);
-    finalStatus = status;
-  }
+//   // prompt for permission if not determined
+//   console.log('not granted');  
+//   if (existingStatus !== 'granted') {
+//     const { status } = await Permissions.askAsync(Permissions.REMOTE_NOTIFICATIONS);
+//     finalStatus = status;
+//   }
 
-  // stop here if permission not granted
-  console.log('stop');
-  console.log('status: ' + finalStatus);
-  if (finalStatus !== 'granted') {
-    return;
-  }
+//   // stop here if permission not granted
+//   console.log('stop');
+//   console.log('status: ' + finalStatus);
+//   if (finalStatus !== 'granted') {
+//     return;
+//   }
 
-  // get token
-  console.log('get token');  
-  let token = await Notifications.getExponentPushTokenAsync();
+//   // get token
+//   console.log('get token');  
+//   let token = await Notifications.getExponentPushTokenAsync();
 
-  // POST token to server
-  console.log('post to server');
-  getUser()
-  .then((user) => {
-    return fetch(TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token: token,
-        user: user.id,
-      }),
-    });
+//   // POST token to server
+//   console.log('post to server');
+//   getUser()
+//   .then((user) => {
+//     return fetch(TOKEN_ENDPOINT, {
+//       method: 'POST',
+//       headers: {
+//         'Accept': 'application/json',
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         token: token,
+//         user: user.id,
+//       }),
+//     });
 
-    console.log('Token: ' + token);
-  });
-}
+//     console.log('Token: ' + token);
+//   });
+// }
 
 // async function registerForPushNotifications() {
 //   console.log('check existing status');
@@ -147,577 +148,500 @@ function fetchToken(email, password) {
   });
 }
 
-class AppScreen extends React.Component {
-  render() {
-    return(
-      <View>
-        <Button
-          title="TEST"
-          onPress={() => { console.log(this.props); this.props.navigation.navigate('Enter'); }}
-        />
-      </View>
-    );
-  };
-}
+// class SignupScreen extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {
+//       loading: false,
+//       alreadyExists: false,
+//       email: '',
+//       password: '',
+//       confirmPassword: '',
+//       incorrectPassword: false,
+//     }
+//   }
 
-class SignupScreen extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      loading: false,
-      alreadyExists: false,
-      email: '',
-      password: '',
-      confirmPassword: '',
-      incorrectPassword: false,
-    }
-  }
+//   signup() {
+//     if (this.state.email !== '' && this.state.password !== '') {
+//       let activated = false;
+//       let accepted = false;
+//       let status = '';
+//       fetch(SIGNUP_ENDPOINT, {
+//         method: 'POST',
+//         headers: {
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           email: this.state.email,
+//           password: this.state.password,
+//         }),
+//       })
+//       .then((response) => response.json())
+//       .then((responseData) => {
+//         if (responseData.status !== undefined && responseData.status == 400) {
+//           const message = responseData['message'];
+//           console.log(message);
+//           if (message.startsWith('User already exists')) {
+//             this.setState({ alreadyExists: true });
+//           }
+//         } else {
+//           console.log(responseData);
+//           this.setState({ alreadyExists: false });
+//           const userId = responseData['id'];
+//           const admin = responseData['admin'];
+//           activated = responseData['active'];
+//           status = responseData['status'];
+//           global.admin = admin;          
+//           storeUser(userId, activated, admin)
+//           .then(() => {
+//             fetchToken(this.state.email, this.state.password);
+//           });
+//         }
+//       })
+//       .then(() => {
+//         this.setState({ loading: false });
+//         if (status !== "ACCEPTED") {
+//           this.props.navigation.navigate('Waiting');
+//         } else if (activated) {
+//           this.props.navigation.navigate('Home');
+//         } else if (!this.state.alreadyExists) {
+//           registerForPushNotifications();
+//           this.props.navigation.navigate('Verification');
+//         }
+//       })
+//       .catch((error) => {
+//         console.log(error);        
+//         if (error['message'].startsWith('User already exists with email')) {
+//           this.setState({alreadyExists: true});
+//         }
+//       })
+//       .done(() => {
+//         this.setState({ loading: false });
+//       });
+//     }
+//   }
 
-  signup() {
-    if (this.state.email !== '' && this.state.password !== '') {
-      let activated = false;
-      let accepted = false;
-      let status = '';
-      fetch(SIGNUP_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: this.state.email,
-          password: this.state.password,
-        }),
-      })
-      .then((response) => response.json())
-      .then((responseData) => {
-        if (responseData.status !== undefined && responseData.status == 400) {
-          const message = responseData['message'];
-          console.log(message);
-          if (message.startsWith('User already exists')) {
-            this.setState({ alreadyExists: true });
-          }
-        } else {
-          console.log(responseData);
-          this.setState({ alreadyExists: false });
-          const userId = responseData['id'];
-          const admin = responseData['admin'];
-          activated = responseData['active'];
-          status = responseData['status'];
-          global.admin = admin;          
-          storeUser(userId, activated, admin)
-          .then(() => {
-            fetchToken(this.state.email, this.state.password);
-          });
-        }
-      })
-      .then(() => {
-        this.setState({ loading: false });
-        if (status !== "ACCEPTED") {
-          this.props.navigation.navigate('Waiting');
-        } else if (activated) {
-          this.props.navigation.navigate('Home');
-        } else if (!this.state.alreadyExists) {
-          registerForPushNotifications();
-          this.props.navigation.navigate('Activation');
-        }
-      })
-      .catch((error) => {
-        console.log(error);        
-        if (error['message'].startsWith('User already exists with email')) {
-          this.setState({alreadyExists: true});
-        }
-      })
-      .done(() => {
-        this.setState({ loading: false });
-      });
-    }
-  }
+//   render() {
+//     return(
+//       <View
+//         style={{flex: 1}}>
+//           <Image
+//             source={images.enter}
+//             style={{flex: 1, width: width, height: height, resizeMode: 'cover'}}>
+//             {this.props.children}
+//             <View>
+//               <TextInput
+//                 style={styles.input}
+//                 marginTop={300}
+//                 marginLeft={60}
+//                 placeholder = "Pitt Email Address"
+//                 placeholderTextColor = '#333'
+//                 inputStyle={{fontSize: 20}}
+//                 returnKeyType = "next"
+//                 autoCapitalize='none'
+//                 autoCorrect={false}
+//                 onChangeText={(text) => this.setState({ 'email': text })}
+//                 value={this.state.email} />
+//               <TextInput
+//                 style={styles.input}
+//                 marginLeft={60}
+//                 secureTextEntry
+//                 placeholder = "Pick a Secure Password"
+//                 placeholderTextColor = '#333'
+//                 inputStyle={{fontSize: 20}}
+//                 returnKeyType = "next"
+//                 autoCapitalize='none'
+//                 autoCorrect={false}
+//                 onChangeText={(text) => this.setState({ 'password': text })}
+//                 value={this.state.password} />
+//               {!this.state.loading &&
+//               <Grid>
+//                 <Col style={{height: 0}}>
+//                   <Button
+//                     title="BACK"
+//                     large
+//                     raised
+//                     fontSize={20}
+//                     color='#333333'
+//                     height={80}
+//                     backgroundColor='rgb(247, 229, 59)'
+//                     onPress={() => this.props.navigation.goBack(null)}
+//                     style={{width: 150, height: 80, alignItems: 'center'}} />
+//                 </Col>
+//                 <Col style={{height: 0}}>
+//                   <Button
+//                     title="ENTER"
+//                     large
+//                     raised
+//                     fontSize={20}
+//                     color='#333333'
+//                     backgroundColor='rgb(247, 229, 59)'
+//                     onPress={() => {
+//                       this.setState({ loading: true });
+//                       this.signup();
+//                     }}
+//                     style={{width: 150, height: 80, alignItems: 'center'}} />
+//                 </Col>
+//                </Grid>}
+//                 {this.state.loading &&
+//                   <ActivityIndicator
+//                     color='#fff'
+//                     marginTop={300} />
+//                 }
+//             </View>
+//               {this.state.alreadyExists && 
+//                 <View>
+//                   <Text fontSize={18} color='purple' backgroundColor='rgba(0,0,0,0)' marginTop={200} >Email already in use</Text>
+//                 </View>
+//               }
+//           </Image>
+//       </View>
+//     );
+//   }
+// }
 
-  render() {
-    return(
-      <View
-        style={{flex: 1}}>
-          <Image
-            source={images.enter}
-            style={{flex: 1, width: width, height: height, resizeMode: 'cover'}}>
-            {this.props.children}
-            <View>
-              <TextInput
-                style={styles.input}
-                marginTop={300}
-                marginLeft={60}
-                placeholder = "Pitt Email Address"
-                placeholderTextColor = '#333'
-                inputStyle={{fontSize: 20}}
-                returnKeyType = "next"
-                autoCapitalize='none'
-                autoCorrect={false}
-                onChangeText={(text) => this.setState({ 'email': text })}
-                value={this.state.email} />
-              <TextInput
-                style={styles.input}
-                marginLeft={60}
-                secureTextEntry
-                placeholder = "Pick a Secure Password"
-                placeholderTextColor = '#333'
-                inputStyle={{fontSize: 20}}
-                returnKeyType = "next"
-                autoCapitalize='none'
-                autoCorrect={false}
-                onChangeText={(text) => this.setState({ 'password': text })}
-                value={this.state.password} />
-              {!this.state.loading &&
-              <Grid>
-                <Col style={{height: 0}}>
-                  <Button
-                    title="BACK"
-                    large
-                    raised
-                    fontSize={20}
-                    color='#333333'
-                    height={80}
-                    backgroundColor='rgb(247, 229, 59)'
-                    onPress={() => this.props.navigation.goBack(null)}
-                    style={{width: 150, height: 80, alignItems: 'center'}} />
-                </Col>
-                <Col style={{height: 0}}>
-                  <Button
-                    title="ENTER"
-                    large
-                    raised
-                    fontSize={20}
-                    color='#333333'
-                    backgroundColor='rgb(247, 229, 59)'
-                    onPress={() => {
-                      this.setState({ loading: true });
-                      this.signup();
-                    }}
-                    style={{width: 150, height: 80, alignItems: 'center'}} />
-                </Col>
-               </Grid>}
-                {this.state.loading &&
-                  <ActivityIndicator
-                    color='#fff'
-                    marginTop={300} />
-                }
-            </View>
-              {this.state.alreadyExists && 
-                <View>
-                  <Text fontSize={18} color='purple' backgroundColor='rgba(0,0,0,0)' marginTop={200} >Email already in use</Text>
-                </View>
-              }
-          </Image>
-      </View>
-    );
-  };
-}
+// class LoginScreen extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {
+//       email: '',
+//       password: '',
+//       loading: false
+//     }
+//   }
 
-class LoginScreen extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      email: '',
-      password: '',
-      loading: false
-    }
-  }
+//   login() {
+//     if (this.state.email !== '' && this.state.password !== '') {
+//       let activated = false;
+//       let status = '';
+//       fetch(LOGIN_ENDPOINT, {
+//         method: 'POST',
+//         headers: {
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           email: this.state.email,
+//           password: this.state.password,
+//         }),
+//       })
+//       .then((response) => response.json())
+//       .then((responseData) => {
+//         if (responseData.status !== undefined && responseData.status >= 400) {
+//           const message = responseData['message'];
+//           console.log(message);
+//         } else {
+//           console.log('in login');
+//           console.log(responseData);
+//           this.setState({ loading: false });
+//           activated = responseData['user']['active'];
+//           status = responseData['user']['status'];
+//           storeToken({token: responseData['token'], expires: responseData['expires']});
+//           storeUser(responseData['user']);
+//           global.admin = responseData['user']['admin'];
+//         }
+//       })
+//       .then(() => {
+//         if (!activated) {
+//           registerForPushNotifications();          
+//           this.props.navigation.navigate('Verification');
+//         } else if (status !== "ACCEPTED") {
+//           this.props.navigation.navigate('Waiting');
+//         } else {
+//           this.props.navigation.navigate('Home');
+//         }
+//       })
+//       .catch((error) => {
+//         console.log('error loggin in');
+//       })
+//       .done(() => {
+//         this.setState({ loading: false });
+//       })
+//     }
+//   }
 
-  login() {
-    if (this.state.email !== '' && this.state.password !== '') {
-      let activated = false;
-      let status = '';
-      fetch(LOGIN_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: this.state.email,
-          password: this.state.password,
-        }),
-      })
-      .then((response) => response.json())
-      .then((responseData) => {
-        if (responseData.status !== undefined && responseData.status >= 400) {
-          const message = responseData['message'];
-          console.log(message);
-        } else {
-          console.log('in login');
-          console.log(responseData);
-          this.setState({ loading: false });
-          activated = responseData['user']['active'];
-          status = responseData['user']['status'];
-          storeToken({token: responseData['token'], expires: responseData['expires']});
-          storeUser(responseData['user']);
-          global.admin = responseData['user']['admin'];
-        }
-      })
-      .then(() => {
-        if (!activated) {
-          registerForPushNotifications();          
-          this.props.navigation.navigate('Activation');
-        } else if (status !== "ACCEPTED") {
-          this.props.navigation.navigate('Waiting');
-        } else {
-          this.props.navigation.navigate('Home');
-        }
-      })
-      .catch((error) => {
-        console.log('error loggin in');
-      })
-      .done(() => {
-        this.setState({ loading: false });
-      })
-    }
-  }
+//   render() {
+//     return(
+//       <View
+//         style={{flex: 1, backgroundColor: '#333333'}}>
+//             {this.props.children}
+//             <TextInput
+//               style={styles.input}
+//               marginTop={300}
+//               marginLeft={60}
+//               placeholder = "Email"
+//               placeholderTextColor = '#444'
+//               inputStyle={{fontSize: 20}}
+//               returnKeyType = "next"
+//               autoCapitalize='none'
+//               autoCorrect={false}
+//               onChangeText={(text) => this.setState({ 'email': text })}
+//               value={this.state.email} />
+//             <TextInput
+//                 style={styles.input}
+//                 marginLeft={60}
+//                 placeholder = "Password"
+//                 secureTextEntry
+//                 placeholderTextColor = '#444'
+//                 inputStyle={{fontSize: 20}}
+//                 returnKeyType = "go"
+//                 autoCapitalize='none'
+//                 autoCorrect={false}
+//                 onChangeText={(text) => this.setState({ 'password': text })}
+//                 value={this.state.password} />
+//               {!this.state.loading &&
+//               <Grid>
+//                 <Col style={{height: 0}}>
+//                   <Button
+//                     title="BACK"
+//                     large
+//                     raised
+//                     fontSize={20}
+//                     color='#333333'
+//                     height={80}
+//                     backgroundColor='rgb(247, 229, 59)'
+//                     onPress={() => this.props.navigation.goBack(null)}
+//                     style={{width: 150, height: 80, alignItems: 'center'}} />
+//                 </Col>
+//                 <Col style={{height: 0}}>
+//                   <Button
+//                     title="ENTER"
+//                     large
+//                     raised
+//                     fontSize={20}
+//                     color='#333333'
+//                     backgroundColor='rgb(247, 229, 59)'
+//                     onPress={() => {
+//                       this.setState({ loading: true });
+//                       this.login();
+//                     }}
+//                     style={{width: 150, height: 80, alignItems: 'center'}} />
+//                 </Col>
+//                </Grid>}
+//               {this.state.loading &&
+//                 <ActivityIndicator
+//                   color='#fff' />
+//               }
 
-  render() {
-    return(
-      <View
-        style={{flex: 1, backgroundColor: '#333333'}}>
-            {this.props.children}
-            <TextInput
-              style={styles.input}
-              marginTop={300}
-              marginLeft={60}
-              placeholder = "Email"
-              placeholderTextColor = '#444'
-              inputStyle={{fontSize: 20}}
-              returnKeyType = "next"
-              autoCapitalize='none'
-              autoCorrect={false}
-              onChangeText={(text) => this.setState({ 'email': text })}
-              value={this.state.email} />
-            <TextInput
-                style={styles.input}
-                marginLeft={60}
-                placeholder = "Password"
-                secureTextEntry
-                placeholderTextColor = '#444'
-                inputStyle={{fontSize: 20}}
-                returnKeyType = "go"
-                autoCapitalize='none'
-                autoCorrect={false}
-                onChangeText={(text) => this.setState({ 'password': text })}
-                value={this.state.password} />
-              {!this.state.loading &&
-              <Grid>
-                <Col style={{height: 0}}>
-                  <Button
-                    title="BACK"
-                    large
-                    raised
-                    fontSize={20}
-                    color='#333333'
-                    height={80}
-                    backgroundColor='rgb(247, 229, 59)'
-                    onPress={() => this.props.navigation.goBack(null)}
-                    style={{width: 150, height: 80, alignItems: 'center'}} />
-                </Col>
-                <Col style={{height: 0}}>
-                  <Button
-                    title="ENTER"
-                    large
-                    raised
-                    fontSize={20}
-                    color='#333333'
-                    backgroundColor='rgb(247, 229, 59)'
-                    onPress={() => {
-                      this.setState({ loading: true });
-                      this.login();
-                    }}
-                    style={{width: 150, height: 80, alignItems: 'center'}} />
-                </Col>
-               </Grid>}
-              {this.state.loading &&
-                <ActivityIndicator
-                  color='#fff' />
-              }
+//               {/*!this.state.loading &&
+//                 <Button
+//                   title="ENTER"
+//                   raised
+//                   fontSize={18}
+//                   color='#333333'
+//                   backgroundColor='rgb(247, 229, 59)'
+//                   containerStyle={{backgroundColor: 'rgb(247, 229, 59)'}}
+//                   onPress={() => {
+//                     if (this.state.email !== '' && this.state.password !== '') {
+//                       this.setState({ loading: true });
+//                     }
+//                   }}
+//                   style={{height: null, width: 10, alignItems: 'center'}} />
+//               }
+//               {this.state.loading &&
+//                 <ActivityIndicator 
+//                   color='#fff'
+//                 />
+//               */}   
+//       </View>
+//     );
+//   };
+// }
 
-              {/*!this.state.loading &&
-                <Button
-                  title="ENTER"
-                  raised
-                  fontSize={18}
-                  color='#333333'
-                  backgroundColor='rgb(247, 229, 59)'
-                  containerStyle={{backgroundColor: 'rgb(247, 229, 59)'}}
-                  onPress={() => {
-                    if (this.state.email !== '' && this.state.password !== '') {
-                      this.setState({ loading: true });
-                    }
-                  }}
-                  style={{height: null, width: 10, alignItems: 'center'}} />
-              }
-              {this.state.loading &&
-                <ActivityIndicator 
-                  color='#fff'
-                />
-              */}   
-      </View>
-    );
-  };
-}
+// class ActivationScreen extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {
+//       loading: false,
+//       activationCode: ''
+//     };
+//   }
 
-class ActivationScreen extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      loading: false,
-      activationCode: ''
-    };
-  }
+//   activateUser() {
+//     fetch(ACTIVATION_ENDPOINT, {
+//         method: 'POST',
+//         headers: {
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           activation: this.state.activationCode,
+//         }),
+//       })
+//       .then((response) => {
+//         if (response.ok) {
+//           let status = '';
+//           activateUser();
+//           console.log('user successfully activated');
+//           registerForPushNotifications();
+//           getUser()
+//             .then((user) => {
+//               status = user.status;
+//               if (status !== "ACCEPTED") {
+//                 this.props.navigation.navigate('Waiting');
+//               } else {
+//                 this.props.navigation.navigate('Home');
+//               }      
+//             });
+//           }
+//       })
+//       .catch((error) => {
+//         console.log('failed activation');
+//       })
+//       .done(() => {
+//         this.setState({ loading: false })
+//       });
+//   }
 
-  activateUser() {
-    fetch(ACTIVATION_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          activation: this.state.activationCode,
-        }),
-      })
-      .then((response) => {
-        if (response.ok) {
-          let status = '';
-          activateUser();
-          console.log('user successfully activated');
-          registerForPushNotifications();
-          getUser()
-            .then((user) => {
-              status = user.status;
-              if (status !== "ACCEPTED") {
-                this.props.navigation.navigate('Waiting');
-              } else {
-                this.props.navigation.navigate('Home');
-              }      
-            });
-          }
-      })
-      .catch((error) => {
-        console.log('failed activation');
-      })
-      .done(() => {
-        this.setState({ loading: false })
-      });
-  }
+//   render() {
+//     return(
+//       <View
+//         style={{flex: 1}}>
+//           <Image
+//             source={images.enter}
+//             style={{flexGrow: 1, width: width, height: height, resizeMode: 'cover', alignContent: 'center', alignItems: 'center'}}>
+//             {this.props.children}
+//           <TextInput
+//             style={styles.input}
+//             marginTop={300}
+//             marginLeft={60}
+//             placeholder="Enter emailed verification"
+//             maxLength={6}
+//             placeholderTextColor = '#333'
+//             inputStyle={{fontSize: 20}}
+//             returnKeyType = "go"
+//             autoCapitalize='characters'
+//             onChangeText={(text) => {
+//               this.setState({ activationCode: text })
+//             }}
+//             value={this.state.activationCode}
+//           />
+//           <Text height={0}>{'\n'}</Text>
+//           {!this.state.loading &&          
+//             <Grid>
+//               <Col style={{height: 0}}>
+//                 <Button
+//                   title="RESEND"
+//                   large
+//                   raised
+//                   fontSize={20}
+//                   color='#333333'
+//                   backgroundColor='rgb(247, 229, 59)'
+//                   onPress={() => this.props.navigation.goBack(null)}
+//                   style={{width: 150, height: 80, alignItems: 'center'}} />
+//               </Col>
+//               <Col style={{height: 0}}>
+//                 <Button
+//                   title="ENTER"
+//                   large
+//                   raised
+//                   fontSize={20}
+//                   color='#333333'
+//                   backgroundColor='rgb(247, 229, 59)'
+//                   onPress={() => {
+//                     if (this.state.activationCode !== '' && this.state.activationCode.length == 6) {
+//                       this.setState({ loading: true });
+//                       this.activateUser();
+//                     }
+//                   }}
+//                   style={{width: 150, height: 80, alignItems: 'center'}} />
+//               </Col>
+//             </Grid>}
+//           {this.state.loading &&
+//             <ActivityIndicator color='#fff' />
+//           }
+//         </Image>
+//       </View>
+//     );
+//   }
+// }
 
-  render() {
-    return(
-      <View
-        style={{flex: 1}}>
-          <Image
-            source={images.enter}
-            style={{flexGrow: 1, width: width, height: height, resizeMode: 'cover', alignContent: 'center', alignItems: 'center'}}>
-            {this.props.children}
-          <TextInput
-            style={styles.input}
-            marginTop={300}
-            marginLeft={60}
-            placeholder="Enter emailed verification"
-            maxLength={6}
-            placeholderTextColor = '#333'
-            inputStyle={{fontSize: 20}}
-            returnKeyType = "go"
-            autoCapitalize='characters'
-            onChangeText={(text) => {
-              this.setState({ activationCode: text })
-            }}
-            value={this.state.activationCode}
-          />
-          <Text height={0}>{'\n'}</Text>
-          {!this.state.loading &&          
-            <Grid>
-              <Col style={{height: 0}}>
-                <Button
-                  title="RESEND"
-                  large
-                  raised
-                  fontSize={20}
-                  color='#333333'
-                  backgroundColor='rgb(247, 229, 59)'
-                  onPress={() => this.props.navigation.goBack(null)}
-                  style={{width: 150, height: 80, alignItems: 'center'}} />
-              </Col>
-              <Col style={{height: 0}}>
-                <Button
-                  title="ENTER"
-                  large
-                  raised
-                  fontSize={20}
-                  color='#333333'
-                  backgroundColor='rgb(247, 229, 59)'
-                  onPress={() => {
-                    if (this.state.activationCode !== '' && this.state.activationCode.length == 6) {
-                      this.setState({ loading: true });
-                      this.activateUser();
-                    }
-                  }}
-                  style={{width: 150, height: 80, alignItems: 'center'}} />
-              </Col>
-            </Grid>}
-          {this.state.loading &&
-            <ActivityIndicator color='#fff' />
-          }
-        </Image>
-      </View>
-    );
-  }
-}
+// class WaitingScreen extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = { };
+//   }
 
-class WaitingScreen extends React.Component {
-  constructor() {
-    super();
-    this.state = { };
-  }
+//   render() {
+//     return(
+//       <View
+//         style={{flex: 1, backgroundColor: '#333333'}}>
+//           <Text height={0}
+//           style={{color: 'white', paddingTop: 40}}>{"You account is pending approval. We will notify you when you have been accepted. Thanks for signing up for PittGrub!"}</Text>
+//           <Button
+//             title="BACK"
+//             large
+//             raised
+//             fontSize={20}
+//             color='#333333'
+//             height={80}
+//             backgroundColor='rgb(247, 229, 59)'
+//             onPress={() => this.props.navigation.goBack(null)}
+//             style={{width: 150, height: 80, alignItems: 'center'}} />
+//       </View>
+//     );
+//   }
+// }
 
-  render() {
-    return(
-      <View
-        style={{flex: 1, backgroundColor: '#333333'}}>
-          <Text height={0}
-          style={{color: 'white', paddingTop: 40}}>{"You account is pending approval. We will notify you when you have been accepted. Thanks for signing up for PittGrub!"}</Text>
-          <Button
-            title="BACK"
-            large
-            raised
-            fontSize={20}
-            color='#333333'
-            height={80}
-            backgroundColor='rgb(247, 229, 59)'
-            onPress={() => this.props.navigation.goBack(null)}
-            style={{width: 150, height: 80, alignItems: 'center'}} />
-      </View>
-    );
-  }
-}
-
-class WelcomeScreen extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      activationCode: ''
-    }
-  }
-  render() {
-    getUser()
-    .then((user) => {
-      if (user !== null && user !== undefined) {
-        if (user.activated) {
-          getToken()
-          .then((token) => {
-            if (token !== null && token !== undefined) {
-              console.log('navigate to home');
-              this.props.navigation.navigate('Home');
-            }
-          })
-        } else if (user.activated !== null && user.activated !== undefined) {
-          console.log('navigate to activation');
-          console.log(user);
-          this.props.navigation.navigate('Activation');
-        }
-      }
-    });
-    // must log in or sign up
-      return(
-        <View
-          style={{flex: 1}}>
-          <Image
-            source={images.enter}
-            style={{flex: 1, width: width, height: height, resizeMode: 'cover'}}>
-            <Grid>
-              <Col style={{marginTop: 400, height: 0, backgroundColor: 'transparent'}}>
-                <Button
-                  title="SIGN UP"
-                  large
-                  raised
-                  fontSize={20}
-                  color='#333333'
-                  height={80}
-                  borderRadius={10}
-                  backgroundColor='rgb(247, 229, 59)'
-                  onPress={() => this.props.navigation.navigate('Signup')}
-                  style={{width: 150, height: 80, alignItems: 'center'}} />
-              </Col>
-              <Col style={{marginTop: 400, height: 0, backgroundColor: 'transparent'}}>
-                <Button
-                  title="LOG IN"
-                  large
-                  raised
-                  fontSize={20}
-                  borderRadius={10}
-                  color='#333333'
-                  width={200}
-                  backgroundColor='rgb(247, 229, 59)'
-                  onPress={() => this.props.navigation.navigate('Login')}
-                  style={{height: 80, alignItems: 'center'}} />
-              </Col>
-            </Grid>
-            </Image>
-        </View> 
-      );
-  };
-}
-
-const AppNav = StackNavigator({
-  Welcome: { 
-    screen: WelcomeScreen,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Enter',
-    }),
-  },
-  Signup: {
-    screen: SignupScreen,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Signup'
-    }),
-  },
-  Login: {
-    screen: LoginScreen,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Login'
-    }),
-  },
-  Activation: {
-    screen: ActivationScreen,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Activation'
-    }),
-  },
-  Waiting: {
-    screen: WaitingScreen,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Waiting for Acceptance'
-    }),
-  },
-  Home: {
-    screen: TabScreen,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Home'
-    }),
-  },
-}, {
-  mode: 'card',
-  headerMode: 'none',
-  transitionConfig: () => {
-    transitionSpec: {
-      duration: 0
-      timing: Animated.timing
-    }
-  }
-});
+// const AppNav = StackNavigator({
+//   Welcome: { 
+//     screen: Welcome,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'Enter',
+//     }),
+//   },
+//   Signup: {
+//     screen: SignupScreen,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'Signup'
+//     }),
+//   },
+//   Login: {
+//     screen: LoginScreen,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'Login'
+//     }),
+//   },
+//   Verification: {
+//     screen: Verification,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'Verification'
+//     }),
+//   },
+//   Waiting: {
+//     screen: WaitingScreen,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'Waiting for Acceptance'
+//     }),
+//   },
+//   Home: {
+//     screen: TabScreen,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'Home'
+//     }),
+//   },
+// }, {
+//   mode: 'card',
+//   headerMode: 'none',
+//   transitionConfig: () => {
+//     transitionSpec: {
+//       duration: 0
+//       timing: Animated.timing
+//     }
+//   }
+// });
 
 class App extends React.Component {
   constructor() {
     super();
+
     this.state = {
       isReady: false,
       notification: {},
     };
+
+    this._handleNotification = handleNotification.bind(this);
   };
 
   static navigationOptions = {
@@ -728,8 +652,8 @@ class App extends React.Component {
     sleep(3000);
     this.setState({ isReady: true, appState: 'active'});
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
-    storeToken(null);
-    storeUser(null);
+    // storeToken(null);
+    // storeUser(null);
   }
 
   componentDidMount() {
@@ -739,21 +663,21 @@ class App extends React.Component {
     });
   }
 
-  _handleNotification = (notification) => {
-    this.setState({notification: notification});
-    if (this.state.appState == 'active') {
-      Alert.alert(
-          'New event: ' + notification.title,
-          'body: ' + notification.body + '  data: ' + notification.data,
-          {text: 'OK'});
-        // Notifications.scheduleLocalNotificationAsync(this.state.notification, {time: Date().getTime()+5000});
-    } else {
-      Notifications.presentLocalNotificationAsync(this.state.notification);
-    }
-    // Notifications.getBadgeNumberAsync()
-    //   .then((badgeCount) => 
-    //     Notifications.setBadgeNumberAsync(badgeCount+1));
-  }
+  // _handleNotification = (notification) => {
+  //   this.setState({notification: notification});
+  //   if (this.state.appState == 'active') {
+  //     Alert.alert(
+  //         'New event: ' + notification.title,
+  //         'body: ' + notification.body + '  data: ' + notification.data,
+  //         {text: 'OK'});
+  //       // Notifications.scheduleLocalNotificationAsync(this.state.notification, {time: Date().getTime()+5000});
+  //   } else {
+  //     Notifications.presentLocalNotificationAsync(this.state.notification);
+  //   }
+  //   // Notifications.getBadgeNumberAsync()
+  //   //   .then((badgeCount) => 
+  //   //     Notifications.setBadgeNumberAsync(badgeCount+1));
+  // }
 
   render() {
     // const { navigate } = this.props.navigation;
