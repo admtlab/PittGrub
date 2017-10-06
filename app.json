@@ -5,7 +5,7 @@
     "slug": "PittGrub",
     // "icon": "",
     "loading": {
-      "backgroundImage": "./assets/splash/iPhone6plus-5.5-Portrait-beta.png",
+      "backgroundImage": "./assets/splash/splash_beta.png",
       "hideExponentText": true
     },
     "orientation": "portrait",
