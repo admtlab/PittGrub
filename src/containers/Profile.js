@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   StyleSheet } from 'react-native'
 import { Button, CheckBox, FormLabel, FormInput } from 'react-native-elements';
+import { NavigationActions } from 'react-navigation';
 import { Permissions, Notifications } from 'expo';
 import metrics from '../config/metrics'
 import colors from '../config/styles'
@@ -21,6 +22,8 @@ import images from '../config/images'
 import settings from '../config/settings';
 import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons';
+import { setFoodPreferences } from '../lib/user';
+import { getToken } from '../lib/auth';
 
 const styles = StyleSheet.create({
   title: {
@@ -95,7 +98,7 @@ class Profile extends React.Component {
     }
   }
 
-  updatePreferences() {
+  async updatePreferences() {
     var preferences = [];
     if (this.state.glutenFree) {
       preferences.push(1);
@@ -109,18 +112,29 @@ class Profile extends React.Component {
     if (this.state.vegan) {
       preferences.push(4);
     }
+    let token = await getToken();
     fetch(PREFERENCES_ENDPOINT, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + AsyncStorage.getItem('token')
+        'Authorization': 'Bearer ' + token.token
       },
       body: JSON.stringify(preferences)
     })
     .then((response) => {
-      console.log('response');
-      console.log(response.status);
+      if (response.ok) {
+        setFoodPreferences(preferences);
+        console.log('response');
+        return response.json();
+      } else {
+        console.log('response failed');
+        console.log(response);
+      }
+    })
+    .then((responseData) => {
+      console.log('responseData');
+      console.log(responseData); 
     })
     .catch((error) => {
       console.log('Error: ' + error);
@@ -262,6 +276,15 @@ class Profile extends React.Component {
             console.log('Logging out');
             AsyncStorage.removeItem('jwt');
             AsyncStorage.removeItem('user');
+            // key must be null to go back to inital page and clear path
+            // see https://github.com/react-community/react-navigation/issues/1127#issuecomment-295841343
+            this.props.navigation.dispatch(NavigationActions.reset({
+              index: 0,
+              key: null,
+              actions: [
+                NavigationActions.navigate({routeName: 'Entrance'})
+              ]
+            }))
           }}
         />
       </ScrollView>
