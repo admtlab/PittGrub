@@ -1,4 +1,4 @@
-import moment from 'moment';
+// import moment from 'moment';
 import React from 'react';
 
 import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
@@ -11,6 +11,7 @@ import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 import images from '../config/images';
 import { ImagePicker } from 'expo';
+var AWS = require('aws-sdk/dist/aws-sdk-react-native');
 
 const createEventURL = settings.server.url + '/events';
 const { width, height } = Dimensions.get('window')
@@ -363,21 +364,8 @@ export default class CreateEventView extends React.Component {
               }
             }}
             checkedColor='#009688'
-          //containerStyle={styles.checkboxContainer}
+          containerStyle={styles.checkboxContainer}
           />
-          <TouchableHighlight
-            style={{
-              flex: 1,
-              alignContent: 'center',
-              marginTop: -4,
-              justifyContent: 'center',
-              alignItems: 'flex-end'
-            }}>
-            <Image
-              resizeMode='center'
-              source={images.info}
-            />
-          </TouchableHighlight>
         </View>
 
         <Grid>
