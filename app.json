@@ -1,6 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "17.0.0"
-  },
-  "privacy": "unlisted"
+    "name": "PittGrub",
+    "version": "0.2.0",
+    "slug": "PittGrub",
+    // "icon": "",
+    "loading": {
+      "backgroundImage": "./assets/splash_beta.png",
+      "hideExponentText": true
+    },
+    "orientation": "portrait",
+    "sdkVersion": "18.0.0",
+    "privacy": "unlisted"
+  }
 }

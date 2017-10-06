@@ -1,30 +1,37 @@
 {
   "name": "PittGrub",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "devDependencies": {
-    "jest-expo": "~1.0.1",
+    "babel-eslint": "^7.2.3",
+    "flow-bin": "^0.50.0",
+    "jest-expo": "^18.0.0",
     "react-native-scripts": "0.0.30",
     "react-test-renderer": "16.0.0-alpha.6"
   },
-  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+  "main": "./src/index.js",
   "scripts": {
     "start": "react-native-scripts start",
     "eject": "react-native-scripts eject",
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
+    "lint": "eslint .",
+    "flow": "flow",
     "test": "node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
-    "expo": "^17.0.0",
+    "aws-sdk": "^2.128.0",
+    "expo": "^18.0.0",
     "react": "16.0.0-alpha.6",
     "react-native": "^0.44.0",
-    "react-native-action-button": "^2.6.10",
+    "react-native-action-button": "^2.7.2",
     "react-native-elements": "^0.13.0",
-    "react-native-modal-datetime-picker": "^4.6.0",
-    "react-navigation": "^1.0.0-beta.11"
+    "react-native-maps": "^0.15.3",
+    "react-native-modal-datetime-picker": "^4.8.0",
+    "react-navigation": "^1.0.0-beta.12",
+    "websql": "^0.4.4"
   }
 }

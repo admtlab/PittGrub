@@ -1,3 +1,13 @@
+# JetBrains
+.idea/
+
+# VSCode
+.vscode/
+
+# Config
+*config.json
+!template.config.json
+
 # Xcode
 build/
 !**/*.xcodeproj
