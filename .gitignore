@@ -3,6 +3,7 @@
 
 # Config
 *config.json
+!template.config.json
 
 # Xcode
 build/

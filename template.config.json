@@ -1,0 +1,18 @@
+{
+  "debug": ,
+  "server": {
+    "url": ""
+  },
+  "aws": {
+    "s3": {
+      "apiVersion": "",
+      "accessKeyId": "",
+      "secretAccessKey": "",
+      "region": "",
+      "params": {
+        "Bucket": "",
+        "Key": ""
+      }
+    }
+  }
+}
