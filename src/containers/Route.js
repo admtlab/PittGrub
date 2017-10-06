@@ -4,7 +4,11 @@ import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import Home from './Home'
 import Events from './Events'
-import Login from './Login'
+import LoginScreen from './Login'
+import Welcome from './Welcome';
+import Verification from './Verification';
+import Waiting from './Waiting';
+import Signup from './Signup';
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
 import Profile from './Profile'
@@ -17,7 +21,6 @@ export const HomeNav = StackNavigator({
     navigationOptions:({navigation}) => ({
       title: 'PittGrub',
       headerBackTitle: 'Home',
-      // header: false
     })
   },
   EventDetail: {
@@ -47,9 +50,47 @@ export const EventNav = StackNavigator({
       title: 'Event Details'
     })
   }
-})
+});
 
-export const Tabs = TabNavigator({
+export const WelcomeNav = StackNavigator({
+  Welcome: {
+    screen: Welcome,
+    navigationOptions: {
+      title: 'Enter',
+      header: false,
+    }
+  },
+  Signup: {
+    screen: Signup,
+    navigationOptions: {
+      title: 'Signup',
+      header: false,
+    }
+  },
+  Login: {
+    screen: LoginScreen,
+    navigationOptions: {
+      title: 'Login',
+      header: false,
+    }
+  },
+  Verification: {
+    screen: Verification,
+    navigationOptions: {
+      title: 'Verification',
+      header: false,
+    }
+  },
+  Waiting: {
+    screen: Waiting,
+    navigationOptions: {
+      title: 'Pending',
+      header: false,
+    }
+  }
+});
+
+export const TabNav = TabNavigator({
   HomeTab: {
     screen: HomeNav,
     navigationOptions: {
@@ -96,7 +137,23 @@ export const Tabs = TabNavigator({
   },
 );
 
-export class TabScreen extends React.Component {
+export const AppNav = StackNavigator({
+  Entrance: {
+    screen: WelcomeNav,
+    navigationOptions: {
+      header: false
+    }
+  },
+  Main: {
+    screen: TabNav,
+    navigationOptions: {
+      header: false
+    }
+  }}, {
+    initialRouteName: 'Entrance'
+  });
+
+export class AppScreen extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -107,7 +164,7 @@ export class TabScreen extends React.Component {
 
   render() {
     return(
-      <Tabs 
+      <AppNav 
         onNavigationStateChange = {(prevState, newState) => {
           this._onNavigationStateChange(prevState, newState);
         }}
