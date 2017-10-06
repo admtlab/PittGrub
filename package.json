@@ -10,7 +10,6 @@
     "react-test-renderer": "16.0.0-alpha.6"
   },
   "main": "./src/index.js",
-  "//old": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
     "start": "react-native-scripts start",
     "eject": "react-native-scripts eject",
@@ -24,6 +23,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "aws-sdk": "^2.128.0",
     "expo": "^18.0.0",
     "react": "16.0.0-alpha.6",
     "react-native": "^0.44.0",
