@@ -12,7 +12,7 @@ import Signup from './Signup';
 import CreateEvent from './CreateEvent'
 import EventDetail from './EventDetail'
 import Profile from './Profile'
-import Metrics from '../config/metrics'
+import metrics from '../config/metrics'
 
 
 export const HomeNav = StackNavigator({
