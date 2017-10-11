@@ -98,7 +98,7 @@ export const TabNav = TabNavigator({
       tabBarIcon: ({ tintColor }) =>
         <Icon
           name="home"
-          size={Metrics.tabBarIconHeight}
+          size={metrics.tabBarIconHeight}
           color={tintColor}
         />,
     },
@@ -110,7 +110,7 @@ export const TabNav = TabNavigator({
       tabBarIcon: ({ tintColor }) =>
         <Icon
           name="event-note"
-          size={Metrics.tabBarIconHeight}
+          size={metrics.tabBarIconHeight}
           color={tintColor}
         />,
     },
@@ -122,7 +122,7 @@ export const TabNav = TabNavigator({
       tabBarIcon: ({ tintColor }) =>
         <Icon
           name="account-circle"
-          size={Metrics.tabBarIconHeight}
+          size={metrics.tabBarIconHeight}
           color={tintColor}
         />,
     }
@@ -131,7 +131,7 @@ export const TabNav = TabNavigator({
   }, {
     tabBarOptions: {
       style: {
-        height: Metrics.tabBarHeight
+        height: metrics.tabBarHeight
       }
     },
   },
