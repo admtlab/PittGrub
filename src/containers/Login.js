@@ -69,8 +69,9 @@ export default class LoginScreen extends React.Component {
 
   render() {
     return (
-      <View
-        style={{ flex: 1, backgroundColor: '#333333' }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: '#333333' }}
+        behaviod='padding'>
         {this.props.children}
         <TextInput
           style={styles.input}
@@ -150,7 +151,7 @@ export default class LoginScreen extends React.Component {
                   color='#fff'
                 />
               */}
-      </View>
+      </KeyboardAvoidingView>
     );
   };
 }
