@@ -14,39 +14,41 @@ import settings from './config/settings';
 import images from './config/images';
 import metrics from './config/metrics';
 import sleep from './lib/sleep';
+import { } from './lib/auth';
 import { registerForPushNotifications, handleNotification } from './lib/notifications';
 
 
-const TOKEN_ENDPOINT = settings.server.url + '/token';
-const SIGNUP_ENDPOINT = settings.server.url + '/signup';
-const LOGIN_ENDPOINT = settings.server.url + '/login';
-const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
+// const TOKEN_ENDPOINT = settings.server.url + '/token';
+// const SIGNUP_ENDPOINT = settings.server.url + '/signup';
+// const LOGIN_ENDPOINT = settings.server.url + '/login';
+// const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
 
+// window size
 var { width, height } = Dimensions.get('window')
 
-async function getToken() {
-  const token = await AsyncStorage.getItem('jwt');
-  return JSON.parse(token);
-}
+// async function getToken() {
+//   const token = await AsyncStorage.getItem('jwt');
+//   return JSON.parse(token);
+// }
 
-async function storeToken(token) {
-  await AsyncStorage.setItem('jwt', JSON.stringify(token));
-}
+// async function storeToken(token) {
+//   await AsyncStorage.setItem('jwt', JSON.stringify(token));
+// }
 
-async function getUser() {
-  const user = await AsyncStorage.getItem('user');
-  return JSON.parse(user);
-}
+// async function getUser() {
+//   const user = await AsyncStorage.getItem('user');
+//   return JSON.parse(user);
+// }
 
-async function storeUser(user) {
-  user = JSON.stringify(user);
-  await AsyncStorage.setItem('user', user);
-}
+// async function storeUser(user) {
+//   user = JSON.stringify(user);
+//   await AsyncStorage.setItem('user', user);
+// }
 
-async function activateUser() {
-  const activated = JSON.stringify({activated: true});
-  await AsyncStorage.mergeItem('user', activated);
-}
+// async function activateUser() {
+//   const activated = JSON.stringify({activated: true});
+//   await AsyncStorage.mergeItem('user', activated);
+// }
 
 // async function registerForPushNotifications() {
 //   console.log('check existing status');
@@ -130,23 +132,23 @@ async function activateUser() {
 //   console.log('Token: ' + token);
 // }
 
-function fetchToken(email, password) {
-  fetch(LOGIN_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-    }),
-  })
-  .then((response) => response.json())
-  .then((responseData) => {
-    storeToken({token: responseData['token'], expires: responseData['expires']});
-  });
-}
+// function fetchToken(email, password) {
+//   fetch(LOGIN_ENDPOINT, {
+//     method: 'POST',
+//     headers: {
+//       'Accept': 'application/json',
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//       email: email,
+//       password: password,
+//     }),
+//   })
+//   .then((response) => response.json())
+//   .then((responseData) => {
+//     storeToken({token: responseData['token'], expires: responseData['expires']});
+//   });
+// }
 
 // class SignupScreen extends React.Component {
 //   constructor() {
