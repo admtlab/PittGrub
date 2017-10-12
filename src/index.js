@@ -3,7 +3,7 @@
 import React from 'react';
 import { AppState, AppRegistry, StyleSheet } from 'react-native';
 import { Notifications } from 'expo';
-import { AppNav } from './containers/Route';
+import Route from './config/routes';
 // import Welcome from './containers/Welcome';
 import sleep from './lib/sleep';
 import { storeToken } from './lib/auth';
@@ -15,8 +15,8 @@ import { registerForPushNotifications, handleNotification } from './lib/notifica
 
 
 class App extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       isReady: false,
@@ -31,9 +31,13 @@ class App extends React.Component {
     title: 'Welcome',
   };
 
+  _onNavigationStateChange = (prevState, newState) => {
+    this.setState({ ...this.state, route_index: newState.index });
+  }
+
   componentWillMount() {
     sleep(3000);
-    this.setState({ isReady: true, appState: 'active'});
+    this.setState({ isReady: true, appState: 'active' });
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
     // storeToken(null);
     // storeUser(null);
@@ -48,12 +52,17 @@ class App extends React.Component {
   }
 
   render() {
-    // Register for push notifications to 
+    // Register for push notifications early to 
     // alert user when they've been accepted
     registerForPushNotifications();
 
     // Routing starts with AppNav
-    return(<AppNav />);
+    return (<Route
+      onNavigationStateChange={(prevState, newState) => {
+        this._onNavigationStateChange(prevState, newState);
+      }}
+      screenProps={this.state}
+    />);
   }
 }
 
@@ -67,9 +76,9 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     backgroundColor: 'rgba(204, 204, 204, 0.6)',
-    paddingHorizontal : 10,
-    color:'#333333',
-    marginBottom : 10,
+    paddingHorizontal: 10,
+    color: '#333333',
+    marginBottom: 10,
     marginRight: 60,
     marginLeft: 40,
     alignItems: 'center',

@@ -1,11 +1,19 @@
+/* @flow */
+
 import React from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, StatusBar, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
-import { Button, Col, Grid } from 'react-native-elements';
+import { ActivityIndicator, Dimensions, KeyboardAvoidingView, StatusBar, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import Button from '../components/Button';
+import Logo from '../components/Logo';
 import settings from '../config/settings';
+import { colors } from '../config/styles';
 import { postLogin } from '../lib/api';
 import { storeToken, storeUser } from '../lib/auth';
 import { registerForPushNotifications } from '../lib/notifications';
+
+
+// screen dimensions
+var { width, height } = Dimensions.get('window');
 
 
 export default class LoginScreen extends React.Component {
@@ -18,7 +26,6 @@ export default class LoginScreen extends React.Component {
       loading: false,
       correctCredentials: false,
     }
-
     this._login = this._login.bind(this);
   }
 
@@ -70,13 +77,15 @@ export default class LoginScreen extends React.Component {
   render() {
     return (
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: '#333333' }}
-        behaviod='padding'>
-        {this.props.children}
+        style={{ flex: 1, backgroundColor: colors.softBlue, alignItems: 'center' }}
+        behavior='padding'>
+        <View marginTop={height - 550} marginBottom={-height + 550}>
+          <Logo size={width / 4} />
+        </View>
         <TextInput
           style={styles.input}
-          marginTop={300}
-          marginLeft={60}
+          marginTop={200}
+          /* marginLeft={60} */
           placeholder="Email"
           placeholderTextColor='#444'
           inputStyle={{ fontSize: 20 }}
@@ -87,7 +96,7 @@ export default class LoginScreen extends React.Component {
           value={this.state.email} />
         <TextInput
           style={styles.input}
-          marginLeft={60}
+          /* marginLeft={60} */
           placeholder="Password"
           secureTextEntry
           placeholderTextColor='#444'
@@ -98,34 +107,30 @@ export default class LoginScreen extends React.Component {
           onChangeText={(text) => this.setState({ 'password': text })}
           value={this.state.password} />
         {!this.state.loading &&
-          <Grid>
-            <Col style={{ height: 0 }}>
-              <Button
-                title="BACK"
-                large
-                raised
-                fontSize={20}
-                color='#333333'
-                height={80}
-                backgroundColor='rgb(247, 229, 59)'
-                onPress={() => this.props.navigation.goBack(null)}
-                style={{ width: 150, height: 80, alignItems: 'center' }} />
-            </Col>
-            <Col style={{ height: 0 }}>
-              <Button
-                title="ENTER"
-                large
-                raised
-                fontSize={20}
-                color='#333333'
-                backgroundColor='rgb(247, 229, 59)'
-                onPress={() => {
-                  this.setState({ loading: true });
-                  this._login();
-                }}
-                style={{ width: 150, height: 80, alignItems: 'center' }} />
-            </Col>
-          </Grid>}
+          <View>
+            <Button
+              title="BACK"
+              large
+              raised
+              fontSize={20}
+              color='#333333'
+              height={80}
+              backgroundColor='rgb(247, 229, 59)'
+              onPress={() => this.props.navigation.goBack(null)}
+              style={{ width: 150, height: 80, alignItems: 'center' }} />
+            <Button
+              title="ENTER"
+              large
+              raised
+              fontSize={20}
+              color='#333333'
+              backgroundColor='rgb(247, 229, 59)'
+              onPress={() => {
+                this.setState({ loading: true });
+                this._login();
+              }}
+              style={{ width: 150, height: 80, alignItems: 'center' }} />
+          </View>}
         {this.state.loading &&
           <ActivityIndicator
             color='#fff' />
@@ -157,14 +162,27 @@ export default class LoginScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  view: {
+    flex: 1
+  },
+  button: {
+    marginTop: 20,
+    width: width - 100,
+    height: 60,
+  },
+  buttonText: {
+    fontSize: width / 18,
+  },
   container: {
     padding: 20,
   },
   input: {
-    borderRadius: 10,
+    // borderRadius: 10,
     minWidth: 80,
-    width: 300,
-    flexWrap: 'wrap',
+    alignItems: 'center',
+    textAlign: 'center',
+    width: width,
+    // flexWrap: 'wrap',
     height: 40,
     backgroundColor: 'rgba(204,204,204,0.2)',
     paddingHorizontal: 10,
