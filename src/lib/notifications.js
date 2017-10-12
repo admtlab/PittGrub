@@ -14,20 +14,23 @@ export async function registerForPushNotifications() {
     finalStatus = status;
   }
 
+  console.log('Notifications status: ' + finalStatus);
+
   // stop here if permission not granted
   if (finalStatus !== 'granted') {
-    console.log('status: ' + finalStatus);
     return;
   }
-
+  
   // configure expo notification token
   let token = await Notifications.getExponentPushTokenAsync();
-
+  
   // send token to server
   getUser()
   .then((user) => {
     postExpoToken(user.id, token);
-    console.log('status: ' + finalStatus);
+  })
+  .then(() => {
+    console.log("Expo token sent to server");
   });
 }
 
