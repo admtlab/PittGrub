@@ -23,7 +23,7 @@ export default class LoginScreen extends React.Component {
       password: '',
       loading: false,
       correctCredentials: false,
-    }
+    };
 
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
@@ -36,7 +36,7 @@ export default class LoginScreen extends React.Component {
     // keyboard is coming into view
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
 
-    // put them back
+    // put it back
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
   }
 
@@ -68,54 +68,51 @@ export default class LoginScreen extends React.Component {
       let activated = false;
       let status = '';
       postLogin(this.state.email, this.state.password)
-        .then((response) => response.json())
-        .then((responseData) => {
-          if (responseData.status !== undefined && responseData.status >= 400) {
-            console.log('printing message')
-            const message = responseData['message'];
-            console.log(message);
+        .then(response => response.json())
+        .then(responseData => {
+          this.setState({ loading: false });
+          activated = responseData['user']['active'];
+          status = responseData['user']['status'];
+          console.log('storing token');
+          storeToken({ token: responseData['token'], expires: responseData['expires'] });
+          console.log('storing user');
+          storeUser(responseData['user']);
+          console.log('setting global');
+          global.admin = responseData['user']['admin'];
+          registerForPushNotifications();
+          this._clearState();
+          if (!activated) {
+            console.log('not activated');
+            this.props.navigation.navigate('Verification');
+          } else if (status !== "ACCEPTED") {
+            console.log('near waiting');
+            this.props.navigation.navigate('Waiting');
           } else {
-            console.log(responseData);
-            this.setState({ loading: false });
-            activated = responseData['user']['active'];
-            status = responseData['user']['status'];
-            console.log('storing token');
-            storeToken({ token: responseData['token'], expires: responseData['expires'] });
-            console.log('storing user');
-            storeUser(responseData['user']);
-            console.log('setting global');
-            global.admin = responseData['user']['admin'];
-            registerForPushNotifications();
-            if (!activated) {
-              console.log('not activated');
-              this._clearState();
-              this.props.navigation.navigate('Verification');
-            } else if (status !== "ACCEPTED") {
-              console.log('near waiting');
-              this.props.navigation.navigate('Waiting');
-            } else {
-              this.props.navigation.navigate('Home');
-            }
+            this.props.navigation.navigate('Home');
           }
         })
         .catch((error) => {
-          console.log('error loggin ing');
+          console.log('error logging in');
           console.log(error);
         })
         .done(() => {
           this.setState({ loading: false });
+          console.log('done');
         });
       this.setState({ loading: false });
     }
   }
 
   render() {
+    const isEnabled = this.state.email.length > 0 &&
+      this.state.password.length > 0;
     return (
       <ScrollView
         ref='scrollView'
         scrollEnabled={false}
         keyboardShouldPersistTaps={'never'}
-        paddingTop={height - 550} paddingBottom={-height + 550}
+        paddingTop={height - 550}
+        paddingBottom={-height + 550}
         style={styles.container}>
         <KeyboardAvoidingView
           behavior='padding'
@@ -125,10 +122,11 @@ export default class LoginScreen extends React.Component {
             ref="EmailInput"
             style={styles.input}
             marginTop={20}
-            placeholder="Email address"
+            placeholder="Email Address"
             placeholderTextColor='#444'
             inputStyle={{ fontSize: 36 }}
-            returnKeyType="next"
+            /* returnKeyType="next" */
+            returnKeyType="none"
             autoCapitalize='none'
             blurOnSubmit={true}
             autoCorrect={false}
@@ -142,11 +140,10 @@ export default class LoginScreen extends React.Component {
           <TextInput
             ref="PasswordInput"
             style={styles.input}
-            /* marginLeft={60} */
-            placeholder="Password"
-            secureTextEntry
-            placeholderTextColor='#444'
             inputStyle={{ fontSize: 20 }}
+            placeholder="Password"
+            placeholderTextColor='#444'
+            secureTextEntry
             returnKeyType="send"
             autoCapitalize='none'
             autoCorrect={false}
@@ -161,6 +158,7 @@ export default class LoginScreen extends React.Component {
           {!this.state.loading &&
             <View>
               <Button text="ENTER"
+                disabled={!(isEnabled)}
                 onPress={() => {
                   Keyboard.dismiss();
                   this.setState({ loading: true });
