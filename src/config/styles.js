@@ -11,4 +11,5 @@ export const colors = {
   facebook: '#3b5998',
   facebook2: '#00838F',
   transparent: 'rgba(0,0,0,0)',
+  transparentTextEntry: 'rgba(204,204,204,0.2)',
 };
