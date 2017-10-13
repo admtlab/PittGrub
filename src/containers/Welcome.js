@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
-import Button from '../components/Button';
+import { Button } from '../components/Button';
 import images from '../config/images';
 import { getToken, getUser } from '../lib/auth';
 
@@ -12,12 +12,13 @@ var { width, height } = Dimensions.get('window');
 
 
 export default class WelcomeScreen extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       activationCode: '',
     };
+
     this._checkActivation = this._checkActivation.bind(this);
   }
 
