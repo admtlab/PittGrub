@@ -59,3 +59,4 @@ export async function postVerification(code) {
     body: JSON.stringify({ activation: code }),
   });
 }
+
