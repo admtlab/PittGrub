@@ -7,7 +7,7 @@ import { colors } from '../../config/styles';
 
 
 const StyledButton = (props) => {
-  const { text, onPress, buttonStyle, textStyle } = props;
+  const { text, onPress, buttonStyle, textStyle, ...childProps } = props;
   return (
     <Button
       title={text}
@@ -18,6 +18,7 @@ const StyledButton = (props) => {
       containerViewStyle={{backgroundColor: 'transparent'}}
       large
       raised
+      {...childProps}
     />
   );
 };

@@ -1,36 +1,30 @@
 /* @flow */
 
 import React from 'react';
-import { Button } from 'react-native-elements';
+import { ButtonIconLeft } from '../Button';
 import styles from './styles';
 import { colors } from '../../config/styles';
 
 
 const BackButton = (props) => {
-  const { onPress, buttonStyle, textStyle } = props;
+  const { text, icon, ...childProps } = props;
   return (
-    <Button
-      title={"BACK"}
-      onPress={onPress}
-      buttonStyle={[styles.button, buttonStyle]}
-      textStyle={[styles.text, textStyle]}
-      color={colors.text}
-      containerViewStyle={{backgroundColor: 'transparent'}}
-      icon={{name: 'navigate-before', color: colors.text}}
-      large
-      raised
+    <ButtonIconLeft
+      text={text}
+      icon={icon}
+      {...childProps}
     />
   );
 };
 
 BackButton.propTypes = {
-  onPress: React.PropTypes.func,
-  buttonStyle: React.PropTypes.any,
-  textStyle: React.PropTypes.any,
+  text: React.PropTypes.string,
+  icon: React.PropTypes.string,
 };
 
 BackButton.defaultProps = {
-  onPress: () => console.log('Button pressed'),
+  text: "BACK",
+  icon: "navigate-before",
 };
 
 export default BackButton;
