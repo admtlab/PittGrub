@@ -1,11 +1,9 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Dimensions, KeyboardAvoidingView, StatusBar, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
-import { NavigationActions } from 'react-navigation';
-import Button from '../components/Button';
+import { ActivityIndicator, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
-import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { postLogin } from '../lib/api';
 import { storeToken, storeUser } from '../lib/auth';
@@ -26,10 +24,46 @@ export default class LoginScreen extends React.Component {
       loading: false,
       correctCredentials: false,
     }
+
+    this._keyboardWillShow = this._keyboardWillShow.bind(this);
+    this._keyboardWillHide = this._keyboardWillHide.bind(this);
+    this._clearState = this._clearState.bind(this);
     this._login = this._login.bind(this);
   }
 
+  componentWillMount() {
+    // move login form out of the way when
+    // keyboard is coming into view
+    this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
+
+    // put them back
+    this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
+  }
+
+  componentWillUnmount() {
+    this.keyboardWillShowListener.remove();
+    this.keyboardWillHideListener.remove();
+  }
+
+  _keyboardWillShow = () => {
+    if (!this.state.loading)
+      this.refs.scrollView.scrollTo({ y: 50, animated: true });
+  }
+
+  _keyboardWillHide = () => {
+    this.refs.scrollView.scrollTo({ y: 0, animated: true });
+  }
+
+  _clearState = async () => {
+    this.setState({
+      email: '',
+      password: '',
+      loading: false,
+    });
+  }
+
   _login = async () => {
+    // check that credentials are filled
     if (this.state.email !== '' && this.state.password !== '') {
       let activated = false;
       let status = '';
@@ -51,15 +85,15 @@ export default class LoginScreen extends React.Component {
             storeUser(responseData['user']);
             console.log('setting global');
             global.admin = responseData['user']['admin'];
+            registerForPushNotifications();
             if (!activated) {
               console.log('not activated');
-              registerForPushNotifications();
+              this._clearState();
               this.props.navigation.navigate('Verification');
             } else if (status !== "ACCEPTED") {
               console.log('near waiting');
               this.props.navigation.navigate('Waiting');
             } else {
-              console.log('near home');
               this.props.navigation.navigate('Home');
             }
           }
@@ -71,133 +105,111 @@ export default class LoginScreen extends React.Component {
         .done(() => {
           this.setState({ loading: false });
         });
+      this.setState({ loading: false });
     }
   }
 
   render() {
     return (
-      <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: colors.softBlue, alignItems: 'center' }}
-        behavior='padding'>
-        <View marginTop={height - 550} marginBottom={-height + 550}>
+      <ScrollView
+        ref='scrollView'
+        scrollEnabled={false}
+        keyboardShouldPersistTaps={'never'}
+        paddingTop={height - 550} paddingBottom={-height + 550}
+        style={styles.container}>
+        <KeyboardAvoidingView
+          behavior='padding'
+          style={styles.view}>
           <Logo size={width / 4} />
-        </View>
-        <TextInput
-          style={styles.input}
-          marginTop={200}
-          /* marginLeft={60} */
-          placeholder="Email"
-          placeholderTextColor='#444'
-          inputStyle={{ fontSize: 20 }}
-          returnKeyType="next"
-          autoCapitalize='none'
-          autoCorrect={false}
-          onChangeText={(text) => this.setState({ 'email': text })}
-          value={this.state.email} />
-        <TextInput
-          style={styles.input}
-          /* marginLeft={60} */
-          placeholder="Password"
-          secureTextEntry
-          placeholderTextColor='#444'
-          inputStyle={{ fontSize: 20 }}
-          returnKeyType="go"
-          autoCapitalize='none'
-          autoCorrect={false}
-          onChangeText={(text) => this.setState({ 'password': text })}
-          value={this.state.password} />
-        {!this.state.loading &&
-          <View>
-            <Button
-              title="BACK"
-              large
-              raised
-              fontSize={20}
-              color='#333333'
-              height={80}
-              backgroundColor='rgb(247, 229, 59)'
-              onPress={() => this.props.navigation.goBack(null)}
-              style={{ width: 150, height: 80, alignItems: 'center' }} />
-            <Button
-              title="ENTER"
-              large
-              raised
-              fontSize={20}
-              color='#333333'
-              backgroundColor='rgb(247, 229, 59)'
-              onPress={() => {
-                this.setState({ loading: true });
-                this._login();
-              }}
-              style={{ width: 150, height: 80, alignItems: 'center' }} />
-          </View>}
-        {this.state.loading &&
-          <ActivityIndicator
-            color='#fff' />
-        }
-
-        {/*!this.state.loading &&
-                <Button
-                  title="ENTER"
-                  raised
-                  fontSize={18}
-                  color='#333333'
-                  backgroundColor='rgb(247, 229, 59)'
-                  containerStyle={{backgroundColor: 'rgb(247, 229, 59)'}}
-                  onPress={() => {
-                    if (this.state.email !== '' && this.state.password !== '') {
-                      this.setState({ loading: true });
-                    }
-                  }}
-                  style={{height: null, width: 10, alignItems: 'center'}} />
-              }
-              {this.state.loading &&
-                <ActivityIndicator 
-                  color='#fff'
-                />
-              */}
-      </KeyboardAvoidingView>
+          <TextInput
+            ref="EmailInput"
+            style={styles.input}
+            /* marginTop={height - 550} */
+            placeholder="Email address"
+            placeholderTextColor='#444'
+            inputStyle={{ fontSize: 36 }}
+            returnKeyType="next"
+            autoCapitalize='none'
+            blurOnSubmit={true}
+            autoCorrect={false}
+            keyboardType={'email-address'}
+            onChangeText={(text) => this.setState({ 'email': text })}
+            /* onSubmitEditing={(event) => {
+              this.refs.PasswordInput.focus();
+              this.refs.scrollView.scrollTo({ y: 0, animated: false });
+            }} */
+            value={this.state.email} />
+          <TextInput
+            ref="PasswordInput"
+            style={styles.input}
+            /* marginLeft={60} */
+            placeholder="Password"
+            secureTextEntry
+            placeholderTextColor='#444'
+            inputStyle={{ fontSize: 20 }}
+            returnKeyType="send"
+            autoCapitalize='none'
+            autoCorrect={false}
+            onChangeText={(text) => this.setState({ 'password': text })}
+            onSubmitEditing={(event) => {
+              Keyboard.dismiss();
+              this.setState({ loading: true });
+              this._login();
+              this.setState({ loading: false });
+            }}
+            value={this.state.password} />
+          {!this.state.loading &&
+            <View>
+              <Button text="ENTER"
+                onPress={() => {
+                  Keyboard.dismiss();
+                  this.setState({ loading: true });
+                  this._login();
+                  this.setState({ loading: false });
+                }}
+                buttonStyle={styles.button}
+                textStyle={styles.buttonText} />
+              <BackButton
+                onPress={() => this.props.navigation.goBack(null)}
+                buttonStyle={styles.button}
+                textStyle={styles.buttonText} />
+            </View>}
+          {this.state.loading &&
+            <ActivityIndicator
+              color='#fff' />}
+          <View style={{ height: 120 }} />
+        </KeyboardAvoidingView>
+      </ScrollView>
     );
   };
 }
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.softBlue,
+    height: height,
+    width: width,
+  },
   view: {
-    flex: 1
+    flex: 1,
+    alignItems: 'center'
   },
   button: {
     marginTop: 20,
     width: width - 100,
-    height: 60,
+    height: 40,
   },
   buttonText: {
-    fontSize: width / 18,
-  },
-  container: {
-    padding: 20,
+    fontSize: width / 20,
   },
   input: {
-    // borderRadius: 10,
-    minWidth: 80,
+    fontSize: width / 20,
+    width: width,
+    height: 40,
+    marginBottom: 10,
+    color: colors.softGrey,
+    backgroundColor: colors.transparentTextEntry,
     alignItems: 'center',
     textAlign: 'center',
-    width: width,
-    // flexWrap: 'wrap',
-    height: 40,
-    backgroundColor: 'rgba(204,204,204,0.2)',
-    paddingHorizontal: 10,
-    color: '#333333',
-    marginBottom: 10,
   },
-  buttonContainer: {
-    backgroundColor: "#1980b9",
-    paddingVertical: 10,
-    marginTop: 15,
-    marginBottom: 20
-  },
-  loginbutton: {
-    color: '#ffffff',
-    textAlign: 'center',
-    fontWeight: '700'
-  }
 });
