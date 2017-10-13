@@ -124,7 +124,7 @@ export default class LoginScreen extends React.Component {
           <TextInput
             ref="EmailInput"
             style={styles.input}
-            /* marginTop={height - 550} */
+            marginTop={20}
             placeholder="Email address"
             placeholderTextColor='#444'
             inputStyle={{ fontSize: 36 }}
