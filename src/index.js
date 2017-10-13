@@ -54,7 +54,8 @@ class App extends React.Component {
   render() {
     // Register for push notifications early to 
     // alert user when they've been accepted
-    registerForPushNotifications();
+    // May be too early here
+    // registerForPushNotifications();
 
     // Routing starts with AppNav
     return (<Route
