@@ -47,7 +47,7 @@ export default class LoginScreen extends React.Component {
 
   _keyboardWillShow = () => {
     if (!this.state.loading)
-      this.refs.scrollView.scrollTo({ y: 50, animated: true });
+      this.refs.scrollView.scrollTo({ y: 80, animated: true });
   }
 
   _keyboardWillHide = () => {
