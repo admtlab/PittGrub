@@ -5,7 +5,7 @@ import { ActivityIndicator, Dimensions, Keyboard, KeyboardAvoidingView, ScrollVi
 import { Button, ButtonIconRight } from '../components/Button';
 import Logo from '../components/Logo';
 import { colors } from '../config/styles';
-import { postVerification } from '../lib/api';
+import { getVerification, postVerification } from '../lib/api';
 import { getUser, activateUser } from '../lib/auth';
 import { registerForPushNotifications } from '../lib/notifications';
 
@@ -20,6 +20,8 @@ export default class VerificationScreen extends React.Component {
 
     this.state = {
       loading: false,
+      resendText: 'RESEND',
+      verificationResent: false,
       code: ''
     };
 
@@ -61,6 +63,7 @@ export default class VerificationScreen extends React.Component {
   }
 
   _verification = () => {
+    console.log('Sending verification code: ' + this.state.code);
     postVerification(this.state.code)
       .then((response) => {
         if (response.ok) {
@@ -86,6 +89,9 @@ export default class VerificationScreen extends React.Component {
             .catch((error) => {
               console.log(error);
             });
+        } else {
+          console.log('Response is not ok');
+          console.log(response);
         }
       })
       .catch((error) => {
@@ -131,23 +137,30 @@ export default class VerificationScreen extends React.Component {
           {!this.state.loading &&
             <View>
               <Button text="ENTER"
-                disabled={!isEnabled}
                 onPress={() => {
                   Keyboard.dismiss()
                   this.setState({ loading: true });
                   this._verification();
                 }}
+                disabled={!isEnabled}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
-              <ButtonIconRight text="RESEND"
+              <ButtonIconRight text={this.state.resendText}
                 icon="mail"
-                onPress={() => console.log('I should resend that email')}
+                onPress={() => {
+                  getVerification()
+                    .then(() => {
+                      this.setState({ verificationResent: true });
+                      this.setState({ resendText: "CHECK YOUR EMAIL" });
+                    });
+                }}
+                disabled={this.state.verificationResent}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
             </View>}
           {this.state.loading && <ActivityIndicator color='#fff' />}
-          </KeyboardAvoidingView>
-          </ScrollView>
+        </KeyboardAvoidingView>
+      </ScrollView>
     );
 
     // return(
@@ -194,25 +207,25 @@ export default class VerificationScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-          container: {
-          backgroundColor: colors.softBlue,
+  container: {
+    backgroundColor: colors.softBlue,
     height: height,
     width: width,
   },
   view: {
-          flex: 1,
+    flex: 1,
     alignItems: 'center'
   },
   button: {
-          marginTop: 20,
+    marginTop: 20,
     width: width - 100,
     height: 40,
   },
   buttonText: {
-          fontSize: width / 20,
+    fontSize: width / 20,
   },
   input: {
-          fontSize: width / 20,
+    fontSize: width / 20,
     width: width,
     height: 40,
     marginBottom: 10,
@@ -223,31 +236,3 @@ const styles = StyleSheet.create({
   },
 });
 
-
-// const styles = StyleSheet.create({
-//   container: {
-//     padding: 20,
-//   },
-//   input: {
-//     borderRadius: 10,
-//     minWidth: 80,
-//     width: 300,
-//     flexWrap: 'wrap',
-//     height: 40,
-//     backgroundColor: 'rgba(204,204,204,0.2)',
-//     paddingHorizontal: 10,
-//     color: '#333333',
-//     marginBottom: 10,
-//   },
-//   buttonContainer: {
-//     backgroundColor: "#1980b9",
-//     paddingVertical: 10,
-//     marginTop: 15,
-//     marginBottom: 20
-//   },
-//   loginbutton: {
-//     color: '#ffffff',
-//     textAlign: 'center',
-//     fontWeight: '700'
-//   }
-// });
