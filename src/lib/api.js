@@ -1,3 +1,4 @@
+import { getToken } from './auth';
 import settings from '../config/settings';
 
 
@@ -49,12 +50,26 @@ export async function postLogin(email, password) {
   });
 }
 
+export async function getVerification() {
+  let token = await getToken();
+  return fetch(ACTIVATION_ENDPOINT, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token.token,
+    },
+  });
+}
+
 export async function postVerification(code) {
+  let token = await getToken();
   return fetch(ACTIVATION_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token.token,
     },
     body: JSON.stringify({ activation: code }),
   });
