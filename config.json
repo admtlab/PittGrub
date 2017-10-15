@@ -1,5 +1,6 @@
 {
   "debug": true,
+  "requireApproval": false,
   "server": {
     "url": "https://dev.pittgrub.com"
   },
