@@ -4,6 +4,7 @@ import React from 'react';
 import { ActivityIndicator, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
+import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { postLogin } from '../lib/api';
 import { storeToken, storeUser } from '../lib/auth';
@@ -73,33 +74,29 @@ export default class LoginScreen extends React.Component {
           this.setState({ loading: false });
           activated = responseData['user']['active'];
           status = responseData['user']['status'];
-          console.log('storing token');
           storeToken({ token: responseData['token'], expires: responseData['expires'] });
-          console.log('storing user');
           storeUser(responseData['user']);
-          console.log('setting global');
           global.admin = responseData['user']['admin'];
           registerForPushNotifications();
           this._clearState();
           if (!activated) {
-            console.log('not activated');
+            console.log("Not activated, sending to verification screen");
             this.props.navigation.navigate('Verification');
-          } else if (status !== "ACCEPTED") {
-            console.log('near waiting');
+          } else if (settings.requireApproval && status !== "ACCEPTED") {
+            console.log("approval required, sending to waiting screen");
             this.props.navigation.navigate('Waiting');
           } else {
-            this.props.navigation.navigate('Home');
+            console.log("they're good, sending to main page");
+            this.props.navigation.navigate('Main');
           }
         })
         .catch((error) => {
-          console.log('error logging in');
+          console.log('ERROR: Failed to log in');
           console.log(error);
         })
         .done(() => {
           this.setState({ loading: false });
-          console.log('done');
         });
-      this.setState({ loading: false });
     }
   }
 
