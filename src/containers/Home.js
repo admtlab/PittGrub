@@ -438,7 +438,6 @@ class Home extends React.Component {
   }
 
   testnav = () => {
-    console.log('in home');
     if (global.refresh !== undefined && global.refresh) {
       console.log('have to reload data');
       this.getEvents();
@@ -471,7 +470,6 @@ class Home extends React.Component {
     if (!this.state.loaded) {
       this.getEvents();
     }
-    // registerForPushNotifications();
     return (
       <View>
         <StatusBar

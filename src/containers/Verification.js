@@ -1,9 +1,11 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { NavigationActions } from 'react-navigation';
 import { Button, ButtonIconRight } from '../components/Button';
 import Logo from '../components/Logo';
+import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { getVerification, postVerification } from '../lib/api';
 import { getUser, activateUser } from '../lib/auth';
@@ -62,7 +64,7 @@ export default class VerificationScreen extends React.Component {
     });
   }
 
-  _verification = () => {
+  _verification = async () => {
     console.log('Sending verification code: ' + this.state.code);
     postVerification(this.state.code)
       .then((response) => {
@@ -72,34 +74,46 @@ export default class VerificationScreen extends React.Component {
           activateUser();
           console.log('user activated');
           registerForPushNotifications();
-          console.log('did push');
+          console.log('push notification registered');
           getUser()
             .then((user) => {
               console.log('got user');
               console.log(user);
               status = user.status;
-              if (status !== 'ACCEPTED') {
-                console.log('not accepted');
+              this.setState({ loading: false });
+              if (settings.requireApproval && status !== 'ACCEPTED') {
+                console.log('Requires approval, go to waiting screen');
                 this.props.navigation.navigate('Waiting');
               } else {
-                console.log('accpted');
-                this.props.navigation.navigate('Home');
+                console.log('Go to Main screen');
+                this.props.navigation.dispatch(NavigationActions.reset({
+                  index: 0,
+                  key: null,
+                  actions: [
+                    NavigationActions.navigate({ routeName: 'Main' })
+                  ],
+                }));
               }
             })
             .catch((error) => {
               console.log(error);
             });
         } else {
-          console.log('Response is not ok');
-          console.log(response);
+          this.setState({ loading: false });
+          response.json()
+            .then((responseData) => {
+              if (responseData['message'] && responseData['message'].startsWith('Invalid activation')) {
+                Alert.alert('Error', 'Invalid activation code', { text: 'OK' });
+              } else {
+                Alert.alert('Error', 'Something went wrong', { text: 'OK' });
+              }
+            });
         }
       })
       .catch((error) => {
-        console.log('failed activation');
-      })
-      .done(() => {
         this.setState({ loading: false });
-      })
+        console.log('failed activation');
+      });
   }
 
   render() {
@@ -124,14 +138,14 @@ export default class VerificationScreen extends React.Component {
             maxLength={6}
             placeholderTextColor='#444'
             inputStyle={{ fontSize: 20 }}
-            returnKeyType="send"
             autoCapitalize="characters"
-            onChangeText={(text) => this.setState({ code: text })}
+            returnKeyType="send"
+            clearButtonMode="always"
+            onChangeText={(text) => this.setState({ code: text.toUpperCase() })}
             onSubmitEditing={() => {
               Keyboard.dismiss();
               this.setState({ loading: true });
               this._verification();
-              this.setState({ loading: false });
             }}
             value={this.state.code} />
           {!this.state.loading &&
@@ -162,49 +176,6 @@ export default class VerificationScreen extends React.Component {
         </KeyboardAvoidingView>
       </ScrollView>
     );
-
-    // return(
-    //   <View
-    //         style={{ flex: 1 }}>
-    //         <Text height={0}>{'\n'}</Text>
-    //         {!this.state.loading &&
-    //           <Grid>
-    //             <Col style={{ height: 0 }}>
-    //               <Button
-    //                 title="RESEND"
-    //                 large
-    //                 raised
-    //                 fontSize={20}
-    //                 color='#333333'
-    //                 backgroundColor='rgb(247, 229, 59)'
-    //                 onPress={() => this.props.navigation.goBack(null)}
-    //                 style={{ width: 150, height: 80, alignItems: 'center' }} />
-    //             </Col>
-    //             <Col style={{ height: 0 }}>
-    //               <Button
-    //                 title="ENTER"
-    //                 large
-    //                 raised
-    //                 fontSize={20}
-    //                 color='#333333'
-    //                 backgroundColor='rgb(247, 229, 59)'
-    //                 onPress={() => {
-    //                   if (this.state.activationCode !== '' && this.state.activationCode.length == 6) {
-    //                     this.setState({ loading: true });
-    //                     this._verification();
-    //                   }
-    //                 }}
-    //                 style={{ width: 150, height: 80, alignItems: 'center' }} />
-    //             </Col>
-    //           </Grid>}
-    //         {this.state.loading &&
-    //           <ActivityIndicator color='#fff' />
-    //         }
-    //     </Image>
-    //         </View>
-    //     );
-  }
-}
 
 const styles = StyleSheet.create({
   container: {
