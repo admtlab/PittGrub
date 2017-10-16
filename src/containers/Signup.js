@@ -1,10 +1,11 @@
 import React from 'react';
-import { ActivityIndicator, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
+import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { postSignup, postLogin } from '../lib/api';
-import { getToken, storeUse, storeToken } from '../lib/auth';
+import { getToken, storeUser, storeToken } from '../lib/auth';
 import { registerForPushNotifications } from '../lib/notifications';
 
 
@@ -60,6 +61,7 @@ export default class SignupScreen extends React.Component {
       email: '',
       password: '',
       loading: false,
+      alreadyExists: false,
     });
   }
 
@@ -72,43 +74,29 @@ export default class SignupScreen extends React.Component {
       postSignup(this.state.email, this.state.password)
         .then((response) => response.json())
         .then((responseData) => {
-          if (responseData.status == 400) {
-            const message = responseData['message'];
-            console.log(message);
-            if (message.startsWith('User already exists')) {
+          if (responseData['status'] && responseData['status'] >= 400) {
+            // alert user of error
+            let message = 'Something went wrong';
+            if (responseData.message && responseData.message.startsWith('Error: user already exists')) {
               this.setState({ alreadyExists: true });
+              message = 'User already exists with that email address';
             }
+            Alert.alert('Error', message, {text: 'OK'});
           } else {
+            // response was ok
             this.setState({ alreadyExists: false });
-            postLogin(this.state.email, this.state.password)
-              .then((respone) => response.json())
-              .then((responseData) => {
-                global.admin = responseData['user']['admin'];
-                storeUser(responseData['user']);
-                storeToken({ token: responseData['token'], expires: responseData['expires'] });
-                storeUser
-              });
-          }
-        })
-        .then(() => {
-          this.setState({ loading: false });
-          if (status !== "ACCEPTED") {
+            global.admin = responseData.user.admin
+            storeUser(responseData.user)
+            storeToken({ token: responseData.token, expires: responseData.expires });
             this._clearState();
-            this.props.navigation.navigate('Waiting');
-          } else if (activated) {
-            this._clearState();
-            this.props.navigation.navigate('Home');
-          } else if (!this.state.alreadyExists) {
-            registerForPushNotifications();
-            this._clearState();
+            // user has to verify their email
             this.props.navigation.navigate('Verification');
           }
         })
         .catch((error) => {
+          console.log("Error signing up");
           console.log(error);
-          if (error['message'].startsWith('User already exists with email')) {
-            this.setState({ alreadyExists: true });
-          }
+          Alert.alert('Error', 'Something went wrong', {text: 'OK'});
         })
         .done(() => {
           this.setState({ loading: false });

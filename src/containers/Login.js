@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
 import settings from '../config/settings';
@@ -71,26 +71,38 @@ export default class LoginScreen extends React.Component {
       postLogin(this.state.email, this.state.password)
         .then(response => response.json())
         .then(responseData => {
-          this.setState({ loading: false });
-          activated = responseData['user']['active'];
-          status = responseData['user']['status'];
-          storeToken({ token: responseData['token'], expires: responseData['expires'] });
-          storeUser(responseData['user']);
-          global.admin = responseData['user']['admin'];
-          registerForPushNotifications();
-          this._clearState();
-          if (!activated) {
-            console.log("Not activated, sending to verification screen");
-            this.props.navigation.navigate('Verification');
-          } else if (settings.requireApproval && status !== "ACCEPTED") {
-            console.log("approval required, sending to waiting screen");
-            this.props.navigation.navigate('Waiting');
+          if (responseData['status'] && responseData['status'] >= 400) {
+            // request was an error
+            if (responseData['message'] && responseData['message'].startsWith('Incorrect username or password')) {
+              Alert.alert('Error', 'Incorrect username or password', {text: 'OK'});
+            } else if (responseData.message) {
+              Alert.alert('Error', responseData.message, {text: 'OK'});
+            } else {
+              Alert.alert('Error', 'Something went wrong', {text: 'OK'});
+            }
           } else {
-            console.log("they're good, sending to main page");
-            this.props.navigation.navigate('Main');
+            this.setState({ loading: false });
+            activated = responseData['user']['active'];
+            status = responseData['user']['status'];
+            storeToken({ token: responseData['token'], expires: responseData['expires'] });
+            storeUser(responseData['user']);
+            global.admin = responseData['user']['admin'];
+            registerForPushNotifications();
+            this._clearState();
+            if (!activated) {
+              console.log("Not activated, sending to verification screen");
+              this.props.navigation.navigate('Verification');
+            } else if (settings.requireApproval && status !== "ACCEPTED") {
+              console.log("approval required, sending to waiting screen");
+              this.props.navigation.navigate('Waiting');
+            } else {
+              console.log("they're good, sending to main page");
+              this.props.navigation.navigate('Main');
+            }
           }
         })
         .catch((error) => {
+          Alert.alert('Error', 'Something went wrong', {text: 'OK'});
           console.log('ERROR: Failed to log in');
           console.log(error);
         })
