@@ -176,6 +176,8 @@ export default class VerificationScreen extends React.Component {
         </KeyboardAvoidingView>
       </ScrollView>
     );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
