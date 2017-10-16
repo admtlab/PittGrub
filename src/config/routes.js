@@ -128,7 +128,7 @@ export const TabNav = TabNavigator({
         />,
     }
   }}, {
-    // initialRouteName: 'ProfileTab'
+    initialRouteName: 'HomeTab',
   }, {
     tabBarOptions: {
       style: {
@@ -151,7 +151,7 @@ export const AppNav = StackNavigator({
       header: false
     }
   }}, {
-    initialRouteName: 'Entrance'
+    initialRouteName: 'Entrance',
 });
 
 export default AppNav;
