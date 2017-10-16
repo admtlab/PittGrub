@@ -2,7 +2,7 @@
   "expo": {
     "name": "PittGrub",
     "version": "0.3.0",
-    "slug": "PittGrubDev",
+    "slug": "PittGrub",
     // "icon": "",
     "loading": {
       "backgroundImage": "./assets/splash_beta.png",

@@ -1,8 +1,8 @@
 {
-  "debug": true,
+  "debug": false,
   "requireApproval": false,
   "server": {
-    "url": "https://dev.pittgrub.com"
+    "url": "https://api.pittgrub.com"
   },
   "aws": {
     "s3": {
