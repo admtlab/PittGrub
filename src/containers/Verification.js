@@ -103,7 +103,7 @@ export default class VerificationScreen extends React.Component {
           response.json()
             .then((responseData) => {
               if (responseData['message'] && responseData['message'].startsWith('Invalid activation')) {
-                Alert.alert('Error', 'Invalid activation code', { text: 'OK' });
+                Alert.alert('Error', 'Invalid verification code', { text: 'OK' });
               } else {
                 Alert.alert('Error', 'Something went wrong', { text: 'OK' });
               }
