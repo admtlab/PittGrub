@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { TabNavigator, StackNavigator } from 'react-navigation';
+import CardStackStyleInterpolator from 'react-navigation/src/views/CardStack/CardStackStyleInterpolator';
 import { Icon } from 'react-native-elements';
 import Home from '../containers/Home';
 import Events from '../containers/Events'
@@ -15,6 +16,21 @@ import EventDetail from '../containers/EventDetail';
 import Profile from '../containers/Profile';
 import metrics from './metrics';
 
+
+const StackNavigatorConfig = {
+  transitionConfig: () => {
+    return {
+      screenInterpolator: CardStackStyleInterpolator.forInitial
+    }
+  }
+  // transitionConfig: () => ({
+  // 	transitionSpec: {
+  // 		duration: 0,
+  // 		timing: Animated.timing,
+  // 		easing: Easing.step0,
+  // 	},
+  // }),
+};
 
 export const HomeNav = StackNavigator({
   Home: {
