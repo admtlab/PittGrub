@@ -1,6 +1,7 @@
 /* @flow */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ButtonIconLeft } from '../Button';
 import styles from './styles';
 import { colors } from '../../config/styles';
@@ -18,8 +19,8 @@ const BackButton = (props) => {
 };
 
 BackButton.propTypes = {
-  text: React.PropTypes.string,
-  icon: React.PropTypes.string,
+  text: PropTypes.string,
+  icon: PropTypes.string,
 };
 
 BackButton.defaultProps = {

@@ -1,6 +1,7 @@
 /* @flow */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button } from '../Button';
 import { colors } from '../../config/styles';
 
@@ -17,7 +18,7 @@ const ButtonIconRight = (props) => {
 };
 
 ButtonIconRight.propTypes = {
-  icon: React.PropTypes.string,
+  icon: PropTypes.string,
 };
 
 ButtonIconRight.defaultProps = {

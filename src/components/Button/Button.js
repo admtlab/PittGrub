@@ -1,6 +1,7 @@
 /* @flow */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ViewPropTypes, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import styles from './styles';
@@ -25,8 +26,8 @@ const StyledButton = (props) => {
 };
 
 StyledButton.propTypes = {
-  text: React.PropTypes.string,
-  onPress: React.PropTypes.func,
+  text: PropTypes.string,
+  onPress: PropTypes.func,
   buttonStyle: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
 };

@@ -1,6 +1,7 @@
 /* @flow */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Text } from 'react-native';
 import styles from './styles';
 import { colors } from '../../config/styles';
@@ -14,7 +15,7 @@ const Logo = (props) => {
 };
 
 Logo.propTypes = {
-  size: React.PropTypes.number,
+  size: PropTypes.number,
 };
 
 Logo.defaultProps = {

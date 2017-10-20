@@ -22,7 +22,7 @@ export async function registerForPushNotifications() {
   }
   
   // configure expo notification token
-  let token = await Notifications.getExponentPushTokenAsync();
+  let token = await Notifications.getExpoPushTokenAsync();
   
   // send token to server
   getUser()
