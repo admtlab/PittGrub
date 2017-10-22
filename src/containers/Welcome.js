@@ -22,22 +22,26 @@ export default class WelcomeScreen extends React.Component {
     this._checkActivation = this._checkActivation.bind(this);
   }
 
+  componentWillMount() {
+    this._checkActivation();
+  }
+
   _checkActivation = () => {
     // Check which page the app should be on
     getUser()
       .then((user) => {
         if (user !== null && user !== undefined) {
           // user is signed in
-          if (user.activated) {
-            // user is activated
+          if (user.active) {
+            // user is active
             getToken()
               .then((token) => {
                 if (token !== null && token !== undefined) {
                   // Token found, send user to home page
-                  this.props.navigation.navigate('Home');
+                  this.props.navigation.navigate('Main');
                 }
               });
-          } else if (user.activated !== null && user.activated !== undefined) {
+          } else if (user.active !== null && user.active !== undefined) {
             // User is signed in, but hasn't activated their account
             // send user to verification page so they can enter their code
             this.props.navigation.navigate('Verification');
@@ -49,7 +53,6 @@ export default class WelcomeScreen extends React.Component {
   }
 
   render() {
-    this._checkActivation();
     return (
       <View style={styles.view}>
         <Image source={images.enter} style={styles.backgroundImage}>
