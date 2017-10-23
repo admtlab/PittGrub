@@ -39,10 +39,12 @@ export async function handleNotification(notification) {
   console.log('notification context: ' + notification);
   if (this.state.appState == 'active') {
     // handle foreground notification
+    console.log(JSON.stringify(notification));
     Alert.alert(
       'New event: ' + notification.title,
-      'body: ' + notification.body + ' data: ' + notification.data,
+      'body: ' + notification.data.data,
       {text: 'OK'});
+    Alert.alert(JSON.stringify(notification));
   } else {
     // handle background notification
     Notifications.presentLocalNotificationAsync(this.state.notification);
