@@ -40,8 +40,8 @@ export async function handleNotification(notification) {
   if (this.state.appState == 'active') {
     // handle foreground notification
     Alert.alert(
-      'New event: ' + notification.title,
-      'body: ' + notification.body + ' data: ' + notification.data,
+      'New PittGrub event!',
+      notification.data.data,
       {text: 'OK'});
   } else {
     // handle background notification
