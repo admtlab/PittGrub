@@ -93,6 +93,7 @@ class Profile extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
+    console.log("Route index: " + newProps.screenProps.route_index);
     if (newProps.screenProps.route_index === 2) {
       this.testnav();
     }
