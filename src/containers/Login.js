@@ -164,6 +164,7 @@ export default class LoginScreen extends React.Component {
               this.setState({ loading: false });
             }}
             value={this.state.password} />
+          <Text style={{marginLeft: -width + 200, fontSize: width/22, color: colors.softGrey}} onPress={() => console.log('forgot')}>Forgot your password?</Text>
           {!this.state.loading &&
             <View>
               <Button text="ENTER"
