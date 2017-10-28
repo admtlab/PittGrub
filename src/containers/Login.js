@@ -119,7 +119,7 @@ export default class LoginScreen extends React.Component {
       <ScrollView
         ref='scrollView'
         scrollEnabled={false}
-        keyboardShouldPersistTaps={'never'}
+        keyboardShouldPersistTaps={'handled'}
         paddingTop={height - 550}
         paddingBottom={-height + 550}
         style={styles.container}>
