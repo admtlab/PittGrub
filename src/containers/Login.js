@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Alert, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
 import settings from '../config/settings';
@@ -13,7 +13,7 @@ import { registerForPushNotifications } from '../lib/notifications';
 
 // screen dimensions
 var { width, height } = Dimensions.get('window');
-
+const top = height * 0.25;
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -25,6 +25,9 @@ export default class LoginScreen extends React.Component {
       loading: false,
       correctCredentials: false,
     };
+    this.logoSize = new Animated.Value(width / 4);
+    this.logoSizeLarge = width / 4;
+    this.logoSizeSmall = width / 6;
 
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
@@ -39,6 +42,8 @@ export default class LoginScreen extends React.Component {
 
     // put it back
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
+
+    console.log(height);
   }
 
   componentWillUnmount() {
@@ -46,13 +51,27 @@ export default class LoginScreen extends React.Component {
     this.keyboardWillHideListener.remove();
   }
 
-  _keyboardWillShow = () => {
-    if (!this.state.loading)
-      this.refs.scrollView.scrollTo({ y: 80, animated: true });
+  _keyboardWillShow = (event) => {
+    const space = event.endCoordinates.height * 0.6;
+    if (!this.state.loading) {
+      this.refs.scrollView.scrollTo({ y: space, animated: true });
+      if (height < 600) {
+        Animated.timing(this.logoSize, {
+          duration: event.duration,
+          toValue: this.logoSizeSmall,
+        }).start();
+      }
+    }
   }
 
-  _keyboardWillHide = () => {
+  _keyboardWillHide = (event) => {
     this.refs.scrollView.scrollTo({ y: 0, animated: true });
+    if (height < 600) {
+      Animated.timing(this.logoSize, {
+        duration: event.duration,
+        toValue: this.logoSizeLarge,
+      }).start();
+    }
   }
 
   _clearState = async () => {
@@ -120,17 +139,18 @@ export default class LoginScreen extends React.Component {
         ref='scrollView'
         scrollEnabled={false}
         keyboardShouldPersistTaps={'handled'}
-        paddingTop={height - 550}
-        paddingBottom={-height + 550}
+        /* paddingTop={height - 550} */
+        paddingTop={top}
+        /* paddingBottom={-height + 550} */
         style={styles.container}>
         <KeyboardAvoidingView
           behavior='padding'
           style={styles.view}>
-          <Logo size={width / 4} />
+          <Logo size={this.logoSize} />
           <TextInput
             ref="EmailInput"
             style={styles.input}
-            marginTop={20}
+            marginTop={5}
             placeholder="Email Address"
             placeholderTextColor='#444'
             inputStyle={{ fontSize: 36 }}
