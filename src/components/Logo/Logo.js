@@ -2,20 +2,24 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Text } from 'react-native';
+import { Animated } from 'react-native';
 import styles from './styles';
 import { colors } from '../../config/styles';
 
 
 const Logo = (props) => {
-  const { size } = props;
+  const { size, ...childProps } = props;
   return (
-    <Text style={[styles.logo, {fontSize: size}]}>PittGrub</Text>
+    <Animated.Text
+      style={[styles.logo, {fontSize: size}]}
+      {...childProps}>
+      PittGrub
+    </Animated.Text>
   );
 };
 
 Logo.propTypes = {
-  size: PropTypes.number,
+  size: PropTypes.object,
 };
 
 Logo.defaultProps = {
