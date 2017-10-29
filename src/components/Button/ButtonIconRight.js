@@ -10,8 +10,7 @@ const ButtonIconRight = (props) => {
   const { icon, ...childProps } = props;
   return (
     <Button
-      iconRight
-      icon={{name: icon, color: colors.text}}
+      rightIcon={{name: icon, color: colors.text}}
       {...childProps}
     />
   );
