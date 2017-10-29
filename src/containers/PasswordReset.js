@@ -1,11 +1,10 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Button, ButtonIconRight } from '../components/Button';
 import Logo from '../components/Logo';
-import metrics from '../config/metrics';
 import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { getVerification, postVerification } from '../lib/api';
@@ -15,7 +14,6 @@ import { registerForPushNotifications } from '../lib/notifications';
 
 // screen dimensions
 var { width, height } = Dimensions.get('window');
-const top = height * 0.25;
 
 
 export default class VerificationScreen extends React.Component {
@@ -28,8 +26,6 @@ export default class VerificationScreen extends React.Component {
       verificationResent: false,
       code: ''
     };
-
-    this.logoSize = new Animated.Value(metrics.logoSizeLarge);
 
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
@@ -51,27 +47,14 @@ export default class VerificationScreen extends React.Component {
     this.keyboardWillHideListener.remove();
   }
 
-  _keyboardWillShow = (event) => {
-    const space = event.endCoordinates.height * 0.5;
+  _keyboardWillShow = () => {
     if (!this.state.loading) {
-      this.refs.scrollView.scrollTo({ y: space, animated: true });
-      if (height < 600) {
-        Animated.timing(this.logoSize, {
-          duration: event.duration,
-          toValue: metrics.logoSizeSmall
-        }).start();
-      }
+      this.refs.scrollView.scrollTo({ y: 80, animated: true });
     }
   }
 
-  _keyboardWillHide = (event) => {
+  _keyboardWillHide = () => {
     this.refs.scrollView.scrollTo({ y: 0, animated: true });
-    if (height < 600) {
-      Animated.timing(this.logoSize, {
-        duration: event.duration,
-        toValue: metrics.logoSizeLarge
-      }).start();
-    }
   }
 
   _clearState = async () => {
@@ -140,16 +123,17 @@ export default class VerificationScreen extends React.Component {
         ref='scrollView'
         scrollEnabled={false}
         keyboardShouldPersistTaps={'handled'}
-        paddingTop={top}
+        paddingTop={height - 550}
+        paddingBottom={-height + 550}
         style={styles.container}>
         <KeyboardAvoidingView
           behavior='padding'
           style={styles.view}>
-          <Logo size={this.logoSize} />
+          <Logo size={width / 4} />
           <TextInput
             ref="VerificationCode"
             style={styles.input}
-            marginTop={5}
+            marginTop={20}
             placeholder="Verification Code"
             maxLength={6}
             placeholderTextColor='#444'
@@ -214,9 +198,8 @@ const styles = StyleSheet.create({
     fontSize: width / 20,
   },
   input: {
-    borderRadius: 1,
     fontSize: width / 20,
-    width: width - 40,
+    width: width,
     height: 40,
     marginBottom: 10,
     color: colors.softGrey,
@@ -225,3 +208,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
