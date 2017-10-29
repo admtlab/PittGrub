@@ -19,7 +19,10 @@ const Logo = (props) => {
 };
 
 Logo.propTypes = {
-  size: PropTypes.object,
+  size: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.number
+  ]),
 };
 
 Logo.defaultProps = {
