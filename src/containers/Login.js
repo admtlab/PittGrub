@@ -177,8 +177,11 @@ export default class LoginScreen extends React.Component {
             }}
             value={this.state.password} />
           </KeyboardAvoidingView>
-          <View style={{marginRight: 20, flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-            <Text style={{fontSize: width / 22, color: colors.softGrey}} onPress={() => console.log('forgot')}>Forgot your password?</Text>
+          <View style={styles.forgotPasswordView}>
+            <Text style={styles.forgotPassword}
+              onPress={() => this.props.navigation.navigate('PasswordReset')}>
+              Forgot your password?
+            </Text>
           </View>
           <KeyboardAvoidingView
             behavior='padding'
@@ -226,6 +229,17 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: width / 20,
+  },
+  forgotPasswordView: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginRight: 20,
+  },
+  forgotPassword: {
+    fontSize: width / 22,
+    fontStyle: 'italic',
+    color: colors.softGrey
   },
   input: {
     borderRadius: 1,

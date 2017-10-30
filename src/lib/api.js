@@ -6,6 +6,7 @@ const TOKEN_ENDPOINT = settings.server.url + '/token';
 const SIGNUP_ENDPONT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
+const PASSWORD_RESET_ENDPOINT = settings.server.url + '/password/reset';
 
 
 export async function postExpoToken(userId, token) {
@@ -75,3 +76,13 @@ export async function postVerification(code) {
   });
 }
 
+export async function postPasswordReset(email) {
+  return fetch(PASSWORD_RESET_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: email }),
+  });
+}
