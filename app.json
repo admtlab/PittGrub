@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "PittGrub-dev",
+    "name": "PittGrub",
     "version": "1.0.0",
-    "slug": "PittGrubDev",
+    "slug": "PittGrub",
     // "icon": "",
     "loading": {
       "backgroundImage": "./assets/splash_beta.png",

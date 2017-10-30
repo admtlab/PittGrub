@@ -41,8 +41,8 @@ export async function handleNotification(notification) {
     // handle foreground notification
     console.log(JSON.stringify(notification));
     Alert.alert(
-      'New event: ' + notification.title,
-      'body: ' + notification.data.data,
+      'New PittGrub event!',
+      notification.data.data,
       {text: 'OK'});
     Alert.alert(JSON.stringify(notification));
   } else {

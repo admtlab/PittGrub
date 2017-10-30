@@ -172,7 +172,8 @@ export const AppNav = StackNavigator({
   Main: {
     screen: TabNav,
     navigationOptions: {
-      header: false
+      header: false,
+      gesturesEnabled: false
     }
   }}, {
     initialRouteName: 'Entrance',

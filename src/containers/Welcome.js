@@ -37,17 +37,13 @@ export default class WelcomeScreen extends React.Component {
       .then((user) => {
         if (user !== null && user !== undefined) {
           // user is signed in
-          console.log('user is signed in');
           if (user.active) {
-            // user is activated
-            console.log('user is activated');
+            // user is active
             getToken()
               .then((token) => {
                 if (token !== null && token !== undefined) {
                   // Token found, send user to home page
-                  console.log("token found, they're good!");
                   this.props.navigation.navigate('Main');
-                  this.setState({ navigate: 'Main' });
                 }
               });
           } else if (user.active !== null && user.active !== undefined) {
@@ -67,23 +63,21 @@ export default class WelcomeScreen extends React.Component {
   }
 
   render() {
-    if (this.state.navigate == 'Welcome') {
-      return (
-        <View style={styles.view}>
-          <Image source={images.enter} style={styles.backgroundImage}>
-            <Text>{"\n\n\n\n"}{"\n\n\n\n"}</Text>
-            <Button text="LOG IN"
-              onPress={() => this.props.navigation.navigate('Login')}
-              buttonStyle={styles.button}
-              textStyle={styles.buttonText} />
-            <Button text="SIGN UP"
-              onPress={() => this.props.navigation.navigate('Signup')}
-              buttonStyle={styles.button}
-              textStyle={styles.buttonText} />
-          </Image>
-        </View>
-      );
-    } else { return (null); }
+    return (
+      <View style={styles.view}>
+        <Image source={images.enter} style={styles.backgroundImage}>
+          <Text>{"\n\n\n\n"}{"\n\n\n\n"}</Text>
+          <Button text="LOG IN"
+            onPress={() => this.props.navigation.navigate('Login')}
+            buttonStyle={styles.button}
+            textStyle={styles.buttonText} />
+          <Button text="SIGN UP"
+            onPress={() => this.props.navigation.navigate('Signup')}
+            buttonStyle={styles.button}
+            textStyle={styles.buttonText} />
+        </Image>
+      </View>
+    );
   }
 }
 
