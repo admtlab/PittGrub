@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "PittGrub",
-    "version": "0.3.0",
+    "version": "1.0.0",
     "slug": "PittGrub",
     // "icon": "",
     "loading": {
@@ -9,7 +9,7 @@
       "hideExponentText": true
     },
     "orientation": "portrait",
-    "sdkVersion": "18.0.0",
+    "sdkVersion": "22.0.0",
     "privacy": "unlisted"
   }
 }

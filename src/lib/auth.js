@@ -15,6 +15,11 @@ export async function getUser() {
     return JSON.parse(user);
 }
 
+export async function getUserTest() {
+    AsyncStorage.getItem("user")
+        .then((user) => { return JSON.parse(user); });
+}
+
 export async function storeUser(user) {
     user = JSON.stringify(user);
     AsyncStorage.setItem('user', user);

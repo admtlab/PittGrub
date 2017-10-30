@@ -1,20 +1,28 @@
 /* @flow */
 
 import React from 'react';
-import { Text } from 'react-native';
+import PropTypes from 'prop-types';
+import { Animated } from 'react-native';
 import styles from './styles';
 import { colors } from '../../config/styles';
 
 
 const Logo = (props) => {
-  const { size } = props;
+  const { size, ...childProps } = props;
   return (
-    <Text style={[styles.logo, {fontSize: size}]}>PittGrub</Text>
+    <Animated.Text
+      style={[styles.logo, {fontSize: size}]}
+      {...childProps}>
+      PittGrub
+    </Animated.Text>
   );
 };
 
 Logo.propTypes = {
-  size: React.PropTypes.number,
+  size: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.number
+  ]),
 };
 
 Logo.defaultProps = {

@@ -1,9 +1,10 @@
 /* @flow */
 
 import React from 'react';
-import { ActivityIndicator, Alert, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
+import metrics from '../config/metrics';
 import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { postLogin } from '../lib/api';
@@ -13,7 +14,7 @@ import { registerForPushNotifications } from '../lib/notifications';
 
 // screen dimensions
 var { width, height } = Dimensions.get('window');
-
+const top = height * 0.25;
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -25,6 +26,7 @@ export default class LoginScreen extends React.Component {
       loading: false,
       correctCredentials: false,
     };
+    this.logoSize = new Animated.Value(metrics.logoSizeLarge);
 
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
@@ -46,13 +48,27 @@ export default class LoginScreen extends React.Component {
     this.keyboardWillHideListener.remove();
   }
 
-  _keyboardWillShow = () => {
-    if (!this.state.loading)
-      this.refs.scrollView.scrollTo({ y: 80, animated: true });
+  _keyboardWillShow = (event) => {
+    const space = event.endCoordinates.height * 0.6;
+    if (!this.state.loading) {
+      this.refs.scrollView.scrollTo({ y: space, animated: true });
+      if (height < 600) {
+        Animated.timing(this.logoSize, {
+          duration: event.duration,
+          toValue: metrics.logoSizeSmall,
+        }).start();
+      }
+    }
   }
 
-  _keyboardWillHide = () => {
+  _keyboardWillHide = (event) => {
     this.refs.scrollView.scrollTo({ y: 0, animated: true });
+    if (height < 600) {
+      Animated.timing(this.logoSize, {
+        duration: event.duration,
+        toValue: metrics.logoSizeLarge,
+      }).start();
+    }
   }
 
   _clearState = async () => {
@@ -119,32 +135,28 @@ export default class LoginScreen extends React.Component {
       <ScrollView
         ref='scrollView'
         scrollEnabled={false}
-        keyboardShouldPersistTaps={'never'}
-        paddingTop={height - 550}
-        paddingBottom={-height + 550}
-        style={styles.container}>
+        keyboardShouldPersistTaps={'handled'}
+        paddingTop={top}
+        style={styles.scrollContainer}>
         <KeyboardAvoidingView
           behavior='padding'
           style={styles.view}>
-          <Logo size={width / 4} />
+          <Logo size={this.logoSize} />
           <TextInput
             ref="EmailInput"
             style={styles.input}
-            marginTop={20}
+            marginTop={5}
             placeholder="Email Address"
             placeholderTextColor='#444'
             inputStyle={{ fontSize: 36 }}
-            /* returnKeyType="next" */
-            returnKeyType="none"
+            returnKeyType="next"
             autoCapitalize='none'
-            blurOnSubmit={true}
             autoCorrect={false}
             keyboardType={'email-address'}
             onChangeText={(text) => this.setState({ 'email': text })}
-            /* onSubmitEditing={(event) => {
+            onSubmitEditing={(event) => {
               this.refs.PasswordInput.focus();
-              this.refs.scrollView.scrollTo({ y: 0, animated: false });
-            }} */
+            }}
             value={this.state.email} />
           <TextInput
             ref="PasswordInput"
@@ -164,8 +176,18 @@ export default class LoginScreen extends React.Component {
               this.setState({ loading: false });
             }}
             value={this.state.password} />
+          </KeyboardAvoidingView>
+          <View style={styles.forgotPasswordView}>
+            <Text style={styles.forgotPassword}
+              onPress={() => this.props.navigation.navigate('PasswordReset')}>
+              Forgot your password?
+            </Text>
+          </View>
+          <KeyboardAvoidingView
+            behavior='padding'
+            style={styles.view}>
           {!this.state.loading &&
-            <View>
+            <View justifyContent='space-between' alignItems='center'>
               <Button text="ENTER"
                 disabled={!(isEnabled)}
                 onPress={() => {
@@ -184,7 +206,6 @@ export default class LoginScreen extends React.Component {
           {this.state.loading &&
             <ActivityIndicator
               color='#fff' />}
-          <View style={{ height: 120 }} />
         </KeyboardAvoidingView>
       </ScrollView>
     );
@@ -192,7 +213,7 @@ export default class LoginScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     backgroundColor: colors.softBlue,
     height: height,
     width: width,
@@ -209,9 +230,21 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: width / 20,
   },
+  forgotPasswordView: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginRight: 20,
+  },
+  forgotPassword: {
+    fontSize: width / 22,
+    fontStyle: 'italic',
+    color: colors.softGrey
+  },
   input: {
+    borderRadius: 1,
     fontSize: width / 20,
-    width: width,
+    width: width - 40,
     height: 40,
     marginBottom: 10,
     color: colors.softGrey,

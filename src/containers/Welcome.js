@@ -4,7 +4,7 @@ import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../components/Button';
 import images from '../config/images';
-import { getToken, getUser } from '../lib/auth';
+import { getToken, getUser, getUserTest } from '../lib/auth';
 
 
 // screen dimensions
@@ -16,7 +16,7 @@ export default class WelcomeScreen extends React.Component {
     super(props);
 
     this.state = {
-      activationCode: '',
+      navigate: '',
     };
 
     this._checkActivation = this._checkActivation.bind(this);
@@ -28,6 +28,11 @@ export default class WelcomeScreen extends React.Component {
 
   _checkActivation = () => {
     // Check which page the app should be on
+    console.log("Checking user status");
+    // getUser()
+    //   .then((user) => console.log("Found user: " + user));
+    // const u = await getUserTest();
+    // console.log("Found user test: " + u);
     getUser()
       .then((user) => {
         if (user !== null && user !== undefined) {
@@ -44,11 +49,16 @@ export default class WelcomeScreen extends React.Component {
           } else if (user.active !== null && user.active !== undefined) {
             // User is signed in, but hasn't activated their account
             // send user to verification page so they can enter their code
+            console.log('User is not activated');
             this.props.navigation.navigate('Verification');
+            this.setState({ navigate: 'Verification' });
           }
+        } else {
+          // Either user is not signed in, or their token wasn't found
+          // Keep user on Welcome screen, since they'll have to log in or sign up
+          console.log('keep them here, they have to log in');
+          this.setState({ navigate: 'Welcome' });
         }
-        // Either user is not signed in, or their token wasn't found
-        // Keep user on Welcome screen, since they'll have to log in or sign up
       });
   }
 
@@ -86,7 +96,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
     width: width - 100,
-    height: 60
+    height: 50
   },
   buttonText: {
     fontSize: width / 18,

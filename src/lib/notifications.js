@@ -22,7 +22,7 @@ export async function registerForPushNotifications() {
   }
   
   // configure expo notification token
-  let token = await Notifications.getExponentPushTokenAsync();
+  let token = await Notifications.getExpoPushTokenAsync();
   
   // send token to server
   getUser()
@@ -39,10 +39,12 @@ export async function handleNotification(notification) {
   console.log('notification context: ' + notification);
   if (this.state.appState == 'active') {
     // handle foreground notification
+    console.log(JSON.stringify(notification));
     Alert.alert(
       'New PittGrub event!',
       notification.data.data,
       {text: 'OK'});
+    Alert.alert(JSON.stringify(notification));
   } else {
     // handle background notification
     Notifications.presentLocalNotificationAsync(this.state.notification);

@@ -333,6 +333,12 @@ class Home extends React.Component {
     global.refresh = true;
   }
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.screenProps.route_index == 0) {
+      console.log("In home");
+    }
+  }
+
   renderRow(rowData) {
     return (
       <TouchableOpacity style={{ paddingBottom: 10 }}>

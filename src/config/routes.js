@@ -2,19 +2,36 @@
 
 import React from 'react';
 import { TabNavigator, StackNavigator } from 'react-navigation';
+import CardStackStyleInterpolator from 'react-navigation/src/views/CardStack/CardStackStyleInterpolator';
 import { Icon } from 'react-native-elements';
-import Home from '../containers/Home';
+import CreateEvent from '../containers/CreateEvent';
 import Events from '../containers/Events'
+import EventDetail from '../containers/EventDetail';
+import Home from '../containers/Home';
 import LoginScreen from '../containers/Login';
-import Welcome from '../containers/Welcome';
+import PasswordReset from '../containers/PasswordReset';
+import Profile from '../containers/Profile';
+import Signup from '../containers/Signup';
 import Verification from '../containers/Verification';
 import Waiting from '../containers/Waiting';
-import Signup from '../containers/Signup';
-import CreateEvent from '../containers/CreateEvent';
-import EventDetail from '../containers/EventDetail';
-import Profile from '../containers/Profile';
+import Welcome from '../containers/Welcome';
 import metrics from './metrics';
 
+
+const StackNavigatorConfig = {
+  transitionConfig: () => {
+    return {
+      screenInterpolator: CardStackStyleInterpolator.forInitial
+    }
+  }
+  // transitionConfig: () => ({
+  // 	transitionSpec: {
+  // 		duration: 0,
+  // 		timing: Animated.timing,
+  // 		easing: Easing.step0,
+  // 	},
+  // }),
+};
 
 export const HomeNav = StackNavigator({
   Home: {
@@ -72,6 +89,13 @@ export const WelcomeNav = StackNavigator({
     screen: LoginScreen,
     navigationOptions: {
       title: 'Login',
+      header: false,
+    }
+  },
+  PasswordReset: {
+    screen: PasswordReset,
+    navigationOptions: {
+      title: 'Password Reset',
       header: false,
     }
   },

@@ -1,3 +1,5 @@
+/* @flow */
+
 export const colors = {
   // main colors
   theme: '#F7E53B',
