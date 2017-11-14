@@ -59,7 +59,10 @@ export default class CreateEventView extends React.Component {
 
   constructor(props) {
     super(props);
-
+    let startDate = new Date();
+    let endDate = new Date();
+    endDate.setHours(endDate.getHours()+1);
+    endDate.setMinutes(Math.ceil(endDate.getMinutes()/30)*30);
     this.state = {
       image: null,
       glutenFree: false,
@@ -68,8 +71,8 @@ export default class CreateEventView extends React.Component {
       vegan: false,
       isDateTimePickerStartVisible: false,
       isDateTimePickerEndVisible: false,
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate: startDate,
+      endDate: endDate,
       organization: '',
       title: '',
       location_details: '',
@@ -112,6 +115,9 @@ export default class CreateEventView extends React.Component {
 
   _mapFoodPreferences = () => {
 
+  }
+
+  componentWillMount() {
   }
 
   _postEvent = () => {
@@ -271,6 +277,7 @@ export default class CreateEventView extends React.Component {
         <DateTimePicker
           isVisible={this.state.isDateTimePickerStartVisible}
           mode='datetime'
+          date={this.state.startDate}
           onConfirm={this._handleStartDatePicked}
           onCancel={this._hideDateTimePickerStart}
         />
@@ -278,6 +285,7 @@ export default class CreateEventView extends React.Component {
         <DateTimePicker
           isVisible={this.state.isDateTimePickerEndVisible}
           mode='time'
+          date={this.state.endDate}
           onConfirm={this._handleEndDatePicked}
           onCancel={this._hideDateTimePickerEnd}
         />
