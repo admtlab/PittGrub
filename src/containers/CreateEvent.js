@@ -346,7 +346,7 @@ export default class CreateEventView extends React.Component {
 
           </Col>
           <Col>
-            <FormLabel labelStyle={styles.textLabel}>Ending Time</FormLabel>
+            <FormLabel labelStyle={styles.textLabel}>End Time</FormLabel>
             <Button
               title={lib._convertHoursMin(this.state.endDate)}
               backgroundColor='#FFC107'
