@@ -157,6 +157,7 @@ class Events extends React.Component {
         <View style={styles.row}>
           <Text style={styles.boldLabel}>{event.title}</Text>
           <Text style={styles.subtitle}> {
+            lib._convertDate_getMonthDay(new Date(event.start_date)) + '\n ' +
             lib._convertHoursMin(new Date(event.start_date)) + ' - ' +
             lib._convertHoursMin(new Date(event.end_date))}
           </Text>
