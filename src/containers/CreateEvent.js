@@ -69,6 +69,7 @@ export default class CreateEventView extends React.Component {
       dairyFree: false,
       vegetarian: false,
       vegan: false,
+      isDayPickerVisible: false,
       isDateTimePickerStartVisible: false,
       isDateTimePickerEndVisible: false,
       startDate: startDate,
@@ -82,16 +83,23 @@ export default class CreateEventView extends React.Component {
       eventId: null
     }
 
+    this._showDayPicker = this._showDayPicker.bind(this);
+    this._hideDayPicker = this._hideDayPicker.bind(this);
     this._showDateTimePickerEnd = this._showDateTimePickerEnd.bind(this);
     this._hideDateTimePickerEnd = this._hideDateTimePickerEnd.bind(this);
     this._showDateTimePickerStart = this._showDateTimePickerStart.bind(this);
     this._hideDateTimePickerStart = this._hideDateTimePickerStart.bind(this);
+    this._handleDayPicked = this._handleDayPicked.bind(this);
     this._handleStartDatePicked = this._handleStartDatePicked.bind(this);
     this._handleEndDatePicked = this._handleEndDatePicked.bind(this);
     this._postEvent = this._postEvent.bind(this);
     this._getImage = this._getImage.bind(this);
     this._postImage = this._postImage.bind(this);
   }
+
+  _showDayPicker = () => this.setState({ isDayPickerVisible: true });
+
+  _hideDayPicker = () => this.setState({ isDayPickerVisible: false });
 
   _showDateTimePickerStart = () => this.setState({ isDateTimePickerStartVisible: true });
 
@@ -101,15 +109,32 @@ export default class CreateEventView extends React.Component {
 
   _hideDateTimePickerEnd = () => this.setState({ isDateTimePickerEndVisible: false });
 
+  _handleDayPicked = (date) => {
+    this._hideDayPicker();
+    let startDate = this.state.startDate;
+    let endDate = this.state.endDate;
+    startDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+    endDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+    this.setState({ startDate: startDate });
+    this.setState({ endDate: endDate });
+  }
+
   _handleStartDatePicked = (date) => {
     console.log('A date has been picked: ', date);
     this._hideDateTimePickerStart();
-    this.setState({ startDate: date })
+    let startDate = this.state.startDate;
+    startDate.setHours(date.getHours());
+    startDate.setMinutes(date.getMinutes());
+    this.setState({ startDate: startDate });
+    // this.setState({ startDate: date })
   };
 
   _handleEndDatePicked = (date) => {
     this._hideDateTimePickerEnd();
-    this.setState({ endDate: date })
+    let endDate = this.state.endDate;
+    endDate.setHours(date.getHours());
+    endDate.setMinutes(date.getMinutes());
+    this.setState({ endDate: endDate })
   }
 
 
@@ -275,8 +300,16 @@ export default class CreateEventView extends React.Component {
           onChangeText={(text) => this.setState({ serving: text })}
         />
         <DateTimePicker
+          isVisible={this.state.isDayPickerVisible}
+          mode='date'
+          date={this.state.startDate}
+          onConfirm={this._handleDayPicked}
+          onCancel={this._hideDayPicker}
+        />
+
+        <DateTimePicker
           isVisible={this.state.isDateTimePickerStartVisible}
-          mode='datetime'
+          mode='time'
           date={this.state.startDate}
           onConfirm={this._handleStartDatePicked}
           onCancel={this._hideDateTimePickerStart}
@@ -290,18 +323,26 @@ export default class CreateEventView extends React.Component {
           onCancel={this._hideDateTimePickerEnd}
         />
 
+        <FormLabel labelStyle={styles.textLabel}>Date</FormLabel>
+        <Button
+          title={lib._convertDate_getMonthDay(this.state.startDate)}
+          backgroundColor='#FFC107'
+          borderRadius={10}
+          containerViewStyle={styles.submitButton}
+          color='#607D8B'
+          onPress={this._showDayPicker}
+        />
         <Grid>
           <Col>
-            <FormLabel labelStyle={styles.textLabel}>Start Date & Time</FormLabel>
+            <FormLabel labelStyle={styles.textLabel}>Start Time</FormLabel>
             <Button
-              title={lib._convertDate(this.state.startDate)}
+              title={lib._convertHoursMin(this.state.startDate)}
               backgroundColor='#FFC107'
               borderRadius={10}
               containerViewStyle={styles.submitButton}
               color='#607D8B'
               onPress={this._showDateTimePickerStart}
             />
-
 
           </Col>
           <Col>
