@@ -15,6 +15,32 @@ const lib = {
     } else return hour
   },
 
+  // _getNearestHalfHourTimeString: (date) => {
+  //   var hour = date.getHours();
+  //   var minutes = date.getMinutes();
+  //   var ampm = "AM";
+  //   if (minutes < 15) {
+  //     minutes = "00";
+  //   } else if (minutes < 45) {
+  //     minutes = "30";
+  //   } else {
+  //     minutes = "00";
+  //     ++hour;
+  //   }
+  //   if (hour > 23) {
+  //     hour = 12;
+  //   } else if (hour > 12) {
+  //     hour = hour - 12;
+  //     ampm = "PM";
+  //   } else if (hour == 12) {
+  //     ampm = "PM";
+  //   } else if (hour == 0) {
+  //     hour = 12;
+  //   }
+
+  //   return (hour + ":" + minutes + " " + ampm);
+  // },
+
   _convertHoursMin: (date) => {
     var hour = date.getHours();
     var min = date.getMinutes();
