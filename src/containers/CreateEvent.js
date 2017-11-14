@@ -241,7 +241,7 @@ export default class CreateEventView extends React.Component {
             raised
             icon={{ name: 'camera', size: 18 }}
             containerStyle={{ backgroundColor: 'transparent' }}
-            buttonStyle={{ backgroundColor: 'red', borderRadius: 10 }}
+            buttonStyle={{ backgroundColor: 'red', borderRadius: 10, marginTop: 10 }}
             textStyle={{ textAlign: 'center' }}
             title={'Add photo'}
             onPress={this._getImage}
