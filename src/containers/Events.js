@@ -8,6 +8,7 @@ import { List, ListItem, SearchBar } from 'react-native-elements'
 import ActionButton from 'react-native-action-button'
 import images from '../config/images'
 import lib from '../lib/scripts'
+import { getUser } from '../lib/auth';
 
 const eventsURL = settings.server.url + '/events';
 var { width, height } = Dimensions.get('window');
@@ -74,7 +75,9 @@ class Events extends React.Component {
     const VEGGIE_IPSUM = 'Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic. Gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato. Dandelion cucumber earthnut pea peanut soko zucchini.'
 
     this.state = {
+      admin: false,
       refreshing: false,                              // state is refreshing
+      searchText: '',                               // what user is searching for
       eventSource: new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1.id !== r2.id
       }),
@@ -84,6 +87,7 @@ class Events extends React.Component {
 
     this.renderRow = this.renderRow.bind(this);
     this.getEvents = this.getEvents.bind(this);
+    this.searchEvents = this.searchEvents.bind(this);
   }
 
   _onRefresh() {
@@ -99,6 +103,14 @@ class Events extends React.Component {
 
   testnav = () => {
     console.log('in events');
+  }
+
+  searchEvents = (text) => {
+    if (text.length > 0) {
+      this.setState({ searchText: text.toLowerCase() });
+    } else {
+      this.setState({ searchText: '' });
+    }
   }
 
   componentWillReceiveProps(newProps) {
@@ -129,9 +141,16 @@ class Events extends React.Component {
 
   componentWillMount() {
     this.getEvents();
+    getUser()
+    .then((user) => {
+      this.setState({ admin: user.admin });
+    })
   }
 
   renderEvent(event) {
+    if (event.title.toLowerCase().indexOf(this.state.searchText) < 0) {
+      return(<View/>);
+    }
     return(
       <TouchableOpacity
         onPress={() => this.props.navigation.navigate('EventDetail', { ...event })}>
@@ -206,17 +225,21 @@ class Events extends React.Component {
           }>
           <SearchBar
             lightTheme
+            onClearText={this.clearSearch}
+            onChangeText={(value) => this.searchEvents(value)}
+            clearIcon={{ color: '#86939e', name: 'clear' }}
             containerStyle={{ backgroundColor: '#fff' }}
             placeholder='Search Event...'
           />
           <ListView
             removeClippedSubviews={false}       // forces list to render
+            keyboardShouldPersistTaps={"handled"}
             dataSource={this.state.eventSource}
             renderRow={(row) => this.renderEvent(row)}
             style={{padding: 0, margin: 0}}
           />
         </ScrollView>
-         {global.admin &&
+         {this.state.admin &&
           <ActionButton style={{marginTop: -10}} buttonColor="rgba(231,76,60,1)">
             <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
               this.props.navigation.navigate('CreateEvent');
