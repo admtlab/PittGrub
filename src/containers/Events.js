@@ -1,5 +1,5 @@
 import React from 'react'
-import { AsyncStorage, RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
+import { AsyncStorage, Dimensions, RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
 import metrics from '../config/metrics'
 import settings from '../config/settings';
 import { colors } from '../config/styles'
@@ -10,6 +10,7 @@ import images from '../config/images'
 import lib from '../lib/scripts'
 
 const eventsURL = settings.server.url + '/events';
+var { width, height } = Dimensions.get('window');
 
 // styles
 const styles = StyleSheet.create({
@@ -78,7 +79,7 @@ class Events extends React.Component {
         rowHasChanged: (r1, r2) => r1.id !== r2.id
       }),
       loaded: false,
-      createButton: false,      
+      createButton: false,
     }
 
     this.renderRow = this.renderRow.bind(this);
@@ -88,7 +89,7 @@ class Events extends React.Component {
   _onRefresh() {
     this.setState({ refreshing: true });
     this.getEvents();
-    this.setState({ refreshing: false });    
+    this.setState({ refreshing: false });
     console.log('refreshed events');
   }
 
@@ -195,6 +196,8 @@ class Events extends React.Component {
     return (
       <View>
         <ScrollView
+          keyboardShouldPersistTaps={'handled'}
+          height={'100%'}
           refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
@@ -213,7 +216,7 @@ class Events extends React.Component {
             style={{padding: 0, margin: 0}}
           />
         </ScrollView>
-         {global.admin && 
+         {global.admin &&
           <ActionButton style={{marginTop: -10}} buttonColor="rgba(231,76,60,1)">
             <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
               this.props.navigation.navigate('CreateEvent');
