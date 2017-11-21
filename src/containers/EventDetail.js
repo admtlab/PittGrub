@@ -108,7 +108,7 @@ export default class EventDetail extends React.Component {
 
           <Text style={styles.header_text}>Date and Time</Text>
           <Text style={styles.normal}>{
-            lib._convertDate_getMonthDay(new Date(this.props.navigation.state.params.start_date)) + '  ' +
+            lib._convertDate_getMonthDay(new Date(this.props.navigation.state.params.start_date)) + '\n' +
             lib._convertHoursMin(new Date(this.props.navigation.state.params.start_date)) + ' ~ ' +
             lib._convertHoursMin(new Date(this.props.navigation.state.params.end_date))
           }
@@ -166,4 +166,3 @@ export default class EventDetail extends React.Component {
     )
   }
 }
-
