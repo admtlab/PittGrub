@@ -228,7 +228,7 @@ class Profile extends React.Component {
           minimumValue={0}
           maximumValue={6}
           step={1}
-          onSlidingComplete={() => console.log("complete")}
+          onSlidingComplete={() => console.log("done")}
           onValueChange={(value) => {
             if (value == unlimitedNotifications) {
               this.setState({ maxNotifications: "unlimited" })

@@ -39,12 +39,22 @@ export async function handleNotification(notification) {
   console.log('notification context: ' + notification);
   if (this.state.appState == 'active') {
     // handle foreground notification
-    console.log(JSON.stringify(notification));
-    Alert.alert(
-      'New PittGrub event!',
-      notification.data.data,
-      {text: 'OK'});
-    Alert.alert(JSON.stringify(notification));
+    if (notification.data.type === 'message') {
+      Alert.alert('message', {test: 'OK'});
+      Alert.alert(
+        notification.data.title + "\n\n" +
+        notification.data.body,
+        {text: 'OK'});
+    } else if (notification.data.type === 'event') {
+      Alert.alert('event', {test: 'OK'});
+      Alert.alert(
+        notification.data.title + "\n\n" +
+        notification.data.body,
+        {text: 'OK'});
+    } else {
+      Alert.alert('else', {test: 'OK'});
+    }
+
   } else {
     // handle background notification
     Notifications.presentLocalNotificationAsync(this.state.notification);
