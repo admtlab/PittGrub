@@ -20,10 +20,10 @@ export async function registerForPushNotifications() {
   if (finalStatus !== 'granted') {
     return;
   }
-  
+
   // configure expo notification token
   let token = await Notifications.getExpoPushTokenAsync();
-  
+
   // send token to server
   getUser()
   .then((user) => {
