@@ -13,7 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet } from 'react-native'
-import { Button, CheckBox, FormLabel, FormInput } from 'react-native-elements';
+import { Button, CheckBox, FormLabel, FormInput, Slider } from 'react-native-elements';
 import { NavigationActions } from 'react-navigation';
 import { Permissions, Notifications } from 'expo';
 import metrics from '../config/metrics'
@@ -82,6 +82,7 @@ class Profile extends React.Component {
       dairyFree: false,
       vegetarian: false,
       vegan: false,
+      maxNotifications: 3,
     }
 
     this.getPreferences();
@@ -135,7 +136,7 @@ class Profile extends React.Component {
     })
     .then((responseData) => {
       console.log('responseData');
-      console.log(responseData); 
+      console.log(responseData);
     })
     .catch((error) => {
       console.log('Error: ' + error);
@@ -163,6 +164,7 @@ class Profile extends React.Component {
   }
 
   render() {
+    const unlimitedNotifications = 6;
     return (
       <ScrollView style={styles.viewContainer}>
         {/* Food preference settings */}
@@ -211,6 +213,30 @@ class Profile extends React.Component {
           checkedColor='#009688'
         />
 
+        {/*<FormLabel labelStyle={styles.title}>Notifications</FormLabel>
+        <Text
+          style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight:20, }}>
+          Set the maximum number of daily event notifications that you would like to receive.
+        </Text>
+        <Text style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20 }}>
+          Max notifications: <Text style={{fontWeight: 'bold'}}>{this.state.maxNotifications}</Text>
+        </Text>
+        <Slider
+          style={{marginLeft: 20, marginRight: 20}}
+          thumbTintColor={'#009688'}
+          value={3}
+          minimumValue={0}
+          maximumValue={6}
+          step={1}
+          onSlidingComplete={() => console.log("done")}
+          onValueChange={(value) => {
+            if (value == unlimitedNotifications) {
+              this.setState({ maxNotifications: "unlimited" })
+            } else {
+              this.setState({ maxNotifications: value });
+            }
+          }}
+        /> */}
         {/*<View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -253,7 +279,7 @@ class Profile extends React.Component {
         {/*<FormLabel labelStyle={styles.title}>Change Password</FormLabel>
         <FormLabel>Old Password</FormLabel>
         <FormInput secureTextEntry={true}/>
-        <FormLabel>New Password</FormLabel>        
+        <FormLabel>New Password</FormLabel>
         <FormInput secureTextEntry={true}/>
         <FormLabel>Confirm New Password</FormLabel>
         <FormInput secureTextEntry={true}/>*/}

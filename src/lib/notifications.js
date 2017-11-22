@@ -20,10 +20,10 @@ export async function registerForPushNotifications() {
   if (finalStatus !== 'granted') {
     return;
   }
-  
+
   // configure expo notification token
   let token = await Notifications.getExpoPushTokenAsync();
-  
+
   // send token to server
   getUser()
   .then((user) => {
@@ -35,16 +35,17 @@ export async function registerForPushNotifications() {
 }
 
 export async function handleNotification(notification) {
-  this.setState({ notification: notification });
+  // this.setState({ notification: notification });
   console.log('notification context: ' + notification);
   if (this.state.appState == 'active') {
     // handle foreground notification
-    console.log(JSON.stringify(notification));
-    Alert.alert(
-      'New PittGrub event!',
-      notification.data.data,
-      {text: 'OK'});
-    Alert.alert(JSON.stringify(notification));
+    if (notification.data.type === 'message') {
+      Alert.alert(notification.data.title + "\n\n" + notification.data.body);
+    } else if (notification.data.type === 'event') {
+      Alert.alert(notification.data.title + "\n\n" + notification.data.event);
+    } else {
+      Alert.alert('else', {test: 'OK'});
+    }
   } else {
     // handle background notification
     Notifications.presentLocalNotificationAsync(this.state.notification);
