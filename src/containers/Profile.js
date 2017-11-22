@@ -213,7 +213,7 @@ class Profile extends React.Component {
           checkedColor='#009688'
         />
 
-        <FormLabel labelStyle={styles.title}>Notifications</FormLabel>
+        {/*<FormLabel labelStyle={styles.title}>Notifications</FormLabel>
         <Text
           style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight:20, }}>
           Set the maximum number of daily event notifications that you would like to receive.
@@ -236,7 +236,7 @@ class Profile extends React.Component {
               this.setState({ maxNotifications: value });
             }
           }}
-        />
+        /> */}
         {/*<View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
