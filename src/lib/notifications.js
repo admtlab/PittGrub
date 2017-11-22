@@ -46,10 +46,9 @@ export async function handleNotification(notification) {
         notification.data.body,
         {text: 'OK'});
     } else if (notification.data.type === 'event') {
-      Alert.alert('event', {test: 'OK'});
       Alert.alert(
         notification.data.title + "\n\n" +
-        notification.data.body,
+        notification.data.event,
         {text: 'OK'});
     } else {
       Alert.alert('else', {test: 'OK'});
