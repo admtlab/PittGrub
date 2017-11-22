@@ -35,25 +35,17 @@ export async function registerForPushNotifications() {
 }
 
 export async function handleNotification(notification) {
-  this.setState({ notification: notification });
+  // this.setState({ notification: notification });
   console.log('notification context: ' + notification);
   if (this.state.appState == 'active') {
     // handle foreground notification
     if (notification.data.type === 'message') {
-      Alert.alert('message', {test: 'OK'});
-      Alert.alert(
-        notification.data.title + "\n\n" +
-        notification.data.body,
-        {text: 'OK'});
+      Alert.alert(notification.data.title + "\n\n" + notification.data.body);
     } else if (notification.data.type === 'event') {
-      Alert.alert(
-        notification.data.title + "\n\n" +
-        notification.data.event,
-        {text: 'OK'});
+      Alert.alert(notification.data.title + "\n\n" + notification.data.event);
     } else {
       Alert.alert('else', {test: 'OK'});
     }
-
   } else {
     // handle background notification
     Notifications.presentLocalNotificationAsync(this.state.notification);
