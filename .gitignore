@@ -58,7 +58,7 @@ local.properties
 npm-debug.*
 
 # Node
-node_modules
+#node_modules
 *.log
 .nvm
 
