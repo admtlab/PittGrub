@@ -240,7 +240,7 @@ class Profile extends React.Component {
         <FormLabel labelStyle={styles.title}>Eagerness</FormLabel>
         <Text
           style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20, }}>
-          How eager are you to receive free food? This will influence your likelihood of being sent event notifications.
+          How eager are you to pursue free food? This will influence your likelihood of being sent event notifications.
         </Text>
         {/* <Text style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20 }}>
           Max notifications: <Text style={{ fontWeight: 'bold' }}>{this.state.maxNotifications}</Text>
@@ -261,7 +261,7 @@ class Profile extends React.Component {
 
         <FormLabel labelStyle={styles.title}>Pitt Pantry</FormLabel>
         <Text style={{fontSize:15, margin:5, marginLeft:20, marginRight:20}}>
-          Check this box if you are a member of The Pitt Pantry. This will influence your likelihood of being sent event notifications. We do not share this information.
+          Check this box if you are a member of The Pitt Pantry. This will increase your likelihood of being sent event notifications. We do not share this information.
         </Text>
         <CheckBox
           title='Member'
