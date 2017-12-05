@@ -88,8 +88,10 @@ export default class EventDetail extends React.Component {
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground }}>
         {/* <Card> */}
+          {this.state.image !== null &&
           <Image source={{uri: imageEndpoint}}
             style={{height: width}} />
+          }
           {/* </Card> */}
         <Card>
           <Text style={styles.title_text}>
