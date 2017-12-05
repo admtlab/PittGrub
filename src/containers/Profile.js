@@ -104,8 +104,21 @@ class Profile extends React.Component {
   componentWillMount() {
     getUser()
       .then((user) => {
-        this.setState({ eagerness: user['eagerness'] });
-        this.setState({ pantry: user['pantry'] })
+        // set pitt pantry setting
+        if (user['pantry'] == undefined || user['pantry'] == null) {
+          setPantry(false);
+          this.setState({ pantry: false });
+        } else {
+          this.setState({ pantry: user['pantry'] })
+        }
+
+        // set eagerness level
+        if (user['eagerness'] == undefined || user['eagerness'] == null) {
+          setEagerness(3);
+          this.setState({ eagerness: 3 });
+        } else {
+          this.setState({ eagerness: user['eagerness'] });
+        }
       });
   }
 
