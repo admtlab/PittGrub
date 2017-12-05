@@ -26,8 +26,8 @@ export async function storeUser(user) {
 }
 
 export async function activateUser() {
-    const activated = JSON.stringify({ activated: true });
-    AsyncStorage.mergeItem('user', activated);
+    const active = JSON.stringify({ active: true });
+    AsyncStorage.mergeItem('user', active);
 }
 
 export async function setStatus(status) {

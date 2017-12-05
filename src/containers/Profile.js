@@ -12,7 +12,8 @@ import {
   TouchableHighlight,
   TextInput,
   TouchableOpacity,
-  StyleSheet } from 'react-native'
+  StyleSheet
+} from 'react-native'
 import { Button, CheckBox, FormLabel, FormInput, Slider } from 'react-native-elements';
 import { NavigationActions } from 'react-navigation';
 import { Permissions, Notifications } from 'expo';
@@ -22,8 +23,13 @@ import images from '../config/images'
 import settings from '../config/settings';
 import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons';
-import { setFoodPreferences } from '../lib/user';
-import { getToken } from '../lib/auth';
+import {
+  setEagerness,
+  setFoodPreferences,
+  setPantry
+} from '../lib/user';
+import { getToken, getUser } from '../lib/auth';
+import { postSettings } from '../lib/api';
 
 const styles = StyleSheet.create({
   title: {
@@ -44,25 +50,25 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  input:{
-    minWidth:300,
-    flexWrap:'wrap',
-    height : 40,
+  input: {
+    minWidth: 300,
+    flexWrap: 'wrap',
+    height: 40,
     backgroundColor: 'rgba(204,204,204,0.2)',
-    paddingHorizontal : 10,
-    color:'#333333',
-    marginBottom : 10,
+    paddingHorizontal: 10,
+    color: '#333333',
+    marginBottom: 10,
   },
-  buttonContainer:{
+  buttonContainer: {
     backgroundColor: "#1980b9",
-    paddingVertical:10,
-    marginTop:15,
-    marginBottom:20
+    paddingVertical: 10,
+    marginTop: 15,
+    marginBottom: 20
   },
-  loginbutton:{
+  loginbutton: {
     color: '#ffffff',
-    textAlign:'center',
-    fontWeight:'700'
+    textAlign: 'center',
+    fontWeight: '700'
   }
 });
 
@@ -82,7 +88,9 @@ class Profile extends React.Component {
       dairyFree: false,
       vegetarian: false,
       vegan: false,
-      maxNotifications: 3,
+      eagerness: 1,
+      maxEager: 5,
+      pantry: false
     }
 
     this.getPreferences();
@@ -91,6 +99,14 @@ class Profile extends React.Component {
 
   testnav = () => {
     console.log('in profile');
+  }
+
+  componentWillMount() {
+    getUser()
+      .then((user) => {
+        this.setState({ eagerness: user['eagerness'] });
+        this.setState({ pantry: user['pantry'] })
+      });
   }
 
   componentWillReceiveProps(newProps) {
@@ -124,47 +140,46 @@ class Profile extends React.Component {
       },
       body: JSON.stringify(preferences)
     })
-    .then((response) => {
-      if (response.ok) {
-        setFoodPreferences(preferences);
-        console.log('response');
-        return response.json();
-      } else {
-        console.log('response failed');
-        console.log(response);
-      }
-    })
-    .then((responseData) => {
-      console.log('responseData');
-      console.log(responseData);
-    })
-    .catch((error) => {
-      console.log('Error: ' + error);
-    });
+      .then((response) => {
+        if (response.ok) {
+          setFoodPreferences(preferences);
+          console.log('response');
+          return response.json();
+        } else {
+          console.log('response failed');
+          console.log(response);
+        }
+      })
+      .then((responseData) => {
+        console.log('responseData');
+        console.log(responseData);
+      })
+      .catch((error) => {
+        console.log('Error: ' + error);
+      });
   }
 
   getPreferences() {
     AsyncStorage.getItem('user')
-    .then((user) => {
-      user = JSON.parse(user);
-      let foodPrefs = user.food_preferences;
-      if (foodPrefs.includes(1)) {
-        this.setState({ glutenFree: true });
-      }
-      if (foodPrefs.includes(2)) {
-        this.setState({ dairyFree: true });
-      }
-      if (foodPrefs.includes(3)) {
-        this.setState({ vegetarian: true });
-      }
-      if (foodPrefs.includes(4)) {
-        this.setState({ vegan: true });
-      }
-    });
+      .then((user) => {
+        user = JSON.parse(user);
+        let foodPrefs = user.food_preferences;
+        if (foodPrefs.includes(1)) {
+          this.setState({ glutenFree: true });
+        }
+        if (foodPrefs.includes(2)) {
+          this.setState({ dairyFree: true });
+        }
+        if (foodPrefs.includes(3)) {
+          this.setState({ vegetarian: true });
+        }
+        if (foodPrefs.includes(4)) {
+          this.setState({ vegan: true });
+        }
+      });
   }
 
   render() {
-    const unlimitedNotifications = 6;
     return (
       <ScrollView style={styles.viewContainer}>
         {/* Food preference settings */}
@@ -212,78 +227,6 @@ class Profile extends React.Component {
           containerStyle={styles.checkboxContainer}
           checkedColor='#009688'
         />
-
-        {/*<FormLabel labelStyle={styles.title}>Notifications</FormLabel>
-        <Text
-          style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight:20, }}>
-          Set the maximum number of daily event notifications that you would like to receive.
-        </Text>
-        <Text style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20 }}>
-          Max notifications: <Text style={{fontWeight: 'bold'}}>{this.state.maxNotifications}</Text>
-        </Text>
-        <Slider
-          style={{marginLeft: 20, marginRight: 20}}
-          thumbTintColor={'#009688'}
-          value={3}
-          minimumValue={0}
-          maximumValue={6}
-          step={1}
-          onSlidingComplete={() => console.log("done")}
-          onValueChange={(value) => {
-            if (value == unlimitedNotifications) {
-              this.setState({ maxNotifications: "unlimited" })
-            } else {
-              this.setState({ maxNotifications: value });
-            }
-          }}
-        /> */}
-        {/*<View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          borderColor: '#ededed',
-          backgroundColor: '#f9f9f9',
-          borderWidth: 1,
-          padding: 10,
-          borderRadius: 3,
-          margin: 5,
-          marginRight: 10,
-          marginLeft: 10
-        }}>
-          <CheckBox
-            style={{ backgroundColor: '#f9f9f9' }}
-            title='Vegan'
-            checked={this.state.vegan}
-            onPress={() => {
-              this.setState({ vegan: !this.state.vegan })
-              if (!this.state.vegan) {
-                this.setState({ dairyFree: true })
-                this.setState({ vegetarian: true })
-              }
-            }}
-            checkedColor='#009688'
-          />
-          <TouchableHighlight
-            style={{
-              flex: 1,
-              alignContent: 'center',
-              marginTop: -4,
-              justifyContent: 'center',
-              alignItems: 'flex-end'
-            }}>
-            <Image
-              resizeMode='center'
-              source={images.info}
-            />
-          </TouchableHighlight>
-        </View>*/}
-        {/*<FormLabel labelStyle={styles.title}>Change Password</FormLabel>
-        <FormLabel>Old Password</FormLabel>
-        <FormInput secureTextEntry={true}/>
-        <FormLabel>New Password</FormLabel>
-        <FormInput secureTextEntry={true}/>
-        <FormLabel>Confirm New Password</FormLabel>
-        <FormInput secureTextEntry={true}/>*/}
-
         <Button
           title='UPDATE'
           backgroundColor='#009688'
@@ -292,6 +235,45 @@ class Profile extends React.Component {
           onPress={() => {
             this.updatePreferences();
           }}
+        />
+
+        <FormLabel labelStyle={styles.title}>Eagerness</FormLabel>
+        <Text
+          style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20, }}>
+          How eager are you to pursue free food? This will influence your likelihood of being sent event notifications.
+        </Text>
+        {/* <Text style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20 }}>
+          Max notifications: <Text style={{ fontWeight: 'bold' }}>{this.state.maxNotifications}</Text>
+        </Text> */}
+        <Slider
+          style={{ marginLeft: 20, marginRight: 20 }}
+          thumbTintColor={'#009688'}
+          value={this.state.eagerness}
+          minimumValue={1}
+          maximumValue={5}
+          step={1}
+          onSlidingComplete={() => {
+            console.log("done: " + this.state.eagerness);
+            setEagerness(this.state.eagerness);
+            postSettings({ eagerness: this.state.eagerness })
+          }}
+          onValueChange={(value) => this.setState({ eagerness: value })}/>
+
+        <FormLabel labelStyle={styles.title}>Pitt Pantry</FormLabel>
+        <Text style={{fontSize:15, margin:5, marginLeft:20, marginRight:20}}>
+          Check this box if you are a member of The Pitt Pantry. This will increase your likelihood of being sent event notifications. We do not share this information.
+        </Text>
+        <CheckBox
+          title='Member'
+          checked={this.state.pantry}
+          onPress={() => {
+            let newStatus = !this.state.pantry;
+            setPantry(newStatus);
+            postSettings({ pantry: newStatus });
+            this.setState({ pantry: newStatus });
+          }}
+          containerStyle={styles.checkboxContainer}
+          checkedColor='#009688'
         />
         <FormLabel labelStyle={styles.title}>Account</FormLabel>
         <Button
@@ -309,7 +291,7 @@ class Profile extends React.Component {
               index: 0,
               key: null,
               actions: [
-                NavigationActions.navigate({routeName: 'Entrance'})
+                NavigationActions.navigate({ routeName: 'Entrance' })
               ]
             }))
           }}
