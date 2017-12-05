@@ -126,11 +126,18 @@ class Events extends React.Component {
       .then((responseData) => {
         console.log("Successfully fetched events");
         console.log(responseData);
-        const events = responseData['_embedded']['events'];
-        this.setState({
-          eventSource: this.state.eventSource.cloneWithRows(events),
-          loaded: true
-        });
+        if (responseData._embedded.events !== undefined) {
+          const events = responseData['_embedded']['events'];
+          this.setState({
+            eventSource: this.state.eventSource.cloneWithRows(events),
+            loaded: true
+          });
+        } else {
+          this.setState({
+            eventSource: this.state.eventSource.cloneWithRows([]),
+            loaded: true
+          })
+        }
       })
       .catch((error) => {
         console.log('failed fetch');

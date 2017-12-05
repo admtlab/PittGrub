@@ -101,221 +101,8 @@ class Home extends React.Component {
         rowHasChanged: (r1, r2) => r1.id !== r2.id
       }),
       loaded: false,
-      recommendedObjects: [
-        {
-          title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: images.kitchen
-        },
-        {
-          title: 'Market Central Extra Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 20,
-          address: '456 Super Cool Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 2,
-              name: "Vegan",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-          ],
-          image: images.restaurant
-        },
-        {
-          title: 'Free donuts',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-          ],
-          // image: images.kitchen
-        },
-        {
-          title: 'Market Central Stir Fry',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: 'Market Central',
-          location_details: 'Ground floor of Towers lobby',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 1,
-              name: 'Gluten Free',
-              description: 'No gluten (including wheat, barley, or rye).'
-            },
-            {
-              id: 2,
-              name: "Vegan",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-          ],
-          // image: images.kitchen
-        },
-        {
-          title: 'Coffee',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: 'Willia Pitt Union',
-          location_details: 'Outside of WPU lobby',
-          organization: 'CS Club',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 1,
-              name: 'Gluten Free',
-              description: 'No gluten (including wheat, barley, or rye).'
-            },
-            {
-              id: 2,
-              name: "Vegan",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-          ],
-          // image: images.kitchen
-        },
-      ], 
-      dataObjects: [
-        {
-          title: 'Cathedral Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            }
-          ],
-          image: images.kitchen
-        },
-        {
-          title: 'Market Central Extra Pizzas',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 20,
-          address: '456 Super Cool Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-            {
-              id: 2,
-              name: "Vegan",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-            {
-              id: 3,
-              name: "Vegetarian",
-              description: "No meat, which includes red meat, poultry, and seafood"
-            },
-          ],
-          image: images.kitchen
-        },
-        {
-          title: 'Free donuts',
-          startDate: new Date(),
-          endDate: new Date(),
-          details: BACON_IPSUM,
-          serving: 3,
-          address: '123 Cathedral Drive',
-          location_details: '3rd floor Room 12',
-          organization: '',
-          organizer_id: '',
-          foodPreferences: [
-          ],
-          image: images.restaurant
-        },
-        // {
-        //   title: 'Cathedral Pizzas',
-        //   startDate: new Date(),
-        //   endDate: new Date(),
-        //   details: BACON_IPSUM,
-        //   serving: 3,
-        //   address: '123 Cathedral Drive',
-        //   location_details: '3rd floor Room 12',
-        //   organization: '',
-        //   organizer_id: '',
-        //   foodPreferences: [
-        //     {
-        //       id: 3,
-        //       name: "Vegetarian",
-        //       description: "No meat, which includes red meat, poultry, and seafood"
-        //     }
-        //   ],
-        //   image: images.kitchen
-        // },
-        // {
-        //   title: 'Cathedral Pizzas',
-        //   startDate: new Date(),
-        //   endDate: new Date(),
-        //   details: BACON_IPSUM,
-        //   serving: 3,
-        //   address: '123 Cathedral Drive',
-        //   location_details: '3rd floor Room 12',
-        //   organization: '',
-        //   organizer_id: '',
-        //   foodPreferences: [
-        //     {
-        //       id: 3,
-        //       name: "Vegetarian",
-        //       description: "No meat, which includes red meat, poultry, and seafood"
-        //     }
-        //   ],
-        //   image: images.kitchen
-        // }
-      ]
     }
+
     this.renderRow = this.renderRow.bind(this);
     this.fetchData = this.fetchData.bind(this);
     this.renderEvent = this.renderEvent.bind(this);
@@ -325,7 +112,7 @@ class Home extends React.Component {
   _onRefresh() {
     this.setState({ refreshing: true });
     this.getEvents();
-    this.setState({ refreshing: false });    
+    this.setState({ refreshing: false });
     console.log('refreshing home');
   }
 
@@ -410,10 +197,14 @@ class Home extends React.Component {
         .then((response) => response.json())
         .then((responseData) => {
           console.log("Fetched recommended events");
-          var events = responseData['_embedded']['events'];
-          console.log('read recommended events');
-          this.setState({recommendedSource: this.state.recommendedSource.cloneWithRows(events)});
-          console.log('set recommended source')        
+          if (responseData._embedded.events !== undefined) {
+            console.log('read recommended events');
+            let events = responseData['_embedded']['events'];
+            this.setState({recommendedSource: this.state.recommendedSource.cloneWithRows(events)});
+          } else {
+            this.setState({recommendedSource: this.state.recommendedSource.cloneWithRows([])});
+          }
+          console.log('set recommended source')
         })
         .catch((error) => {
           console.log('failed fetching recommended');
@@ -425,10 +216,14 @@ class Home extends React.Component {
         .then((response) => response.json())
         .then((responseData) => {
           console.log("fetched accepted events");
-          var events = responseData['_embedded']['events'];
-          console.log('read accepted events')
-          this.setState({acceptedSource: this.state.acceptedSource.cloneWithRows(events)});
-          console.log('set accepted source')        
+          if (responseData._embedded.events !== undefined) {
+            console.log('read accepted events')
+            let events = responseData['_embedded']['events'];
+            this.setState({acceptedSource: this.state.acceptedSource.cloneWithRows(events)});
+          } else {
+            this.setState({acceptedSource: this.state.acceptedSource.cloneWithRows([])});
+          }
+          console.log('set accepted source')
         })
         .catch((error) => {
           console.log('failed fetching accepted');
@@ -513,7 +308,7 @@ class Home extends React.Component {
             }
           </List> */}
 
-          {/* new */}          
+          {/* new */}
           <View style={styles.banner}>
             <Text style={styles.bannerLabel}> {'My Events (' + this.state.acceptedSource.getRowCount() + ')'}</Text>
           </View>
@@ -528,7 +323,7 @@ class Home extends React.Component {
             />
           }
 
-          {/* old */}          
+          {/* old */}
           {/* <View style={styles.banner2}>
             <Text style={styles.bannerLabel}> {'Recommended (' + this.state.recommendedObjects.length + ')'} </Text>
           </View>
