@@ -6,6 +6,7 @@ const TOKEN_ENDPOINT = settings.server.url + '/token';
 const SIGNUP_ENDPONT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
+const SETTINGS_ENDPOINT = settings.server.url + '/users/settings';
 const PASSWORD_RESET_ENDPOINT = settings.server.url + '/password/reset';
 
 
@@ -73,6 +74,24 @@ export async function postVerification(code) {
       'Authorization': 'Bearer ' + token.token,
     },
     body: JSON.stringify({ activation: code }),
+  });
+}
+
+export async function postSettings(settings) {
+  /* possible settings keys
+   * eagerness - eagerness value
+   * pantry - pitt pantry value
+   * food_preferences - ids of update food preferences
+  */
+  let token = await getToken();
+  return fetch(SETTINGS_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token.token,
+    },
+    body: JSON.stringify(settings),
   });
 }
 

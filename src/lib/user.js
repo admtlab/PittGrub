@@ -24,3 +24,13 @@ export async function setFoodPreferences(foodPreferences) {
   const foodPrefs = JSON.stringify({ foodPreferences: foodPreferences });
   AsyncStorage.mergeItem('user', foodPrefs);
 }
+
+export async function setEagerness(value) {
+  const eagerness = JSON.stringify({ eagerness: value });
+  AsyncStorage.mergeItem('user', eagerness);
+}
+
+export async function setPantry(value) {
+  const pantry = JSON.stringify({ pantry: value });
+  AsyncStorage.mergeItem('user', pantry);
+}
