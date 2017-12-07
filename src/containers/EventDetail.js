@@ -47,7 +47,7 @@ export default class EventDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      image: null,
+      image: true,
     }
     this._renderFoodPreferences = this._renderFoodPreferences.bind(this)
     this._getEventImage = this._getEventImage.bind(this);
@@ -84,13 +84,14 @@ export default class EventDetail extends React.Component {
     const eventId = this.props.navigation.state.params.id;
     const imageEndpoint = settings.server.url + '/events/' + eventId + '/images/';
     var food_arr = this.props.navigation.state.params.foodPreferences;
-    console.log('state: ' + this.state);
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground }}>
         {/* <Card> */}
-          {this.state.image !== null &&
+          {this.state.image &&
           <Image source={{uri: imageEndpoint}}
-            style={{height: width}} />
+            style={{height: width}}
+            onError={this.setState({ image: false })}
+            />
           }
           {/* </Card> */}
         <Card>
