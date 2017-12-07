@@ -254,7 +254,7 @@ export default class CreateEventView extends React.Component {
         <FormInput
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. Best Tacos In Town'}
-          maxLength={20}
+          maxLength={255}
           onChangeText={(text) => this.setState({ title: text })}
         />
 
