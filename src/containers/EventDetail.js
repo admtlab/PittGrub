@@ -90,7 +90,7 @@ export default class EventDetail extends React.Component {
           {this.state.image &&
           <Image source={{uri: imageEndpoint}}
             style={{height: width}}
-            onError={this.setState({ image: false })}
+            onError={() => {this.setState({ image: false })}}
             />
           }
           {/* </Card> */}
