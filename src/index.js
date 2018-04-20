@@ -47,12 +47,12 @@ class App extends React.Component {
     // Track app state (active, background)
     AppState.addEventListener('change', state => {
       this.setState({ appState: state });
-      console.log('AppState is ', state);
+      console.log('AppState is', state);
     });
   }
 
   render() {
-    // Register for push notifications early to 
+    // Register for push notifications early to
     // alert user when they've been accepted
     // May be too early here
     // registerForPushNotifications();
