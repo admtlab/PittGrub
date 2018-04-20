@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     height: height,
-    resizeMode: 'cover',
+    //resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center'
   },
