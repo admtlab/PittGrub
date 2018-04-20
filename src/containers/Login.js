@@ -7,8 +7,9 @@ import Logo from '../components/Logo';
 import metrics from '../config/metrics';
 import settings from '../config/settings';
 import { colors } from '../config/styles';
-import { postLogin } from '../lib/api';
+import { postLogin, getUserProfile } from '../lib/api';
 import { storeToken, storeUser } from '../lib/auth';
+import { isHost, getProfile, storeProfile } from '../lib/user';
 import { registerForPushNotifications } from '../lib/notifications';
 
 
@@ -98,11 +99,24 @@ export default class LoginScreen extends React.Component {
             }
           } else {
             this.setState({ loading: false });
-            activated = responseData['user']['active'];
-            status = responseData['user']['status'];
-            storeToken({ token: responseData['token'], expires: responseData['expires'] });
-            storeUser(responseData['user']);
-            global.admin = responseData['user']['admin'];
+            user = responseData['user'];
+            token = responseData['token'];
+            activated = user.active;
+            status = user.status;
+            storeToken({ token: token, expires: responseData['expires'] });
+            storeUser(user);
+            getProfile()
+            .then(response => response.json())
+            .then(responseData => {
+              profile = {
+                id: responseData['id'],
+                pittPantry: responseData['pitt_pantry'],
+                eagerness: responseData['eagerness'],
+                foodPreferences: responseData['food_preferences']
+              };
+              storeProfile(profile);
+            });
+            global.admin = isHost(user);
             registerForPushNotifications();
             this._clearState();
             if (!activated) {

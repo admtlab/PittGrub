@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../components/Button';
 import images from '../config/images';
 import { getToken, getUser, getUserTest } from '../lib/auth';
@@ -65,7 +65,7 @@ export default class WelcomeScreen extends React.Component {
   render() {
     return (
       <View style={styles.view}>
-        <Image source={images.enter} style={styles.backgroundImage}>
+        <ImageBackground source={images.enter} style={styles.backgroundImage}>
           <Text>{"\n\n\n\n"}{"\n\n\n\n"}</Text>
           <Button text="LOG IN"
             onPress={() => this.props.navigation.navigate('Login')}
@@ -75,7 +75,7 @@ export default class WelcomeScreen extends React.Component {
             onPress={() => this.props.navigation.navigate('Signup')}
             buttonStyle={styles.button}
             textStyle={styles.buttonText} />
-        </Image>
+        </ImageBackground>
       </View>
     );
   }

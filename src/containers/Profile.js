@@ -173,23 +173,23 @@ class Profile extends React.Component {
   }
 
   getPreferences() {
-    AsyncStorage.getItem('user')
-      .then((user) => {
-        user = JSON.parse(user);
-        let foodPrefs = user.food_preferences;
-        if (foodPrefs.includes(1)) {
-          this.setState({ glutenFree: true });
-        }
-        if (foodPrefs.includes(2)) {
-          this.setState({ dairyFree: true });
-        }
-        if (foodPrefs.includes(3)) {
-          this.setState({ vegetarian: true });
-        }
-        if (foodPrefs.includes(4)) {
-          this.setState({ vegan: true });
-        }
-      });
+    // AsyncStorage.getItem('user')
+    //   .then((user) => {
+    //     user = JSON.parse(user);
+    //     let foodPrefs = user.food_preferences;
+    //     if (foodPrefs.includes(1)) {
+    //       this.setState({ glutenFree: true });
+    //     }
+    //     if (foodPrefs.includes(2)) {
+    //       this.setState({ dairyFree: true });
+    //     }
+    //     if (foodPrefs.includes(3)) {
+    //       this.setState({ vegetarian: true });
+    //     }
+    //     if (foodPrefs.includes(4)) {
+    //       this.setState({ vegan: true });
+    //     }
+    //   });
   }
 
   render() {

@@ -4,10 +4,10 @@
     "description": "Notifications for free food at the University of Pittsburgh.",
     "version": "1.0.0-beta.6",
     "platforms": [
-        "ios"
+        "android"
     ],
     "slug": "PittGrubDev",
-    "sdkVersion": "22.0.0",
+    "sdkVersion": "23.0.0",
     "privacy": "unlisted",
     "orientation": "portrait",
     "ios": {
@@ -18,18 +18,20 @@
     "android": {
         "package": "edu.pitt.cs.admt.pittgrub",
         "versionCode": 1,
-        "versionName": "1.0.0",
         "permissions": [
             "ACCESS_COARSE_LOCATION",
             "ACCESS_FINE_LOCATION",
             "CAMERA"
         ]
     },
-    "icon": "./assets/Logo.jpg",
+    "icon": "./assets/logo.png",
     "loading": {
       "backgroundImage": "./assets/splash_beta.png",
       "hideExponentText": true
     },
-    "primaryColor": "#4C6AA4"
+    "primaryColor": "#4C6AA4",
+    "packagerOpts": {
+      "nonPersistent": true
+    }
   }
 }

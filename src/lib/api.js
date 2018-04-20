@@ -5,10 +5,22 @@ import settings from '../config/settings';
 const TOKEN_ENDPOINT = settings.server.url + '/token';
 const SIGNUP_ENDPONT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
-const ACTIVATION_ENDPOINT = settings.server.url + '/users/activate';
+const VERIFICATION_ENDPOINT = settings.server.url + '/users/verify';
+const PROFILE_ENDPOINT = settings.server.url + '/users/profile';
 const SETTINGS_ENDPOINT = settings.server.url + '/users/settings';
 const PASSWORD_RESET_ENDPOINT = settings.server.url + '/password/reset';
 
+
+export async function getUserProfile() {
+  return fetch(PROFILE_ENDPOINT, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token.token,
+    },
+  });
+}
 
 export async function postExpoToken(userId, token) {
   return fetch(TOKEN_ENDPOINT, {
@@ -54,7 +66,7 @@ export async function postLogin(email, password) {
 
 export async function getVerification() {
   let token = await getToken();
-  return fetch(ACTIVATION_ENDPOINT, {
+  return fetch(VERIFICATION_ENDPOINT, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
@@ -66,7 +78,7 @@ export async function getVerification() {
 
 export async function postVerification(code) {
   let token = await getToken();
-  return fetch(ACTIVATION_ENDPOINT, {
+  return fetch(VERIFICATION_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',

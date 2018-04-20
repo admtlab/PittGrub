@@ -5,7 +5,7 @@ import Logo from '../components/Logo';
 import metrics from '../config/metrics';
 import settings from '../config/settings';
 import { colors } from '../config/styles';
-import { postSignup, postLogin } from '../lib/api';
+import { postSignup } from '../lib/api';
 import { getToken, storeUser, storeToken } from '../lib/auth';
 import { registerForPushNotifications } from '../lib/notifications';
 
