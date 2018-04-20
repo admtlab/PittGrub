@@ -9,8 +9,8 @@ import ActionButton from 'react-native-action-button'
 import images from '../config/images'
 import lib from '../lib/scripts'
 import { getUser } from '../lib/auth';
+import { getEvents } from '../lib/api';
 
-const eventsURL = settings.server.url + '/events';
 var { width, height } = Dimensions.get('window');
 
 // styles
@@ -86,13 +86,13 @@ class Events extends React.Component {
     }
 
     this.renderRow = this.renderRow.bind(this);
-    this.getEvents = this.getEvents.bind(this);
+    this.fetchEvents = this.fetchEvents.bind(this);
     this.searchEvents = this.searchEvents.bind(this);
   }
 
   _onRefresh() {
     this.setState({ refreshing: true });
-    this.getEvents();
+    this.fetchEvents();
     this.setState({ refreshing: false });
     console.log('refreshed events');
   }
@@ -120,34 +120,31 @@ class Events extends React.Component {
   }
 
   // fetch event data from server
-  getEvents() {
-    return fetch(eventsURL, { method: 'GET' })
+  fetchEvents() {
+    getEvents()
       .then((response) => response.json())
       .then((responseData) => {
-        console.log("Successfully fetched events");
-        console.log(responseData);
         if (responseData._embedded.events !== undefined) {
           const events = responseData['_embedded']['events'];
           this.setState({
             eventSource: this.state.eventSource.cloneWithRows(events),
-            loaded: true
+            loaded: true,
           });
         } else {
           this.setState({
             eventSource: this.state.eventSource.cloneWithRows([]),
-            loaded: true
-          })
+            loaded: true,
+          });
         }
       })
       .catch((error) => {
-        console.log('failed fetch');
-        console.log(error);
+        console.log('Failed to fetch events\n' + error);
       })
       .done();
   }
 
   componentWillMount() {
-    this.getEvents();
+    this.fetchEvents();
     getUser()
     .then((user) => {
       this.setState({ admin: user.admin });

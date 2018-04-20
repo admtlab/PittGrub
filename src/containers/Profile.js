@@ -28,7 +28,7 @@ import {
   setFoodPreferences,
   setPantry
 } from '../lib/user';
-import { getToken, getUser } from '../lib/auth';
+import { getToken, getUser, clearAll } from '../lib/auth';
 import { postSettings } from '../lib/api';
 
 const styles = StyleSheet.create({
@@ -296,8 +296,7 @@ class Profile extends React.Component {
           containerViewStyle={styles.submitButton}
           onPress={() => {
             console.log('Logging out');
-            AsyncStorage.removeItem('jwt');
-            AsyncStorage.removeItem('user');
+            clearAll();
             // key must be null to go back to inital page and clear path
             // see https://github.com/react-community/react-navigation/issues/1127#issuecomment-295841343
             this.props.navigation.dispatch(NavigationActions.reset({

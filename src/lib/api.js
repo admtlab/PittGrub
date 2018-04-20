@@ -5,10 +5,13 @@ import settings from '../config/settings';
 const TOKEN_ENDPOINT = settings.server.url + '/token';
 const SIGNUP_ENDPONT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
-const VERIFICATION_ENDPOINT = settings.server.url + '/users/verify';
+const USER_ENDPOINT = settings.server.url + '/users';
+const VERIFICATION_ENDPOINT = settings.server.url + '/verify';
 const PROFILE_ENDPOINT = settings.server.url + '/users/profile';
 const SETTINGS_ENDPOINT = settings.server.url + '/users/settings';
 const PASSWORD_RESET_ENDPOINT = settings.server.url + '/password/reset';
+const EVENT_ENDPOINT = settings.server.url + '/events';
+const BEARER = 'Bearer ';
 
 
 export async function getUserProfile() {
@@ -115,5 +118,17 @@ export async function postPasswordReset(email) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email: email }),
+  });
+}
+
+export async function getEvents() {
+  let token = await getToken();
+  return fetch(EVENT_ENDPOINT, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token.token,
+    },
   });
 }
