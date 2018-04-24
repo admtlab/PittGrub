@@ -343,11 +343,11 @@ export default class CreateEventView extends React.Component {
           <Image source={{ uri: this.state.image }}
             style={{ width: width, height: width }} />}
 
-        <FormLabel labelStyle={styles.textLabel}>Event Title</FormLabel>
+        <FormLabel labelStyle={styles.textLabel}>Title</FormLabel>
         <FormInput
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. Best Tacos In Town'}
-          maxLength={255}
+          maxLength={150}
           onChangeText={(text) => this.setState({ title: text })}
         />
 
@@ -362,7 +362,7 @@ export default class CreateEventView extends React.Component {
         <FormLabel labelStyle={styles.textLabel}>Address</FormLabel>
         <FormInput
           inputStyle={styles.textboxNormal}
-          placeholder={'E.g. 4200 Fifth Ave, Pittsburgh, PA or Cathedral'}
+          placeholder={'E.g. 4200 Fifth Ave Pittsburgh, PA or Cathedral'}
           maxLength={100}
           autoCapitalize={'words'}
           onChangeText={(text) => this.setState({ address: text })}
@@ -391,17 +391,17 @@ export default class CreateEventView extends React.Component {
         <FormInput
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. 4th floor, Room 125'}
-          maxLength={20}
+          maxLength={255}
           onChangeText={(text) => this.setState({ location_details: text })}
         />
 
-        <FormLabel labelStyle={styles.textLabel}>Event Description</FormLabel>
+        <FormLabel labelStyle={styles.textLabel}>Description</FormLabel>
         <FormInput
           style={styles.textboxLarge}
           multiline={true}
           placeholderTextColor="#bdc6cf"
-          placeholder={'E.g. Fish, chicken, bacon, sushi tacos! You name it we got it! '}
-          maxLength={150}
+          placeholder={'E.g. Fish, chicken, bacon, sushi, and tacos! You name it, we got it! '}
+          maxLength={500}
           onChangeText={(text) => this.setState({ description: text })}
         />
         <FormLabel labelStyle={styles.textLabel}>Available Servings</FormLabel>
@@ -410,7 +410,9 @@ export default class CreateEventView extends React.Component {
           keyboardType='number-pad'
           placeholder={'E.g. 25 people'}
           maxLength={3}
-          onChangeText={(text) => this.setState({ serving: text })}
+          onChangeText={(text) => this.setState({
+            serving: text.replace(/[^0-9]/g, '')
+          })}
         />
         <DateTimePicker
           isVisible={this.state.isDayPickerVisible}
