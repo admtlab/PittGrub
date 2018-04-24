@@ -10,6 +10,7 @@ import settings from '../config/settings';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
+import { findBuilding, closest } from '../lib/location';
 import images from '../config/images';
 var AWS = require('aws-sdk/dist/aws-sdk-react-native');
 
@@ -104,8 +105,9 @@ export default class CreateEventView extends React.Component {
       organization: '',
       eventId: null,      
       title: '',
-      location_details: '',
       address: '',
+      building: null,
+      location_details: '',
       serving: 0,
       description: '',
       mapRegion: defaultMapRegion,      
@@ -172,10 +174,27 @@ export default class CreateEventView extends React.Component {
   }
 
   _handleAddressSearch = async () => {
-    let location = await Location.geocodeAsync(this.state.address);
-    location = location[0];
-    console.log('Searching for:');
-    console.log(location);
+    // cleanup address input
+    let address = this.state.address.trim();
+    address = address.replace(/\./g, '');
+
+    // try to find in our building set
+    let location = findBuilding(this.state.address);
+
+    if (location == null) {
+      // not found, find by geocode
+      this.setState({ building: null });
+      if (!address.toLowerCase().includes("pittsburgh, pa")){
+        address += " Pittsburgh, PA";
+      }
+      location = await Location.geocodeAsync(address);
+      location = location[closest(defaultMapRegion, location)];
+    } else {
+      // found, get info
+      this.setState({ building: location.id });
+      this.setState({ address: location.name });
+    }
+    // set map region and marker
     let region = {
       latitude: location.latitude,
       longitude: location.longitude,
@@ -343,9 +362,11 @@ export default class CreateEventView extends React.Component {
         <FormLabel labelStyle={styles.textLabel}>Address</FormLabel>
         <FormInput
           inputStyle={styles.textboxNormal}
-          placeholder={'E.g. 4200 Fifth Ave, Pittsburgh, PA 15260'}
+          placeholder={'E.g. 4200 Fifth Ave, Pittsburgh, PA or Cathedral'}
           maxLength={100}
+          autoCapitalize={'words'}
           onChangeText={(text) => this.setState({ address: text })}
+          value={this.state.address}
         />
         <Button
           title={'Search'}

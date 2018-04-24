@@ -24,6 +24,55 @@ export async function registerForLocation() {
   console.log(location);
 }
 
+export function findBuilding(str) {
+  for (let name of Object.keys(buildings)) {
+    if (name.toLowerCase().startsWith(str.toLowerCase())) {
+      return buildings[name];
+    }
+  }
+  return null;
+}
+
+/**
+ * Find location in locs closest to point
+ */
+export function closest(point, locs) {
+  let min = Number.MAX_SAFE_INTEGER;
+  let minIndex;
+  locs.forEach((loc, i) => {
+    let diff = distance(point, loc);
+    if (diff < min) {
+      min = diff;
+      minIndex = i;
+    } 
+  });
+  return minIndex;
+}
+
+/**
+ * Haversine distance between two locations
+ * Implementation from: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula/27943#27943
+ */
+export function distance(loc1, loc2) {
+  const R = 6371;
+  let lat1 = loc1.latitude;
+  let long1 = loc1.longitude;
+  let lat2 = loc2.latitude;
+  let long2 = loc2.latitude;
+  let dLat = degToRad(lat2-lat1);
+  let dLong = degToRad(long2-long1);
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+          Math.sin(dLong/2) * Math.sin(dLong/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var d = R * c;
+  return d;
+}
+
+function degToRad(deg) {
+  return deg * (Math.PI/180);
+}
+
 export const buildings = {
   "Allen Hall":{id: 1, name: "Allen Hall", latitude: 40.44461599, longitude: -79.95841026},
   "Alumni Hall": {id: 2, name: "Alumni Hall", latitude: 40.44557946, longitude: -79.95388269},
@@ -80,6 +129,10 @@ export const buildings = {
   "Thaw Hall": {id: 53, name: "Thaw Hall", latitude: 40.44517937, longitude: -79.95759487},
   "Litchfield Towers": {id: 54, name: "Litchfield Towers", latitude: 40.44257471, longitude: -79.95667756},
   "Trees Hall": {id: 55, name: "Trees Hall", latitude: 40.44408118, longitude: -79.96550202},
+  "Towers": {id: 54, name: "Litchfield Towers", latitude: 40.44257471, longitude: -79.95667756},
+  "Tower A": {id: 54, name: "Litchfield Towers", latitude: 40.44257471, longitude: -79.95667756},
+  "Tower B": {id: 54, name: "Litchfield Towers", latitude: 40.44257471, longitude: -79.95667756},
+  "Tower C": {id: 54, name: "Litchfield Towers", latitude: 40.44257471, longitude: -79.95667756},
   "University Club": {id: 56, name: "University Club", latitude: 40.44421182, longitude: -79.95683312},
   "Victoria Building": {id: 57, name: "Victoria Building", latitude: 40.44129684, longitude: -79.96071696},
   "Van de Graaff Building": {id: 58, name: "Van de Graaff Building", latitude: 40.44479562, longitude: -79.95856583},
