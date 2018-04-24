@@ -414,6 +414,7 @@ export default class CreateEventView extends React.Component {
             serving: text.replace(/[^0-9]/g, '')
           })}
         />
+
         <DateTimePicker
           isVisible={this.state.isDayPickerVisible}
           mode='date'
