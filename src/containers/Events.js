@@ -10,6 +10,7 @@ import images from '../config/images'
 import lib from '../lib/scripts'
 import { getUser } from '../lib/auth';
 import { getEvents } from '../lib/api';
+import { isHost } from '../lib/user';
 
 var { width, height } = Dimensions.get('window');
 
@@ -70,18 +71,15 @@ class Events extends React.Component {
     * This is an array of objects with the properties you desire
     * Usually this should come from Redux mapStateToProps
     *************************************************************/
-    const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
-
-    const VEGGIE_IPSUM = 'Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic. Gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato. Dandelion cucumber earthnut pea peanut soko zucchini.'
 
     this.state = {
-      admin: false,
       refreshing: false,                              // state is refreshing
       searchText: '',                               // what user is searching for
       eventSource: new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1.id !== r2.id
       }),
       loaded: false,
+      host: false,      
       createButton: false,
     }
 
@@ -147,7 +145,7 @@ class Events extends React.Component {
     this.fetchEvents();
     getUser()
     .then((user) => {
-      this.setState({ admin: user.admin });
+      this.setState({ host: isHost(user) });
     })
   }
 
@@ -244,7 +242,7 @@ class Events extends React.Component {
             style={{padding: 0, margin: 0}}
           />
         </ScrollView>
-         {this.state.admin &&
+         {this.state.host &&
           <ActionButton style={{marginTop: -10}} buttonColor="rgba(231,76,60,1)">
             <ActionButton.Item buttonColor='#9b59b6' title="Create Event" onPress={() => {
               this.props.navigation.navigate('CreateEvent');

@@ -10,7 +10,7 @@ import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { getVerification, postVerification } from '../lib/api';
 import { getUser, activateUser } from '../lib/auth';
-import { registerForPushNotifications } from '../lib/notifications';
+import { registerForPushNotifications } from '../';
 
 
 // screen dimensions

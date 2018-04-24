@@ -80,6 +80,10 @@ export default class LoginScreen extends React.Component {
     });
   }
 
+  _checkPermissions = async () => {
+
+  }
+
   _login = async () => {
     // check that credentials are filled
     if (this.state.email !== '' && this.state.password !== '') {

@@ -3,6 +3,7 @@ import React from 'react';
 
 import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
+import { ImagePicker, MapView, Permissions, Location } from 'expo';
 import metrics from '../config/metrics';
 import colors from '../config/styles';
 import settings from '../config/settings';
@@ -10,11 +11,27 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 import images from '../config/images';
-import { ImagePicker } from 'expo';
 var AWS = require('aws-sdk/dist/aws-sdk-react-native');
 
 const createEventURL = settings.server.url + '/events';
 const { width, height } = Dimensions.get('window')
+const defaultLatitude = 40.44158671;
+const defaultLongitude = -79.95638251;
+const latitudeDelta = 0.025;
+const longitudeDelta = 0.01;
+const defaultMapRegion = {
+  latitude: defaultLatitude,
+  longitude: defaultLongitude,
+  latitudeDelta: latitudeDelta,
+  longitudeDelta: longitudeDelta,
+}
+const defaultMarker = {
+  key: 'Event',
+  coordinate: {
+    latitude: defaultLatitude,
+    longitude: defaultLongitude,
+  }
+}
 
 // styles
 const styles = StyleSheet.create({
@@ -52,7 +69,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'column',
-  }
+  },
+  map: {
+    position: 'relative',
+    zIndex: 999,
+    paddingTop: 10,
+    marginTop: 10,
+    width: metrics.screenWidth - 30,
+    left: 15,
+    height: 400,
+    borderRadius: 10,
+  },
 })
 
 export default class CreateEventView extends React.Component {
@@ -75,12 +102,14 @@ export default class CreateEventView extends React.Component {
       startDate: startDate,
       endDate: endDate,
       organization: '',
+      eventId: null,      
       title: '',
       location_details: '',
       address: '',
       serving: 0,
       description: '',
-      eventId: null
+      mapRegion: defaultMapRegion,      
+      mapMarker: defaultMarker,
     }
 
     this._showDayPicker = this._showDayPicker.bind(this);
@@ -140,6 +169,50 @@ export default class CreateEventView extends React.Component {
 
   _mapFoodPreferences = () => {
 
+  }
+
+  _handleAddressSearch = async () => {
+    let location = await Location.geocodeAsync(this.state.address);
+    location = location[0];
+    console.log('Searching for:');
+    console.log(location);
+    let region = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: latitudeDelta,
+      longitudeDelta: longitudeDelta      
+    }
+    this.setState({ mapRegion: region });
+    this.setState({ mapMarker: {
+      coordinate: {
+        latitude: location.latitude,
+        longitude: location.longitude},
+      key: 'Event'}})
+  }
+
+  _handleMapRegionChange = mapRegion => {
+    this.setState({ mapRegion });
+  }
+
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({ mapRegion: defaultMapRegion });
+    } else {
+      let location = await Location.getCurrentPositionAsync({ enableHighAccuracy: true });
+      let region = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: latitudeDelta,
+        longitudeDelta: longitudeDelta,
+      }
+      this.setState({ mapRegion: region });
+      this.setState({ mapMarker: {coordinate: location.coords, key: 'Event'}});
+    }
+  }
+
+  componentDidMount() {
+    this._getLocationAsync();
   }
 
   componentWillMount() {
@@ -246,6 +319,7 @@ export default class CreateEventView extends React.Component {
             title={'Add photo'}
             onPress={this._getImage}
           />}
+
         {this.state.image !== null &&
           <Image source={{ uri: this.state.image }}
             style={{ width: width, height: width }} />}
@@ -270,9 +344,27 @@ export default class CreateEventView extends React.Component {
         <FormInput
           inputStyle={styles.textboxNormal}
           placeholder={'E.g. 4200 Fifth Ave, Pittsburgh, PA 15260'}
-          maxLength={20}
+          maxLength={100}
           onChangeText={(text) => this.setState({ address: text })}
         />
+        <Button
+          title={'Search'}
+          backgroundColor='#FFC107'
+          borderRadius={10}
+          containerViewStyle={styles.button}
+          color='#607D8B'
+          onPress={this._handleAddressSearch}
+        />
+
+        <MapView
+          style={styles.map}
+          region={this.state.mapRegion}
+          onRegionChange={this._handleMapRegionChange}>
+          <MapView.Marker
+            title={this.state.mapMarker.key}
+            key={this.state.mapMarker.key}
+            coordinate={this.state.mapMarker.coordinate} />
+        </MapView>
 
         <FormLabel labelStyle={styles.textLabel}>Location Details</FormLabel>
         <FormInput

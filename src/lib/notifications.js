@@ -4,7 +4,6 @@ import { getUser } from './auth';
 import { postExpoToken } from './api';
 
 export async function registerForPushNotifications() {
-  console.log('Check for push notifications');
   const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
   let finalStatus = existingStatus;
 

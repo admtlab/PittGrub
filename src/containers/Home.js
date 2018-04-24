@@ -1,5 +1,6 @@
 import React from 'react'
 import { AsyncStorage, Alert, RefreshControl, StatusBar, ScrollView, Text, Image, ListView, View, TouchableOpacity, StyleSheet } from 'react-native'
+import { Location, Permissions } from 'expo';
 import metrics from '../config/metrics'
 import { colors } from '../config/styles'
 import images from '../config/images'
@@ -8,8 +9,12 @@ import lib from '../lib/scripts';
 import { List, ListItem } from 'react-native-elements'
 import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons';
-import registerForPushNotifications from '../';
+import registerForPushNotifications from '../lib/notifications';
+import registerForLocation from '../lib/location';
 
+const notificationMessage = "PittGrub will alert you of leftover food that you may find interesting. To receive alerts of free food near you, be sure to enable notifications at the next prompt.";
+
+const locationMessage = "PittGrub uses your location to find free food close to you. We keep this information private, and we will never share it with 3rd parties. Please consider enabling location services at the next prompt.";
 
 const styles = StyleSheet.create({
   container: {
@@ -118,12 +123,7 @@ class Home extends React.Component {
 
   componentDidMount() {
     global.refresh = true;
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.screenProps.route_index == 0) {
-      console.log("In home");
-    }
+    this._permissions();    
   }
 
   renderRow(rowData) {
@@ -246,7 +246,29 @@ class Home extends React.Component {
     }
   }
 
+  _permissions = async () => {
+    console.log('Getting permissions');
+    if (this.state.location == null || this.state.location == undefined) {
+      console.log('Requesting');
+      let { status } = await Permissions.askAsync(Permissions.LOCATION);
+      if (status == 'granted') {
+        let location = await Location.getCurrentPositionAsync({});
+        console.log('got location');
+        console.log(JSON.stringify(location));
+        this.setState({ location: JSON.stringify(location)});
+      } else {
+        this.setState({ location: null });
+      }
+    }
+  }
+
+  componentWillMount() {
+  }
+
   componentWillReceiveProps(newProps) {
+    if (newProps.screenProps.route_index == 0) {
+      console.log("In home");
+    }
     if (newProps.screenProps.route_index === 0) {
       this.testnav();
       if (!this.state.loaded) {
