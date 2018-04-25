@@ -50,6 +50,13 @@ export function closest(point, locs) {
 }
 
 /**
+ * Find Pitt building closest to location
+ */
+export function closestPittBuilding(loc) {
+  return Object.values(buildings)[closest(loc, Object.values(buildings))];
+}
+
+/**
  * Haversine distance between two locations
  * Implementation from: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula/27943#27943
  */
@@ -74,7 +81,7 @@ function degToRad(deg) {
 }
 
 export const buildings = {
-  "Allen Hall":{id: 1, name: "Allen Hall", latitude: 40.44461599, longitude: -79.95841026},
+  "Allen Hall": {id: 1, name: "Allen Hall", latitude: 40.44461599, longitude: -79.95841026},
   "Alumni Hall": {id: 2, name: "Alumni Hall", latitude: 40.44557946, longitude: -79.95388269},
   "Amos Hall": {id: 3, name: "Amos Hall", latitude: 40.44349329, longitude: -79.95573342},
   "Bellefield Hall": {id: 4, name: "Bellefield Hall", latitude: 40.44539166, longitude: -79.95090008},

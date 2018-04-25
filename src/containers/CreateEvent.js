@@ -3,7 +3,7 @@ import React from 'react';
 
 import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
-import { ImagePicker, MapView, Permissions, Location } from 'expo';
+import { ImagePicker, MapView, Permissions, Location, Linking } from 'expo';
 import metrics from '../config/metrics';
 import colors from '../config/styles';
 import settings from '../config/settings';
@@ -111,7 +111,7 @@ export default class CreateEventView extends React.Component {
       serving: 0,
       description: '',
       mapRegion: defaultMapRegion,      
-      mapMarker: defaultMarker,
+      mapMarker: null,
     }
 
     this._showDayPicker = this._showDayPicker.bind(this);
@@ -216,7 +216,7 @@ export default class CreateEventView extends React.Component {
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
-      this.setState({ mapRegion: defaultMapRegion });
+      this.setState({ address: "Sennott Square" });
     } else {
       let location = await Location.getCurrentPositionAsync({ enableHighAccuracy: true });
       let region = {
@@ -226,7 +226,7 @@ export default class CreateEventView extends React.Component {
         longitudeDelta: longitudeDelta,
       }
       this.setState({ mapRegion: region });
-      this.setState({ mapMarker: {coordinate: location.coords, key: 'Event'}});
+      // this.setState({ mapMarker: {coordinate: location.coords, key: 'Event'}});
     }
   }
 
@@ -367,9 +367,11 @@ export default class CreateEventView extends React.Component {
           autoCapitalize={'words'}
           onChangeText={(text) => this.setState({ address: text })}
           value={this.state.address}
+          returnKeyType="search"
+          onSubmitEditing={() => this._handleAddressSearch}          
         />
         <Button
-          title={'Search'}
+          title={'Find On Map'}
           backgroundColor='#FFC107'
           borderRadius={10}
           containerViewStyle={styles.button}
@@ -381,10 +383,11 @@ export default class CreateEventView extends React.Component {
           style={styles.map}
           region={this.state.mapRegion}
           onRegionChange={this._handleMapRegionChange}>
-          <MapView.Marker
-            title={this.state.mapMarker.key}
-            key={this.state.mapMarker.key}
-            coordinate={this.state.mapMarker.coordinate} />
+          {this.state.mapMarker != null &&
+            <MapView.Marker
+              title={this.state.mapMarker.key}
+              key={this.state.mapMarker.key}
+              coordinate={this.state.mapMarker.coordinate} />}
         </MapView>
 
         <FormLabel labelStyle={styles.textLabel}>Location Details</FormLabel>

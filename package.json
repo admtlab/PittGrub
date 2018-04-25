@@ -6,6 +6,8 @@
     "babel-eslint": "^7.2.3",
     "babel-preset-expo": "^4.0.0",
     "babel-preset-flow": "^6.23.0",
+    "deep-freeze": "0.0.1",
+    "expect": "^22.4.3",
     "flow-bin": "^0.50.0",
     "jest-expo": "^22.0.1",
     "react-native-scripts": "0.0.30",
