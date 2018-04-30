@@ -12,6 +12,8 @@ const SETTINGS_ENDPOINT = settings.server.url + '/users/settings';
 const PASSWORD_RESET_ENDPOINT = settings.server.url + '/password/reset';
 const EVENT_ENDPOINT = settings.server.url + '/events';
 const BEARER = 'Bearer ';
+const REQUEST_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/request';
+const VALIDATE_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/validate';
 
 
 export async function getUserProfile() {
@@ -129,6 +131,19 @@ export async function getEvents() {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token.token,
+    },
+  });
+}
+
+export async function postTokenValidation(token) {
+  return fetch(VALIDATE_TOKEN_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: {
+      'token': token
     },
   });
 }

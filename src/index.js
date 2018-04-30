@@ -1,17 +1,15 @@
 /* @flow */
 
 import React from 'react';
-import { AppState, AppRegistry, StyleSheet } from 'react-native';
+import { AppState, AppRegistry, SafeAreaView, StyleSheet } from 'react-native';
+import { Provider, observer } from 'mobx-react/native';
 import { Notifications } from 'expo';
 import Route from './config/routes';
 // import Welcome from './containers/Welcome';
 import sleep from './lib/sleep';
 import { storeToken } from './lib/auth';
+import stores from './stores';
 import { registerForPushNotifications, handleNotification } from './lib/notifications';
-
-
-// window size
-// var { width, height } = Dimensions.get('window')
 
 
 class App extends React.Component {
@@ -37,7 +35,6 @@ class App extends React.Component {
 
   componentWillMount() {
     sleep(3000);
-    this.setState({ isReady: true, appState: 'active' });
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
     // storeToken(null);
     // storeUser(null);
@@ -45,6 +42,7 @@ class App extends React.Component {
 
   componentDidMount() {
     // Track app state (active, background)
+    this.setState({ isReady: true, appState: 'active' });    
     AppState.addEventListener('change', state => {
       this.setState({ appState: state });
       console.log('AppState is', state);
@@ -58,12 +56,16 @@ class App extends React.Component {
     // registerForPushNotifications();
 
     // Routing starts with AppNav
-    return (<Route
-      onNavigationStateChange={(prevState, newState) => {
-        this._onNavigationStateChange(prevState, newState);
-      }}
-      screenProps={this.state}
-    />);
+    return (
+      <Provider {...stores}>
+        <Route
+          onNavigationStateChange={(prevState, newState) => {
+            this._onNavigationStateChange(prevState, newState);
+          }}
+          screenProps={this.state}
+        />
+      </Provider>
+    );
   }
 }
 

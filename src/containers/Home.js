@@ -1,6 +1,7 @@
 import React from 'react'
 import { AsyncStorage, Alert, RefreshControl, StatusBar, ScrollView, Text, Image, ListView, View, TouchableOpacity, StyleSheet } from 'react-native'
 import { Location, Permissions } from 'expo';
+import { inject, observer } from 'mobx-react';
 import metrics from '../config/metrics'
 import { colors } from '../config/styles'
 import images from '../config/images'
@@ -92,9 +93,12 @@ const styles = StyleSheet.create({
 const recommendedURL = settings.server.url + '/events/recommended/';
 const acceptedURL = settings.server.url + '/events/accepted/';
 
+@inject("tokenStore")
+@observer
 class Home extends React.Component {
   constructor(props) {
     super(props);
+
     const BACON_IPSUM = 'Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
 
     this.state = {
@@ -114,7 +118,7 @@ class Home extends React.Component {
     this.getEvents = this.getEvents.bind(this);
   }
 
-  _onRefresh() {
+  _onRefresh = async () => {
     this.setState({ refreshing: true });
     this.getEvents();
     this.setState({ refreshing: false });
@@ -293,6 +297,9 @@ class Home extends React.Component {
     if (!this.state.loaded) {
       this.getEvents();
     }
+    const tokenStore = this.props.tokenStore;
+    console.log('props');
+    console.log(this.props);
     return (
       <View>
         <StatusBar
@@ -331,7 +338,9 @@ class Home extends React.Component {
           </List> */}
 
           {/* new */}
+
           <View style={styles.banner}>
+            <Text style={styles.bannerLabel}> {this.props.tokenStore.accessToken}</Text>
             <Text style={styles.bannerLabel}> {'My Events (' + this.state.acceptedSource.getRowCount() + ')'}</Text>
           </View>
           {this.state.acceptedSource.getRowCount() == 0 &&

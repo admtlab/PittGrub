@@ -4,6 +4,9 @@
     "react-native",
     "flow"
   ],
+  "plugins": [
+    "transform-decorators-legacy"
+  ],
   "retainLines": true,
   "env": {
     "development": {

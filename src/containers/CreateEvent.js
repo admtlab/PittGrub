@@ -3,7 +3,7 @@ import React from 'react';
 
 import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
-import { ImagePicker, MapView, Permissions, Location, Linking } from 'expo';
+import { ImagePicker, MapView, Permissions, Location } from 'expo';
 import metrics from '../config/metrics';
 import colors from '../config/styles';
 import settings from '../config/settings';

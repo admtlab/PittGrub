@@ -3,6 +3,7 @@
 import React from 'react';
 import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
+import { inject, observer } from 'mobx-react';
 import Logo from '../components/Logo';
 import metrics from '../config/metrics';
 import settings from '../config/settings';
@@ -17,6 +18,8 @@ import { registerForPushNotifications } from '../lib/notifications';
 var { width, height } = Dimensions.get('window');
 const top = height * 0.25;
 
+@inject("tokenStore")
+@observer
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -86,6 +89,7 @@ export default class LoginScreen extends React.Component {
 
   _login = async () => {
     // check that credentials are filled
+    const tokenStore = this.props.tokenStore;
     if (this.state.email !== '' && this.state.password !== '') {
       let activated = false;
       let status = '';
@@ -109,6 +113,16 @@ export default class LoginScreen extends React.Component {
             status = user.status;
             storeToken({ token: token, expires: responseData['expires'] });
             storeUser(user);
+            console.log('setting access token');
+            console.log(token);
+            tokenStore.setAccessToken(token);
+            tokenStore.id = user.id;
+            tokenStore.email = user.email;
+            tokenStore.name = user.name;
+            tokenStore.status = user.status;
+            tokenStore.roles = user.roles;
+            tokenStore.active = user.active;
+            tokenStore.disabled = user.disabled;
             getProfile()
             .then(response => response.json())
             .then(responseData => {

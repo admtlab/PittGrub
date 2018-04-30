@@ -5,7 +5,6 @@ import {
   Switch,
   ScrollView,
   Text,
-  Linking,
   WebView,
   Image,
   View,
