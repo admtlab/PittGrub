@@ -16,6 +16,6 @@ class EventStore {
   }
 
   @action setEvents(newEvents) {
-    this.events.split(0, this.events.length, ...newEvents);
+    this.events.splice(0, this.events.length, ...newEvents);
   }
 }

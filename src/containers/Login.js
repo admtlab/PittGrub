@@ -6,19 +6,18 @@ import { Button, BackButton } from '../components/Button';
 import { inject, observer } from 'mobx-react';
 import Logo from '../components/Logo';
 import metrics from '../config/metrics';
-import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { postLogin, getUserProfile } from '../lib/api';
-import { storeToken, storeUser } from '../lib/auth';
-import { isHost, getProfile, storeProfile } from '../lib/user';
+import { storeAccessToken, storeRefreshToken } from '../lib/token';
+import { isHost, getProfile, storeProfile, storeUser } from '../lib/user';
 import { registerForPushNotifications } from '../lib/notifications';
 
 
 // screen dimensions
-var { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const top = height * 0.25;
 
-@inject("tokenStore")
+@inject("tokenStore", "userStore")
 @observer
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -90,6 +89,7 @@ export default class LoginScreen extends React.Component {
   _login = async () => {
     // check that credentials are filled
     const tokenStore = this.props.tokenStore;
+    const userStore = this.props.userStore;
     if (this.state.email !== '' && this.state.password !== '') {
       let activated = false;
       let status = '';
@@ -106,43 +106,39 @@ export default class LoginScreen extends React.Component {
               Alert.alert('Error', 'Something went wrong', {text: 'OK'});
             }
           } else {
-            this.setState({ loading: false });
-            user = responseData['user'];
-            token = responseData['token'];
-            activated = user.active;
-            status = user.status;
-            storeToken({ token: token, expires: responseData['expires'] });
+            const refreshToken = responseData['refresh_token'];
+            const accessToken = responseData['access_token'];
+            const user = responseData['user'];
+            tokenStore.setRefreshToken(refreshToken);
+            tokenStore.setAccessToken(accessToken);
+            userStore.setUser(user);
+            storeRefreshToken(refreshToken);
+            storeAccessToken(accessToken);
             storeUser(user);
-            console.log('setting access token');
-            console.log(token);
-            tokenStore.setAccessToken(token);
-            tokenStore.id = user.id;
-            tokenStore.email = user.email;
-            tokenStore.name = user.name;
-            tokenStore.status = user.status;
-            tokenStore.roles = user.roles;
-            tokenStore.active = user.active;
-            tokenStore.disabled = user.disabled;
-            getProfile()
-            .then(response => response.json())
-            .then(responseData => {
-              profile = {
-                id: responseData['id'],
-                pittPantry: responseData['pitt_pantry'],
-                eagerness: responseData['eagerness'],
-                foodPreferences: responseData['food_preferences']
+
+            // get user profile
+            getUserProfile(accessToken)
+            .then((response) => {
+              if (!response.ok) { throw response };
+              return response.json();
+            })
+            .then((responseData) => {
+              const food = responseData['food_preferences'].map(fp => fp.id);
+              const pantry = responseData['pitt_pantry'];
+              const eager = responseData['eagerness'];
+              const profile = {
+                foodPreferences: food,
+                pantry: pantry,
+                eagerness: eager
               };
+              userStore.setUserProfile(profile);
               storeProfile(profile);
-            });
-            global.admin = isHost(user);
+            })
             registerForPushNotifications();
             this._clearState();
-            if (!activated) {
+            if (!user.active) {
               console.log("Not activated, sending to verification screen");
               this.props.navigation.navigate('Verification');
-            } else if (settings.requireApproval && status !== "ACCEPTED") {
-              console.log("approval required, sending to waiting screen");
-              this.props.navigation.navigate('Waiting');
             } else {
               console.log("they're good, sending to main page");
               this.props.navigation.navigate('Main');

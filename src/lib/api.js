@@ -1,9 +1,8 @@
-import { getToken } from './auth';
 import settings from '../config/settings';
 
 
 const TOKEN_ENDPOINT = settings.server.url + '/token';
-const SIGNUP_ENDPONT = settings.server.url + '/signup';
+const SIGNUP_ENDPOINT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const USER_ENDPOINT = settings.server.url + '/users';
 const VERIFICATION_ENDPOINT = settings.server.url + '/verify';
@@ -16,13 +15,13 @@ const REQUEST_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/request';
 const VALIDATE_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/validate';
 
 
-export async function getUserProfile() {
+export async function getUserProfile(token) {
   return fetch(PROFILE_ENDPOINT, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token.token,
+      'Authorization': 'Bearer ' + token,
     },
   });
 }
@@ -42,7 +41,7 @@ export async function postExpoToken(userId, token) {
 }
 
 export async function postSignup(email, password) {
-  return fetch(SIGNUP_ENDPONT, {
+  return fetch(SIGNUP_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -51,6 +50,19 @@ export async function postSignup(email, password) {
     body: JSON.stringify({
       email: email,
       password: password,
+    }),
+  });
+}
+
+export async function postTokenRequest(token) {
+  return fetch(REQUEST_TOKEN_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      token: token
     }),
   });
 }

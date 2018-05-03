@@ -24,13 +24,6 @@ const StackNavigatorConfig = {
       screenInterpolator: CardStackStyleInterpolator.forInitial
     }
   }
-  // transitionConfig: () => ({
-  // 	transitionSpec: {
-  // 		duration: 0,
-  // 		timing: Animated.timing,
-  // 		easing: Easing.step0,
-  // 	},
-  // }),
 };
 
 export const HomeNav = StackNavigator({

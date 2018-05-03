@@ -4,32 +4,6 @@ import { AsyncStorage } from 'react-native';
 const HOST = "Host";
 const ADMIN = "Admin";
 
-// class User {
-//   constructor(id, email, name, status, roles, active, disabled) {
-//     this.id = id;
-//     this.email = email;
-//     this.name = name;
-//     this.status = status;
-//     this.active = active;
-//     this.disabled = disabled
-//     this.roles = roles;
-//   }
-
-//   set roles(roles) {
-//     this.isHost  = roles.some(role => role.name == HOST);
-//     this.isAdmin = roles.some(role => role.name == ADMIN);
-//   }
-// }
-
-// class Profile {
-//   constructor(id, pittPantry, eagerness, foodPreferences) {
-//     this.id = id;
-//     this.pittPantry = pittPantry;
-//     this.eagerness = eagerness;
-//     this.foodPreferences = foodPreferences;
-//   }
-// }
-
 export async function isHost(user) {
   return user.roles.some(role => role.name == HOST);
 }

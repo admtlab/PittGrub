@@ -1,16 +1,20 @@
 /* @flow */
 
 import React from 'react';
-import { Dimensions, Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { inject, observer } from 'mobx-react';
 import { Button } from '../components/Button';
 import images from '../config/images';
-import { getToken, getUser, getUserTest } from '../lib/auth';
+import { postTokenRequest, getUserProfile } from '../lib/api';
+import { getRefreshToken, getAccessToken, storeAccessToken } from '../lib/token';
+import { storeUser, storeProfile } from '../lib/user';
 
 
 // screen dimensions
-var { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-
+@inject("tokenStore", "userStore")
+@observer
 export default class WelcomeScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -18,48 +22,91 @@ export default class WelcomeScreen extends React.Component {
     this.state = {
       navigate: '',
     };
-
-    this._checkActivation = this._checkActivation.bind(this);
+    this._checkNavigation = this._checkNavigation.bind(this);
   }
 
-  componentWillMount() {
-    this._checkActivation();
+  componentDidMount() {
+    console.log('welcome mounted');
+    this._checkNavigation();
   }
 
-  _checkActivation = () => {
+  _checkNavigation = async () => {
+    const tokenStore = this.props.tokenStore;
+    const userStore = this.props.userStore;
+
     // Check which page the app should be on
     console.log("Checking user status");
-    // getUser()
-    //   .then((user) => console.log("Found user: " + user));
-    // const u = await getUserTest();
-    // console.log("Found user test: " + u);
-    getUser()
+
+    // check refresh token
+    let refreshToken = tokenStore.refreshToken;
+    if (!refreshToken) {
+      // not in store, check storage
+      refreshToken
+      refreshToken = await getRefreshToken().catch(() => '');
+    }
+    // not in store or storage
+    if (!refreshToken) {
+      // they have to log in
+      console.log('No refresh token, keep them here');
+      return;
+    }
+
+    // check access token
+    let accessToken = tokenStore.accessToken;
+    if (!accessToken) {
+      accessToken = await getAccessToken();
+    }
+    if (!accessToken || (accessToken && tokenStore.accessTokenIsExpired)) {
+      postTokenRequest(refreshToken)
+      .then((response) => {
+        if (!response.ok) { throw response };
+        return response.json();
+      })
+      .then((responseData) => {
+        accessToken = responseData['access_token'];
+        const user = responseData['user'];
+        tokenStore.setAccessToken(accessToken);
+        storeAccessToken(accessToken);
+        userStore.setUser(user);
+        storeUser(user);
+        return user;
+      })
       .then((user) => {
-        if (user !== null && user !== undefined) {
-          // user is signed in
-          if (user.active) {
-            // user is active
-            getToken()
-              .then((token) => {
-                if (token !== null && token !== undefined) {
-                  // Token found, send user to home page
-                  this.props.navigation.navigate('Main');
-                }
-              });
-          } else if (user.active !== null && user.active !== undefined) {
-            // User is signed in, but hasn't activated their account
-            // send user to verification page so they can enter their code
-            console.log('User is not activated');
-            this.props.navigation.navigate('Verification');
-            this.setState({ navigate: 'Verification' });
-          }
+        // check user status
+        if (user == null || user == undefined || userStore.disabled) {
+          console.log(user);
+          return;
         } else {
-          // Either user is not signed in, or their token wasn't found
-          // Keep user on Welcome screen, since they'll have to log in or sign up
-          console.log('keep them here, they have to log in');
-          this.setState({ navigate: 'Welcome' });
+          // get user profile
+          getUserProfile(accessToken)
+          .then((response) => {
+            if (!response.ok) { throw response };
+            return response.json();
+          })
+          .then((responseData) => {
+            const food = responseData['food_preferences'].map(fp => fp.id);
+            const pantry = responseData['pitt_pantry'];
+            const eager = responseData['eagerness'];
+            const profile = {
+              foodPreferences: food,
+              pantry: pantry,
+              eagerness: eager
+            };
+            userStore.setUserProfile(profile);
+            storeProfile(profile);
+          })
+          // handle correct screen
+          if (!user.active) {
+            console.log('user is not activated');
+            this.props.navigation.navigate('Verification');
+          } else {
+            console.log('user is good');
+            this.props.navigation.navigate('Main');
+          }
         }
-      });
+      })
+      .catch(() => false);
+    }
   }
 
   render() {
@@ -89,7 +136,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     height: height,
-    //resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center'
   },

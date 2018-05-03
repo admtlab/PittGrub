@@ -3,12 +3,15 @@
 import React from 'react';
 import { AppState, AppRegistry, SafeAreaView, StyleSheet } from 'react-native';
 import { Provider, observer } from 'mobx-react/native';
+import { inject } from 'mobx-react';
 import { Notifications } from 'expo';
 import Route from './config/routes';
 // import Welcome from './containers/Welcome';
 import sleep from './lib/sleep';
 import { storeToken } from './lib/auth';
 import stores from './stores';
+import { getRefreshToken, getAccessToken } from './lib/token';
+import { getUser, getProfile } from './lib/user';
 import { registerForPushNotifications, handleNotification } from './lib/notifications';
 
 
@@ -41,11 +44,28 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    console.log('index mounted')
     // Track app state (active, background)
+    const tokenStore = stores.tokenStore;
     this.setState({ isReady: true, appState: 'active' });    
+    
     AppState.addEventListener('change', state => {
       this.setState({ appState: state });
       console.log('AppState is', state);
+      if (state === 'Active') {
+        tokenStore.setRefreshToken(
+          getRefreshToken().catch(() => '')
+        );
+        tokenStore.setAccessToken(
+          getAccessToken().catch(() => '')
+        );
+        userStore.setUser(
+          getUser().catch(() => null)
+        );
+        userStore.setProfile(
+          getProfile().catch(() => null)
+        );
+      }
     });
   }
 
