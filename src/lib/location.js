@@ -1,11 +1,10 @@
 import { Location, Permissions } from 'expo';
+import { postLocation } from '../lib/api';
 
-export async function registerForLocation() {
-  console.log('Checking location permission');
+
+export async function registerForLocation(accessToken, userStore) {
   const { existingStatus } = await Permissions.getAsync(Permissions.LOCATION);
   let finalStatus = existingStatus;
-
-  console.log('Asking for location permission');
 
   // prompt for permission if not determine
   if (existingStatus !== 'granted') {
@@ -13,15 +12,24 @@ export async function registerForLocation() {
     finalStatus = status;
   }
 
+  console.log("Location status: " + finalStatus);
+
   if (finalStatus !== 'granted') {
-    console.log("location not granted");
     return;
   }
   
-  console.log('Location granted!');
   // get current location
   let location = await Location.getCurrentPositionAsync({});
-  console.log(location);
+  const lat = location.coords.latitude;
+  const long = location.coords.longitude;
+  userStore.setLatLong(lat, long);
+  postLocation(accessToken, lat, long)
+  .then(response => {
+    if (!response.ok) { throw response }
+  })
+  .catch(error => {
+    console.log(error);
+  });
 }
 
 export function findBuilding(str) {

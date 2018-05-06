@@ -7,6 +7,7 @@ import { colors } from '../config/styles';
 import images from '../config/images';
 import settings from '../config/settings';
 import { NavigationActions } from 'react-navigation';
+import { postAcceptEvent } from '../lib/api';
 import lib from '../lib/scripts';
 
 const server = settings.server.url;
@@ -43,6 +44,7 @@ const styles = StyleSheet.create({
   },
 })
 
+@inject("tokenStore")
 @observer
 export default class EventDetail extends React.Component {
   constructor(props) {
@@ -65,7 +67,7 @@ export default class EventDetail extends React.Component {
   }
 
   _getEventImage = () => {
-    const eventId = this.props.navigation.state.params.id;
+    const eventId = this.props.navigation.state.params.event.id;
     const imageEndpoint = settings.server.url + '/events/' + eventId + '/images/';
     fetch(imageEndpoint, {
       method: 'GET',
@@ -82,10 +84,10 @@ export default class EventDetail extends React.Component {
   }
 
   render() {
+    const tokenStore = this.props.tokenStore;
+    const event = this.props.navigation.state.params.event;
     console.log(this.props);
-    const eventId = this.props.navigation.state.params.id;
-    const imageEndpoint = settings.server.url + '/events/' + eventId + '/images/';
-    var food_arr = this.props.navigation.state.params.foodPreferences;
+    const imageEndpoint = settings.server.url + '/events/' + event.id + '/images/';
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground }}>
         {/* <Card> */}
@@ -95,35 +97,49 @@ export default class EventDetail extends React.Component {
             onError={() => {this.setState({ image: false })}}
             />
           }
-          {/* </Card> */}
         <Card>
           <Text style={styles.title_text}>
-            {this.props.navigation.state.params.title}
+            {event.title}
           </Text>
 
           <Text style={styles.description_text}>
-            {this.props.navigation.state.params.details}
+            {event.details}
           </Text>
         </Card>
+        {!event.accepted && 
+        <Button
+          icon={{ name: 'done' }}
+          backgroundColor='#03A9F4'
+          style={{ paddingTop: 10 }}
+          buttonStyle={{ borderRadius: 10 }}
+          onPress={
+            () => {
+              event.accepted = true;
+              console.log('Signed up for ' + event.id);
+              postAcceptEvent(tokenStore.accessToken, event.id)
+              .then(() => {
+                this.props.navigation.goBack(null);
+              });
+            }
+          }
+          title='INTERESTED' />
+        }
         <Card>
           <Text style={styles.header_text}>Location</Text>
-          <Text style={styles.normal}>{this.props.navigation.state.params.address}</Text>
+          <Text style={styles.normal}>{event.address}</Text>
           <Text style={styles.header_text}>Details</Text>
-          <Text style={styles.normal}>{this.props.navigation.state.params.location}</Text>
+          <Text style={styles.normal}>{event.location}</Text>
 
           <Text style={styles.header_text}>Date and Time</Text>
           <Text style={styles.normal}>{
-            lib._convertDate_getMonthDay(new Date(this.props.navigation.state.params.start_date)) + '\n' +
-            lib._convertHoursMin(new Date(this.props.navigation.state.params.start_date)) + ' ~ ' +
-            lib._convertHoursMin(new Date(this.props.navigation.state.params.end_date))
+            lib._convertDate_getMonthDay(new Date(event.start_date)) + '\n' +
+            lib._convertHoursMin(new Date(event.start_date)) + ' ~ ' +
+            lib._convertHoursMin(new Date(event.end_date))
           }
           </Text>
-
-
-
           <Text style={styles.header_text}>Food Preferences</Text>
           {
-            this.props.navigation.state.params['food_preferences'].map((obj, i) => {
+            event['food_preferences'].map((obj, i) => {
               return (
                 <View key={i} style={{
                   paddingTop: 5,
@@ -139,35 +155,7 @@ export default class EventDetail extends React.Component {
               )
             })
           }
-
         </Card>
-        <Button
-          icon={{ name: 'done' }}
-          backgroundColor='#03A9F4'
-          style={{ paddingTop: 10, paddingBottom: 10 }}
-          buttonStyle={{ borderRadius: 10 }}
-          onPress={
-            () => {
-              this.props.navigation.state.params.event.accepted = true;
-              console.log('Signed up for ' + this.props.navigation.state.params.id);
-              global.refresh = true;
-              AsyncStorage.getItem('user')
-                .then((user) => {
-                  user = JSON.parse(user);
-                  fetch(server + '/events/' + this.props.navigation.state.params.id + '/accept/' + user.id, {
-                    method: 'POST',
-                    headers: {
-                      'Accept': 'application/json',
-                      'Content-Type': 'application/json',
-                    }
-                  });
-                  return this.props.navigation.goBack(null);
-                });
-            }
-          }
-          title='SIGN ME UP' />
-
-
       </ScrollView>
     )
   }

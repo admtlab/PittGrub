@@ -3,7 +3,7 @@ import { Permissions, Notifications } from 'expo';
 import { getUser } from './auth';
 import { postExpoToken } from './api';
 
-export async function registerForPushNotifications() {
+export async function registerForPushNotifications(accessToken) {
   const { existingStatus } = await Permissions.getAsync(Permissions.REMOTE_NOTIFICATIONS);
   let finalStatus = existingStatus;
 

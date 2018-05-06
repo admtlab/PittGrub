@@ -9,7 +9,7 @@ export async function getAccessToken() {
 }
 
 export async function storeAccessToken(token) {
-  AsyncStorage.setItem('accessToken', JSON.stringify(token));
+  return AsyncStorage.setItem('accessToken', JSON.stringify(token));
 }
 
 export async function deleteAccessToken() {
@@ -18,11 +18,11 @@ export async function deleteAccessToken() {
 
 export async function getRefreshToken() {
   const token = await SecureStore.getItemAsync('refreshToken');
-  return JSON.parse(token);
+  return token === undefined ? null : JSON.parse(token);
 }
 
 export async function storeRefreshToken(token) {
-  SecureStore.setItemAsync('refreshToken', JSON.stringify(token), SecureProps);
+  return SecureStore.setItemAsync('refreshToken', JSON.stringify(token), SecureProps);
 }
 
 export async function deleteRefreshToken() {

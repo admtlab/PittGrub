@@ -11,10 +11,12 @@ import {
   TouchableHighlight,
   TextInput,
   TouchableOpacity,
-  StyleSheet
+  StyleSheet,
+  Picker,
 } from 'react-native'
 import { Button, CheckBox, FormLabel, FormInput, Slider } from 'react-native-elements';
 import { NavigationActions } from 'react-navigation';
+import { inject, observer } from 'mobx-react';
 import { Permissions, Notifications } from 'expo';
 import metrics from '../config/metrics'
 import colors from '../config/styles'
@@ -28,12 +30,156 @@ import {
   setPantry
 } from '../lib/user';
 import { getToken, getUser, clearAll } from '../lib/auth';
-import { postSettings } from '../lib/api';
+import { postProfile } from '../lib/api';
+
+const FEEDBACK_LINK = 'pittgrub.org';
+
+@inject("userStore", "tokenStore")
+@observer
+class Profile extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: '',
+      password: '',
+    }
+
+    this.updatePreferences = this.updatePreferences.bind(this);
+  }
+
+  updatePreferences = async () => {
+    const tokenStore = this.props.tokenStore;
+    const userStore = this.props.userStore;
+    postProfile(tokenStore.accessToken, userStore.foodPreferences, userStore.pantry)
+    .then(response => {
+      if (!response.ok) { throw response}
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
+  render() {
+    const userStore = this.props.userStore;
+    return (
+      <ScrollView style={styles.viewContainer}>
+
+        <FormLabel labelStyle={styles.title}>Pitt Pantry</FormLabel>
+        <Text style={styles.descriptionText}>
+          Check this box if you are a member of The Pitt Pantry. This will increase your likelihood of being sent event notifications. This information is kept confidential.
+        </Text>
+        <CheckBox
+          title='Member'
+          checked={userStore.pantry}
+          onPress={() => userStore.togglePantry()}
+          containerStyle={styles.checkboxContainer}
+          checkedColor='#009688'
+        />
+
+        {/* Food preference settings */}
+        <FormLabel labelStyle={styles.title}>Food Preferences</FormLabel>
+        <Text
+          style={styles.descriptionText}>
+          We will only send notifications for food events that match your preferences.
+        </Text>
+        <CheckBox
+          title='Gluten Free'
+          checked={userStore.foodPreferences.some(f => f === 1)}
+          onPress={() => {
+            userStore.toggleFoodPreference(1);
+          }}
+          containerStyle={styles.checkboxContainer}
+          checkedColor='#009688'
+        />
+
+        <CheckBox
+          title='Dairy Free'
+          checked={userStore.foodPreferences.some(f => f === 2)}
+          onPress={() => {
+            userStore.toggleFoodPreference(2);          
+          }}
+          checkedColor='#009688'
+          containerStyle={styles.checkboxContainer}
+        />
+
+        <CheckBox
+          title='Vegetarian'
+          checked={userStore.foodPreferences.some(f => f === 3)}
+          onPress={() => {
+            userStore.toggleFoodPreference(3);          
+          }}
+          containerStyle={styles.checkboxContainer}
+          checkedColor='#009688'
+        />
+
+        <CheckBox
+          title='Vegan'
+          checked={userStore.foodPreferences.some(f => f === 4)}
+          onPress={() => {
+            userStore.toggleFoodPreference(4);
+          }}
+          containerStyle={styles.checkboxContainer}
+          checkedColor='#009688'
+        />
+
+        {/*
+        <FormLabel labelStyle={styles.title}>Status</FormLabel>
+        <Text style={styles.descriptionText}>
+        By letting us know of your status at Pitt, we can better tailor your experience.
+        </Text>
+        <Picker selectedValue={'student'} >
+          <Picker.Item label="Student" value="student" />
+          <Picker.Item label="Faculty" value="faculty" />
+          <Picker.Item label="Staff" value="staff" />
+        </Picker>
+        */}
+
+        <Button
+          title='SAVE'
+          backgroundColor='#009688'
+          borderRadius={10}
+          containerViewStyle={styles.submitButton}
+          onPress={() => {
+            this.updatePreferences();
+          }}
+        />
+
+        <FormLabel labelStyle={styles.title}>Account</FormLabel>
+        <Button
+          title='LOG OUT'
+          backgroundColor='rgba(231,76,60,1)'
+          borderRadius={10}
+          containerViewStyle={styles.submitButton}
+          onPress={() => {
+            console.log('Logging out');
+            clearAll();
+            // key must be null to go back to inital page and clear path
+            // see https://github.com/react-community/react-navigation/issues/1127#issuecomment-295841343
+            this.props.navigation.dispatch(NavigationActions.reset({
+              index: 0,
+              key: null,
+              actions: [
+                NavigationActions.navigate({ routeName: 'Entrance' })
+              ]
+            }))
+          }}
+        />
+      </ScrollView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: 'bold',
+  },
+  descriptionText: {
+    fontSize: 15,
+    margin: 5,
+    marginLeft: 20,
+    marginRight: 20
   },
   submitButton: {
     paddingTop: 10,
@@ -41,7 +187,6 @@ const styles = StyleSheet.create({
   },
   viewContainer: {
     backgroundColor: '#fff',
-    marginTop: 20,
     width: metrics.screenWidth,
     height: metrics.screenHeight - metrics.tabBarHeight,
     zIndex: 100
@@ -70,246 +215,5 @@ const styles = StyleSheet.create({
     fontWeight: '700'
   }
 });
-
-const LOGIN_ENDPOINT = settings.server.url + '/login';
-const TOKEN_ENDPOINT = settings.server.url + '/token';
-const PREFERENCES_ENDPOINT = settings.server.url + '/users/preferences';
-const FEEDBACK_LINK = 'pittgrub.org';
-
-class Profile extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      email: '',
-      password: '',
-      glutenFree: false,
-      dairyFree: false,
-      vegetarian: false,
-      vegan: false,
-      eagerness: 1,
-      maxEager: 5,
-      pantry: false
-    }
-
-    this.getPreferences();
-
-  }
-
-  testnav = () => {
-    console.log('in profile');
-  }
-
-  componentWillMount() {
-    getUser()
-      .then((user) => {
-        // set pitt pantry setting
-        if (user['pantry'] == undefined || user['pantry'] == null) {
-          setPantry(false);
-          this.setState({ pantry: false });
-        } else {
-          this.setState({ pantry: user['pantry'] })
-        }
-
-        // set eagerness level
-        if (user['eagerness'] == undefined || user['eagerness'] == null) {
-          setEagerness(3);
-          this.setState({ eagerness: 3 });
-        } else {
-          this.setState({ eagerness: user['eagerness'] });
-        }
-      });
-  }
-
-  componentWillReceiveProps(newProps) {
-    console.log("Route index: " + newProps.screenProps.route_index);
-    if (newProps.screenProps.route_index === 2) {
-      this.testnav();
-    }
-  }
-
-  async updatePreferences() {
-    var preferences = [];
-    if (this.state.glutenFree) {
-      preferences.push(1);
-    }
-    if (this.state.dairyFree) {
-      preferences.push(2);
-    }
-    if (this.state.vegetarian) {
-      preferences.push(3);
-    }
-    if (this.state.vegan) {
-      preferences.push(4);
-    }
-    let token = await getToken();
-    fetch(PREFERENCES_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token.token
-      },
-      body: JSON.stringify(preferences)
-    })
-      .then((response) => {
-        if (response.ok) {
-          setFoodPreferences(preferences);
-          console.log('response');
-          return response.json();
-        } else {
-          console.log('response failed');
-          console.log(response);
-        }
-      })
-      .then((responseData) => {
-        console.log('responseData');
-        console.log(responseData);
-      })
-      .catch((error) => {
-        console.log('Error: ' + error);
-      });
-  }
-
-  getPreferences() {
-    // AsyncStorage.getItem('user')
-    //   .then((user) => {
-    //     user = JSON.parse(user);
-    //     let foodPrefs = user.food_preferences;
-    //     if (foodPrefs.includes(1)) {
-    //       this.setState({ glutenFree: true });
-    //     }
-    //     if (foodPrefs.includes(2)) {
-    //       this.setState({ dairyFree: true });
-    //     }
-    //     if (foodPrefs.includes(3)) {
-    //       this.setState({ vegetarian: true });
-    //     }
-    //     if (foodPrefs.includes(4)) {
-    //       this.setState({ vegan: true });
-    //     }
-    //   });
-  }
-
-  render() {
-    return (
-      <ScrollView style={styles.viewContainer}>
-        {/* Food preference settings */}
-        <FormLabel labelStyle={styles.title}>Food Preferences</FormLabel>
-        <Text
-          style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20 }}>
-          We will only send notifications for food events that match your preferences.
-        </Text>
-        <CheckBox
-          title='Gluten Free'
-          checked={this.state.glutenFree}
-          onPress={() => {
-            this.setState({ glutenFree: !this.state.glutenFree })
-          }}
-          containerStyle={styles.checkboxContainer}
-          checkedColor='#009688'
-        />
-
-        <CheckBox
-          title='Dairy Free'
-          checked={this.state.dairyFree}
-          onPress={() => {
-            this.setState({ dairyFree: !this.state.dairyFree })
-          }}
-          checkedColor='#009688'
-          containerStyle={styles.checkboxContainer}
-        />
-
-        <CheckBox
-          title='Vegetarian'
-          checked={this.state.vegetarian}
-          onPress={() => {
-            this.setState({ vegetarian: !this.state.vegetarian })
-          }}
-          containerStyle={styles.checkboxContainer}
-          checkedColor='#009688'
-        />
-
-        <CheckBox
-          title='Vegan'
-          checked={this.state.vegan}
-          onPress={() => {
-            this.setState({ vegan: !this.state.vegan })
-          }}
-          containerStyle={styles.checkboxContainer}
-          checkedColor='#009688'
-        />
-        <Button
-          title='UPDATE'
-          backgroundColor='#009688'
-          borderRadius={10}
-          containerViewStyle={styles.submitButton}
-          onPress={() => {
-            this.updatePreferences();
-          }}
-        />
-
-        <FormLabel labelStyle={styles.title}>Eagerness</FormLabel>
-        <Text
-          style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20, }}>
-          How eager are you to pursue free food? This will influence your likelihood of being sent event notifications.
-        </Text>
-        {/* <Text style={{ fontSize: 15, margin: 5, marginLeft: 20, marginRight: 20 }}>
-          Max notifications: <Text style={{ fontWeight: 'bold' }}>{this.state.maxNotifications}</Text>
-        </Text> */}
-        <Slider
-          style={{ marginLeft: 20, marginRight: 20 }}
-          thumbTintColor={'#009688'}
-          value={this.state.eagerness}
-          minimumValue={1}
-          maximumValue={5}
-          step={1}
-          onSlidingComplete={() => {
-            console.log("done: " + this.state.eagerness);
-            setEagerness(this.state.eagerness);
-            postSettings({ eagerness: this.state.eagerness })
-          }}
-          onValueChange={(value) => this.setState({ eagerness: value })}/>
-
-        <FormLabel labelStyle={styles.title}>Pitt Pantry</FormLabel>
-        <Text style={{fontSize:15, margin:5, marginLeft:20, marginRight:20}}>
-          Check this box if you are a member of The Pitt Pantry. This will increase your likelihood of being sent event notifications. We do not share this information.
-        </Text>
-        <CheckBox
-          title='Member'
-          checked={this.state.pantry}
-          onPress={() => {
-            let newStatus = !this.state.pantry;
-            setPantry(newStatus);
-            postSettings({ pantry: newStatus });
-            this.setState({ pantry: newStatus });
-          }}
-          containerStyle={styles.checkboxContainer}
-          checkedColor='#009688'
-        />
-        <FormLabel labelStyle={styles.title}>Account</FormLabel>
-        <Button
-          title='LOG OUT'
-          backgroundColor='rgba(231,76,60,1)'
-          borderRadius={10}
-          containerViewStyle={styles.submitButton}
-          onPress={() => {
-            console.log('Logging out');
-            clearAll();
-            // key must be null to go back to inital page and clear path
-            // see https://github.com/react-community/react-navigation/issues/1127#issuecomment-295841343
-            this.props.navigation.dispatch(NavigationActions.reset({
-              index: 0,
-              key: null,
-              actions: [
-                NavigationActions.navigate({ routeName: 'Entrance' })
-              ]
-            }))
-          }}
-        />
-      </ScrollView>
-    );
-  }
-}
 
 export default Profile;

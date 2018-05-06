@@ -28,18 +28,15 @@ export default class PasswordResetScreen extends React.Component {
     };
 
     this.logoSize = new Animated.Value(metrics.logoSizeLarge);
-
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
-    this._clearState = this._clearState.bind(this);
     this._resetPasswordRequest = this._resetPasswordRequest.bind(this);
   }
 
-  componentWillMount() {
-    // move verification form out of the way when
+  componentDidMount() {
+    // move verification form when
     // keyboard is coming into view
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
-
     // put it back
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
   }
@@ -72,40 +69,28 @@ export default class PasswordResetScreen extends React.Component {
     }
   }
 
-  _clearState = async () => {
-    this.setState({
-      code: '',
-      loading: false,
-    });
-  }
-
   _resetPasswordRequest = async () => {
-    console.log('Resetting password for: ' + this.state.email);
-    postPasswordReset(this.state.email)
-      .then((response) => {
-        if (response.ok) {
-          console.log('response is ok');
-          this.setState({ requestSent: true });
-          this.setState({ loading: false });
-        } else {
-          response.json()
-          .then((responseData) => {
-            if (responseData['message']) {
-              Alert.alert('Error', responseData['message'], { text: 'OK' });
-            } else {
-              Alert.alert('Error', 'Something went wrong', { text: 'OK' });
-            }
-          })
-        }
-      })
-      .catch((error) => {
-        this.setState({ loading: false });
-        console.log('failed reset');
-      });
+    const email = this.state.email.trim();
+    postPasswordReset(email)
+    .then(response => {
+      if (!response.ok) { throw response }
+      this.setState({ requestSent: true });
+      this.setState({ buttonText: "CHECK YOUR EMAIL" });
+    })
+    .catch(error => {
+      const body = JSON.parse(error['_bodyText']);
+      const msg = body.message;
+      if (msg) {
+        Alert.alert('Error', msg, {text: 'OK'});
+      } else {
+        Alert.alert('Error', 'Something went wrong', {text: 'OK'});          
+      }
+    })
+    .done(_ => this.setState({ loading: false }));
   }
 
   render() {
-    const isDisabled = this.state.verificationResent;
+    const isDisabled = this.state.email.trim().length === 0 || this.state.requestSent;
     return (
       <ScrollView
         ref='scrollView'
@@ -131,7 +116,6 @@ export default class PasswordResetScreen extends React.Component {
               Keyboard.dismiss();
               this.setState({ loading: true });
               this._resetPasswordRequest();
-              this.setState({ buttonText: "CHECK YOUR EMAIL" });
             }}
             value={this.state.email} />
             <View>
@@ -141,13 +125,12 @@ export default class PasswordResetScreen extends React.Component {
                   Keyboard.dismiss();
                   this.setState({ loading: true });
                   this._resetPasswordRequest();
-                  this.setState({ buttonText: "CHECK YOUR EMAIL" });
                 }}
                 disabled={isDisabled}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
               <BackButton
-                onPress={() => this.props.navigation.goBack(null)}
+                onPress={() => { Keyboard.dismiss(); this.props.navigation.goBack(null) }}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
             </View>

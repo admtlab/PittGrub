@@ -1,21 +1,22 @@
 /* @flow */
 
+import { inject, observer } from 'mobx-react';
 import React from 'react';
 import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
-import { inject, observer } from 'mobx-react';
 import Logo from '../components/Logo';
 import metrics from '../config/metrics';
 import { colors } from '../config/styles';
 import { postLogin, getUserProfile } from '../lib/api';
-import { storeAccessToken, storeRefreshToken } from '../lib/token';
-import { isHost, getProfile, storeProfile, storeUser } from '../lib/user';
 import { registerForPushNotifications } from '../lib/notifications';
+import { storeAccessToken, storeRefreshToken, getRefreshToken } from '../lib/token';
+import { isHost, getProfile, storeProfile, storeUser } from '../lib/user';
 
 
 // screen dimensions
 const { width, height } = Dimensions.get('window');
 const top = height * 0.25;
+
 
 @inject("tokenStore", "userStore")
 @observer
@@ -29,24 +30,24 @@ export default class LoginScreen extends React.Component {
       loading: false,
       correctCredentials: false,
     };
-    this.logoSize = new Animated.Value(metrics.logoSizeLarge);
 
+    this.logoSize = new Animated.Value(metrics.logoSizeLarge);
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
     this._clearState = this._clearState.bind(this);
     this._login = this._login.bind(this);
   }
-
-  componentWillMount() {
-    // move login form out of the way when
+  
+  componentDidMount() {
+    // move login form and logo when
     // keyboard is coming into view
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
-
-    // put it back
+    // put them back when keyboard is leaving
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
   }
 
   componentWillUnmount() {
+    // remove listeners when component is done
     this.keyboardWillShowListener.remove();
     this.keyboardWillHideListener.remove();
   }
@@ -79,87 +80,82 @@ export default class LoginScreen extends React.Component {
       email: '',
       password: '',
       loading: false,
+      correctCredentials: false
     });
   }
 
-  _checkPermissions = async () => {
-
-  }
-
   _login = async () => {
-    // check that credentials are filled
     const tokenStore = this.props.tokenStore;
     const userStore = this.props.userStore;
-    if (this.state.email !== '' && this.state.password !== '') {
-      let activated = false;
-      let status = '';
-      postLogin(this.state.email, this.state.password)
-        .then(response => response.json())
-        .then(responseData => {
-          if (responseData['status'] && responseData['status'] >= 400) {
-            // request was an error
-            if (responseData['message'] && responseData['message'].startsWith('Incorrect username or password')) {
-              Alert.alert('Error', 'Incorrect username or password', {text: 'OK'});
-            } else if (responseData.message) {
-              Alert.alert('Error', responseData.message, {text: 'OK'});
-            } else {
-              Alert.alert('Error', 'Something went wrong', {text: 'OK'});
-            }
-          } else {
-            const refreshToken = responseData['refresh_token'];
-            const accessToken = responseData['access_token'];
-            const user = responseData['user'];
-            tokenStore.setRefreshToken(refreshToken);
-            tokenStore.setAccessToken(accessToken);
-            userStore.setUser(user);
-            storeRefreshToken(refreshToken);
-            storeAccessToken(accessToken);
-            storeUser(user);
-            console.log('stored tokens?');
+    const email = this.state.email.trim();
+    const password = this.state.password;
 
-            // get user profile
-            getUserProfile(accessToken)
-            .then((response) => {
-              if (!response.ok) { throw response };
-              return response.json();
-            })
-            .then((responseData) => {
-              const food = responseData['food_preferences'].map(fp => fp.id);
-              const pantry = responseData['pitt_pantry'];
-              const eager = responseData['eagerness'];
-              const profile = {
-                foodPreferences: food,
-                pantry: pantry,
-                eagerness: eager
-              };
-              userStore.setProfile(profile);
-              storeProfile(profile);
-            })
-            registerForPushNotifications();
-            this._clearState();
-            if (!user.active) {
-              console.log("Not activated, sending to verification screen");
-              this.props.navigation.navigate('Verification');
-            } else {
-              console.log("they're good, sending to main page");
-              this.props.navigation.navigate('Main');
-            }
-          }
+    // check that credentials are filled
+    if (email !== '' && password !== '') {
+      postLogin(email, password)
+      .then(response => {
+        if (!response.ok) throw { response };
+        return response.json();
+      })
+      .then(responseData => {
+        // store tokens and user data
+        const refreshToken = responseData['refresh_token'];
+        const accessToken = responseData['access_token'];
+        const user = responseData['user'];
+        tokenStore.setRefreshToken(refreshToken);
+        tokenStore.setAccessToken(accessToken);
+        userStore.setUser(user);
+        storeRefreshToken(refreshToken)
+        storeAccessToken(accessToken);
+        storeUser(user);
+
+        // get user profile
+        getUserProfile(accessToken)
+        .then((response) => {
+          if (!response.ok) { throw response.json() };
+          return response.json();
         })
-        .catch((error) => {
+        .then((responseData) => {
+          const profile = {
+            foodPreferences: responseData['food_preferences'].map(fp => fp.id),
+            pantry: responseData['pitt_pantry']
+          };
+          userStore.setProfile(profile);
+          storeProfile(profile);
+        })
+        
+        // go to next screen
+        this._clearState();
+        if (!user.active) {
+          this.props.navigation.navigate('Verification');
+        } else {
+          this.props.navigation.navigate('Main');
+        }
+      })
+      .catch(error => {
+        if (!error.response) {
+          // no response object (other error)
           Alert.alert('Error', 'Something went wrong', {text: 'OK'});
-          console.log('ERROR: Failed to log in');
-          console.log(error);
-        })
-        .done(() => {
-          this.setState({ loading: false });
-        });
+        } else {          
+          const body = JSON.parse(error.response['_bodyText']);
+          const msg = body.message;
+          if (msg && msg.startsWith('Error: Incorrect')) {
+            Alert.alert('Error', 'Incorrect username or password', {text: 'OK'});
+          } else if (msg) {
+            Alert.alert('Error', msg, {text: 'OK'});
+          } else {
+            Alert.alert('Error', 'Something went wrong', {text: 'OK'});
+          }
+        }
+      })
+      .done(() => this.setState({ loading: false }));
     }
   }
 
   render() {
-    const isEnabled = this.state.email.length > 0 &&
-      this.state.password.length > 0;
+    const email = this.state.email.trim();
+    const password = this.state.password;
+    const isEnabled = email.length > 0 && password.length > 0;
     return (
       <ScrollView
         ref='scrollView'
@@ -202,7 +198,6 @@ export default class LoginScreen extends React.Component {
               Keyboard.dismiss();
               this.setState({ loading: true });
               this._login();
-              this.setState({ loading: false });
             }}
             value={this.state.password} />
           </KeyboardAvoidingView>
@@ -223,18 +218,16 @@ export default class LoginScreen extends React.Component {
                   Keyboard.dismiss();
                   this.setState({ loading: true });
                   this._login();
-                  this.setState({ loading: false });
                 }}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
               <BackButton
-                onPress={() => this.props.navigation.goBack(null)}
+                onPress={() => { Keyboard.dismiss(); this.props.navigation.goBack(null) }}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
             </View>}
           {this.state.loading &&
-            <ActivityIndicator
-              color='#fff' />}
+            <ActivityIndicator color='#fff' />}
         </KeyboardAvoidingView>
       </ScrollView>
     );

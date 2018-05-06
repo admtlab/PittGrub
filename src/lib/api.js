@@ -5,14 +5,16 @@ const TOKEN_ENDPOINT = settings.server.url + '/token';
 const SIGNUP_ENDPOINT = settings.server.url + '/signup';
 const LOGIN_ENDPOINT = settings.server.url + '/login';
 const USER_ENDPOINT = settings.server.url + '/users';
-const VERIFICATION_ENDPOINT = settings.server.url + '/verify';
+const LOCATION_ENDPOINT = settings.server.url + '/users/location';
+const VERIFICATION_ENDPOINT = settings.server.url + '/users/verify';
 const PROFILE_ENDPOINT = settings.server.url + '/users/profile';
-const SETTINGS_ENDPOINT = settings.server.url + '/users/settings';
-const PASSWORD_RESET_ENDPOINT = settings.server.url + '/password/reset';
+const PASSWORD_RESET_ENDPOINT = settings.server.url + '/users/password/reset';
 const EVENT_ENDPOINT = settings.server.url + '/events';
+const ACCEPT_EVENT_ENDPOINT = settings.server.url + '/events/accept';
 const BEARER = 'Bearer ';
 const REQUEST_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/request';
 const VALIDATE_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/validate';
+const NOTIFICATION_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/notification';
 
 
 export async function getUserProfile(token) {
@@ -26,12 +28,13 @@ export async function getUserProfile(token) {
   });
 }
 
-export async function postExpoToken(userId, token) {
-  return fetch(TOKEN_ENDPOINT, {
+export async function postExpoToken(accessToken, userId, token) {
+  return fetch(NOTIFICATION_TOKEN_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken,
     },
     body: JSON.stringify({
       user:  userId,
@@ -81,44 +84,71 @@ export async function postLogin(email, password) {
   });
 }
 
-export async function getVerification() {
-  let token = await getToken();
+export async function getVerification(token) {
   return fetch(VERIFICATION_ENDPOINT, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token.token,
+      'Authorization': 'Bearer ' + token,
     },
   });
 }
 
-export async function postVerification(code) {
-  let token = await getToken();
+export async function postVerification(token, code) {
   return fetch(VERIFICATION_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token.token,
+      'Authorization': 'Bearer ' + token,
     },
-    body: JSON.stringify({ activation: code }),
+    body: JSON.stringify({ code: code }),
   });
 }
 
-export async function postSettings(settings) {
+export async function postLocation(token, latitude, longitude) {
+  return fetch(LOCATION_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    },
+    body: JSON.stringify({
+      latitude: latitude,
+      longitude: longitude,
+    })
+  });
+}
+
+export async function postProfile(token, foodPrefs, pantry) {
+  return fetch(PROFILE_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    },
+    body: JSON.stringify({
+      food_preferences: foodPrefs,
+      pantry: pantry
+    })
+  });
+}
+
+export async function postSettings(token, settings) {
   /* possible settings keys
    * eagerness - eagerness value
    * pantry - pitt pantry value
    * food_preferences - ids of update food preferences
   */
-  let token = await getToken();
-  return fetch(SETTINGS_ENDPOINT, {
+  return fetch(PROFILE_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token.token,
+      'Authorization': 'Bearer ' + token,
     },
     body: JSON.stringify(settings),
   });
@@ -146,6 +176,30 @@ export async function getEvents(token) {
   });
 }
 
+export async function postEvent(token, body) {
+  return fetch(EVENT_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    },
+    body: JSON.stringify(body)
+  })
+}
+
+export async function postAcceptEvent(token, eventId) {
+  return fetch(ACCEPT_EVENT_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    },
+    body: JSON.stringify({ event_id: eventId })
+  });
+}
+
 export async function postTokenValidation(token) {
   return fetch(VALIDATE_TOKEN_ENDPOINT, {
     method: 'POST',
@@ -153,8 +207,6 @@ export async function postTokenValidation(token) {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: {
-      'token': token
-    },
+    body: JSON.stringify({ token: token }),
   });
 }

@@ -38,10 +38,10 @@ class TokenStore {
   }
 
   @computed get parsedAccessToken () {
-      return {
-        header: JSON.parse(Buffer.from(this.accessToken.split('.')[0], 'base64')),
-        payload: JSON.parse(Buffer.from(this.accessToken.split('.')[1], 'base64'))
-      }
+    return {
+      header: JSON.parse(Buffer.from(this.accessToken.split('.')[0], 'base64')),
+      payload: JSON.parse(Buffer.from(this.accessToken.split('.')[1], 'base64'))
+    }
   }
 
   @computed get parsedRefreshToken () {

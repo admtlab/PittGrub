@@ -1,10 +1,9 @@
 /* @flow */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Animated } from 'react-native';
+import PropTypes from 'prop-types';
 import styles from './styles';
-import { colors } from '../../config/styles';
 
 
 const Logo = (props) => {

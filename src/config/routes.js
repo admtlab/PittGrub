@@ -1,6 +1,7 @@
 /* @flow */
 
 import React from 'react'
+import { Text } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import CreateEvent from '../containers/CreateEvent';
@@ -15,6 +16,9 @@ import Verification from '../containers/Verification';
 import Welcome from '../containers/Welcome';
 import metrics from './metrics';
 
+const headerTitle = (title) => {
+  return(<Text style={{ fontSize: 22 }}>{title}</Text>)
+}
 
 export const HomeNav = StackNavigator({
   Home: {
@@ -22,12 +26,14 @@ export const HomeNav = StackNavigator({
     navigationOptions:({navigation}) => ({
       title: 'PittGrub',
       headerBackTitle: 'Home',
+      headerTitle: headerTitle('PittGrub'),
     })
   },
   EventDetail: {
     screen: EventDetail,
     navigationOptions: ({navigation}) => ({
       title: `Event Details`,
+      headerTitle: headerTitle('Event Details'),      
     })
   },
 })
@@ -36,20 +42,33 @@ export const EventNav = StackNavigator({
   Events: {
     screen: Events,
     navigationOptions: {
-      title: 'Events'
+      title: 'Events',
+      headerTitle: headerTitle('Events'),
     },
   },
   CreateEvent: {
     screen: CreateEvent,
     navigationOptions: {
-      title: 'Create Event'
+      title: 'Create Event',
+      headerTitle: headerTitle('Create Event'),      
     }
   },
   EventDetail: {
     screen: EventDetail,
     navigationOptions: ({navigation}) => ({
-      title: 'Event Details'
+      title: 'Event Details',
+      headerTitle: headerTitle('Event Details'),      
     })
+  }
+});
+
+export const ProfileNav = StackNavigator({
+  Profile: {
+    screen: Profile,
+    navigationOptions: {
+      title: 'Profile',
+      headerTitle: headerTitle('Profile'),
+    }
   }
 });
 
@@ -116,8 +135,8 @@ export const TabNav = TabNavigator({
         />,
     },
   },
-  Profile: {
-    screen: Profile,
+  ProfileTab: {
+    screen: ProfileNav,
     navigationOptions: {
       tabBarLabel: 'Profile',
       tabBarIcon: ({ tintColor }) =>

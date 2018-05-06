@@ -28,58 +28,67 @@ export default class WelcomeScreen extends React.Component {
   }
 
   componentDidMount() {
-    console.log('welcome mounted');
     this._appStateHandler();
     this._checkNavigation();
   }
 
-  _appStateHandler = () => {
+  _appStateHandler = async () => {
     const tokenStore = this.props.tokenStore;
     const userStore = this.props.userStore;
     AppState.addEventListener('change', state => {
       console.log('AppState is', state);
       if (state === 'active') {
-        let refreshToken = getRefreshToken().catch(() => '');
-        let valid = postTokenValidation(refreshToken)
-        .then(response => {
-          if (!response.ok) { throw response }
-          return response.json();
-        })
-        .then(responseData => {
-          return responseData['valid'];
-        })
-        .catch(() => {
-          return false;
-        });
-        if (!valid) {
-          console.log('refresh is not valid');
-          tokenStore.setRefreshToken('');
-          tokenStore.setAccessToken('');
-          deleteRefreshToken();
-          deleteAccessToken();
-          removeUser();
-          removeProfile();
-          this.props.navigation.dispatch(NavigationActions.reset({
-            index: 0,
-            key: null,
-            actions: [
-              NavigationActions.navigate({ routeName: 'Entrance' })
-            ]
-          }));
+        if (!tokenStore.refreshToken) {
+          getRefreshToken()
+          .then(refreshToken => {
+          let valid = postTokenValidation(refreshToken)
+          .then(response => {
+            if (!response.ok) { throw response }
+            return response.json();
+          })
+          .then(responseData => {
+            return responseData['valid'];
+          })
+          .catch(() => {
+            return false;
+          });
+  
+          if (!valid) {
+            tokenStore.setRefreshToken('');
+            tokenStore.setAccessToken('');
+            deleteRefreshToken();
+            deleteAccessToken();
+            removeUser();
+            removeProfile();
+            this.props.navigation.dispatch(NavigationActions.reset({
+              index: 0,
+              key: null,
+              actions: [
+                NavigationActions.navigate({ routeName: 'Entrance' })
+              ]
+            }));
+          } else {
+            console.log('refresh is still valid');
+            getRefreshToken()
+            .then(token => tokenStore.setRefreshToken(token))
+            .then(() => {
+              getUser().then(user => userStore.setUser(user));
+              getProfile().then(profile => userStore.setProfile);
+            })
+            .then(() => {
+              getAccessToken()
+              .then(token => tokenStore.setAccessToken(token))
+              .then(() => {
+                this.props.navigation.navigate('Main');
+              });
+            });
+          }})
+        } else {
+          if (!tokenStore.accessToken) {
+            tokenStore.getOrFetchAccessToken();
+          }
+          this.props.navigation.navigate('Main');
         }
-        console.log('refresh is valid');
-        tokenStore.setRefreshToken(
-          getRefreshToken().catch(() => '').done()
-        );
-        tokenStore.setAccessToken(
-          getAccessToken().catch(() => '').done()
-        );
-        userStore.setUser(
-          getUser().catch(() => null).done()
-        );
-        userStore.setProfile(
-          getProfile().catch(() => null).done()
-        );
       }
     });
   }
@@ -95,7 +104,7 @@ export default class WelcomeScreen extends React.Component {
     let refreshToken = tokenStore.refreshToken;
     if (!refreshToken) {
       // not in store, check storage
-      refreshToken = await getRefreshToken().catch(() => '').done();
+      refreshToken = await getRefreshToken();
     }
     // not in store or storage
     if (!refreshToken) {
@@ -104,7 +113,6 @@ export default class WelcomeScreen extends React.Component {
       return;
     }
 
-    
     let valid = postTokenValidation(refreshToken)
     .then(response => {
       if (!response.ok) { throw response }

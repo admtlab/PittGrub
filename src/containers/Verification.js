@@ -1,5 +1,6 @@
 /* @flow */
 
+import { inject, observer } from 'mobx-react';
 import React from 'react';
 import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
@@ -9,7 +10,7 @@ import metrics from '../config/metrics';
 import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { getVerification, postVerification } from '../lib/api';
-import { getUser, activateUser } from '../lib/auth';
+import { getUser, activateUser } from '../lib/user';
 import { registerForPushNotifications } from '../';
 
 
@@ -17,7 +18,8 @@ import { registerForPushNotifications } from '../';
 var { width, height } = Dimensions.get('window');
 const top = height * 0.25;
 
-
+@inject("tokenStore", "userStore")
+@observer
 export default class VerificationScreen extends React.Component {
   constructor() {
     super();
@@ -30,14 +32,14 @@ export default class VerificationScreen extends React.Component {
     };
 
     this.logoSize = new Animated.Value(metrics.logoSizeLarge);
-
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
     this._clearState = this._clearState.bind(this);
     this._verification = this._verification.bind(this);
+    this._resendVerifiction = this._resendVerifiction.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     // move verification form out of the way when
     // keyboard is coming into view
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
@@ -81,56 +83,44 @@ export default class VerificationScreen extends React.Component {
     });
   }
 
-  _verification = async () => {
-    console.log('Sending verification code: ' + this.state.code);
-    postVerification(this.state.code)
-      .then((response) => {
-        if (response.ok) {
-          console.log('response is ok');
-          let status = '';
-          activateUser();
-          console.log('user activated');
-          registerForPushNotifications();
-          console.log('push notification registered');
-          getUser()
-            .then((user) => {
-              console.log('got user');
-              console.log(user);
-              status = user.status;
-              this.setState({ loading: false });
-              if (settings.requireApproval && status !== 'ACCEPTED') {
-                console.log('Requires approval, go to waiting screen');
-                this.props.navigation.navigate('Waiting');
-              } else {
-                console.log('Go to Main screen');
-                this.props.navigation.dispatch(NavigationActions.reset({
-                  index: 0,
-                  key: null,
-                  actions: [
-                    NavigationActions.navigate({ routeName: 'Main' })
-                  ],
-                }));
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        } else {
-          this.setState({ loading: false });
-          response.json()
-            .then((responseData) => {
-              if (responseData['message'] && responseData['message'].startsWith('Invalid activation')) {
-                Alert.alert('Error', 'Invalid verification code', { text: 'OK' });
-              } else {
-                Alert.alert('Error', 'Something went wrong', { text: 'OK' });
-              }
-            });
-        }
+  _resendVerifiction = async () => {
+    const tokenStore = this.props.tokenStore;
+    const accessToken = await tokenStore.getOrFetchAccessToken();
+    getVerification(accessToken)
+      .then(() => {
+        this.setState({ verificationResent: true });
+        this.setState({ resendText: "CHECK YOUR EMAIL" });
       })
-      .catch((error) => {
-        this.setState({ loading: false });
-        console.log('failed activation');
-      });
+      .catch(error => console.log(error));
+  }
+
+  _verification = async () => {
+    const tokenStore = this.props.tokenStore;
+    const accessToken = await tokenStore.getOrFetchAccessToken();
+    const code = this.state.code;
+    postVerification(accessToken, code)
+    .then(response => {
+      if (!response.ok) { throw response };
+      activateUser();
+      this._clearState();
+      this.props.navigation.dispatch(NavigationActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+          NavigationActions.navigate({ routeName: 'Main'})
+        ]
+      }));
+    })
+    .catch(error => {
+      if (!error.response) {
+        Alert.alert('Error', 'Something went wrong', {text: 'OK'});
+      } else {
+        const body = JSON.parse(error.response['_bodyText']);
+        const msg = body.message;
+        Alert.alert('Error', msg, {text: 'OK'});
+      }
+    })
+    .done(() => this.setState({ loading: false }));
   }
 
   render() {
@@ -177,13 +167,7 @@ export default class VerificationScreen extends React.Component {
                 textStyle={styles.buttonText} />
               <ButtonIconRight text={this.state.resendText}
                 icon="mail"
-                onPress={() => {
-                  getVerification()
-                    .then(() => {
-                      this.setState({ verificationResent: true });
-                      this.setState({ resendText: "CHECK YOUR EMAIL" });
-                    });
-                }}
+                onPress={() => this._resendVerifiction()}
                 disabled={this.state.verificationResent}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />

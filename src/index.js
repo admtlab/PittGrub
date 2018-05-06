@@ -1,9 +1,9 @@
 /* @flow */
 
-import React from 'react';
-import { AppRegistry, SafeAreaView } from 'react-native';
 import { Notifications } from 'expo';
 import { Provider } from 'mobx-react/native';
+import React from 'react';
+import { AppRegistry, SafeAreaView } from 'react-native';
 import Route from './config/routes';
 import { handleNotification } from './lib/notifications';
 import stores from './stores';
@@ -27,6 +27,7 @@ class App extends React.Component {
     } else {
       // set current route
       this.setState({ routeName: newState.routeName })
+      console.log('Route: ' + newState.routeName);
     }
   }
 

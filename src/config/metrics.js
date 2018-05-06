@@ -2,8 +2,8 @@ import { Dimensions, Platform } from 'react-native'
 
 const { width, height } = Dimensions.get('window')
 
-// Used via metrics.baseMargin
-export const metrics = {
+
+const metrics = {
   logoSizeLarge: width / 4,
   logoSizeSmall: width / 6,
   marginHorizontal: 10,

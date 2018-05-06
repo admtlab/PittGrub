@@ -1,3 +1,6 @@
+/* @flow */
+
+import { inject, observer } from 'mobx-react';
 import React from 'react';
 import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
@@ -6,7 +9,8 @@ import metrics from '../config/metrics';
 import settings from '../config/settings';
 import { colors } from '../config/styles';
 import { postSignup } from '../lib/api';
-import { getToken, storeUser, storeToken } from '../lib/auth';
+import { storeAccessToken, storeRefreshToken } from '../lib/token';
+import { storeUser } from '../lib/user';
 import { registerForPushNotifications } from '../lib/notifications';
 
 
@@ -15,6 +19,8 @@ var { width, height } = Dimensions.get('window');
 const top = height * 0.25;
 
 
+@inject("tokenStore", "userStore")
+@observer
 export default class SignupScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -23,8 +29,6 @@ export default class SignupScreen extends React.Component {
       email: '',
       password: '',
       confirmPassword: '',
-      incorrectPassword: false,
-      alreadyExists: false,
       loading: false,
     };
 
@@ -36,7 +40,7 @@ export default class SignupScreen extends React.Component {
     this._signup = this._signup.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     // move signup form out of the way when
     // keyboard is coming into view
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
@@ -78,53 +82,58 @@ export default class SignupScreen extends React.Component {
       email: '',
       password: '',
       loading: false,
-      alreadyExists: false,
     });
   }
 
   _signup = async () => {
-    // only submit if credentials are filled in
+    const tokenStore = this.props.tokenStore;
+    const userStore = this.props.userStore;
     const email = this.state.email.trim();
     const password = this.state.password;
+
+    // only submit if credentials are filled in
+    // and email is a pitt email address
     if (email !== '' && password !== '') {
-      let activated = false;
-      let accepted = false;
-      let status = '';
       if (!email.toLowerCase().endsWith('@pitt.edu')) {
-        Alert.alert('A Pitt email address is required', {test: 'OK'});
-        return;
-      }
-      postSignup(email, password)
-        .then((response) => response.json())
-        .then((responseData) => {
-          if (responseData['status'] && responseData['status'] >= 400) {
-            // alert user of error
-            let message = 'Something went wrong';
-            if (responseData.message && responseData.message.startsWith('Error: user already exists')) {
-              this.setState({ alreadyExists: true });
-              message = 'User already exists with that email address';
-              this.refs.EmailInput.focus();
-            }
-            Alert.alert('Error', message, {text: 'OK'});
-          } else {
-            // response was ok
-            this.setState({ alreadyExists: false });
-            global.admin = responseData.user.admin
-            storeUser(responseData.user)
-            storeToken({ token: responseData.token, expires: responseData.expires });
-            this._clearState();
-            // user has to verify their email
-            this.props.navigation.navigate('Verification');
-          }
+        Alert.alert('Error', 'A Pitt email address is required', {test: 'OK'});
+        this._clearState();
+      } else {
+        postSignup(email, password)
+        .then(response => {
+          if (!response.ok) throw { response };
+          return response.json();
+        })
+        .then(responseData => {
+          const refreshToken = responseData['refresh_token'];
+          const accessToken = responseData['access_token'];
+          const user = responseData['user'];
+          tokenStore.setRefreshToken(refreshToken);
+          tokenStore.setAccessToken(accessToken);
+          userStore.setUser(user);
+          storeRefreshToken(refreshToken);
+          storeAccessToken(accessToken);
+          storeUser(user);
+
+          // get user profile
+          userStore.setProfile({
+            foodPreferences: [],
+            pantry: false,
+          });
+          // user has to verify their email
+          this._clearState();
+          this.props.navigation.navigate('Verification');
         })
         .catch((error) => {
-          console.log("Error signing up");
-          console.log(error);
-          Alert.alert('Error', 'Something went wrong', {text: 'OK'});
+          if (!error.response) {
+            Alert.alert('Error', 'Something went wrong', {text: 'OK'});
+          } else {
+            const body = JSON.parse(error.response['_bodyText']);
+            const msg = body.message;
+            Alert.alert('Error', msg, {text: 'OK'});
+          }
         })
-        .done(() => {
-          this.setState({ loading: false });
-        });
+        .done(() => this.setState({ loading: false }));
+      }
     }
   }
 
@@ -190,7 +199,7 @@ export default class SignupScreen extends React.Component {
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
               <BackButton
-                onPress={() => this.props.navigation.goBack(null)}
+                onPress={() => { Keyboard.dismiss(); this.props.navigation.goBack(null) }}
                 buttonStyle={styles.button}
                 textStyle={styles.buttonText} />
             </View>}

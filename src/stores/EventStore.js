@@ -51,10 +51,6 @@ class EventStore {
   @action fetchEvents() {
     this.tokenStore.getOrFetchAccessToken()
     .then((accessToken) => {
-      console.log('access token is: ' + accessToken);
-      if (!accessToken) {
-        console.log("NO ACCESS TOKEN TO FETCH EVENTS");
-      }
       getEvents(accessToken)
       .then((response) => {
         if (!response.ok) { throw response }
@@ -63,10 +59,10 @@ class EventStore {
       .then((responseData) => {
         const eventViews = responseData['_embedded']['eventViews'];
         this.setEvents(eventViews);
-        console.log('got events in event store');
-        console.log(this.events);
+        console.log('fetched');
+        console.log(eventViews);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('Error fetching events in event store');
         console.log(error);
       })

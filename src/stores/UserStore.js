@@ -10,7 +10,6 @@ class UserStore {
   @observable disabled;
   @observable foodPreferences = [];
   @observable pantry;
-  @observable eagerness;
   @observable latitude;
   @observable longitude;
 
@@ -19,8 +18,6 @@ class UserStore {
   }
 
   @action setUser(user) {
-    console.log('setting user');
-    console.log(user);
     if (!user) {
       this.id = null;
       this.email = null;
@@ -43,18 +40,28 @@ class UserStore {
     }
   }
 
+  @action toggleFoodPreference(food) {
+    if (this.foodPreferences.some(f => f === food)) {
+      this.foodPreferences = this.foodPreferences.filter(f => f !== food);
+    } else {
+      this.foodPreferences.push(food);
+    }
+  }
+
+  @action togglePantry() {
+    this.pantry = !this.pantry;
+  }
+
   @action setProfile(profile) {
     if (!profile) {
       this.foodPreferences.splice(0, this.foodPreferences.length);
       this.pantry = null;
-      this.eagerness = null;
     } else {
       this.foodPreferences.splice(
         0,
         this.foodPreferences.length,
         ...profile.foodPreferences);
       this.pantry = profile.pantry;
-      this.eagerness = profile.eagerness;
     }
   }
   

@@ -4,12 +4,14 @@ import React from 'react';
 import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
 import { ImagePicker, MapView, Permissions, Location } from 'expo';
+import { inject, observer } from 'mobx-react';
 import metrics from '../config/metrics';
 import colors from '../config/styles';
 import settings from '../config/settings';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
+import { postEvent } from '../lib/api';
 import { findBuilding, closest } from '../lib/location';
 import images from '../config/images';
 var AWS = require('aws-sdk/dist/aws-sdk-react-native');
@@ -83,6 +85,8 @@ const styles = StyleSheet.create({
   },
 })
 
+@inject("tokenStore")
+@observer
 export default class CreateEventView extends React.Component {
 
   constructor(props) {
@@ -168,11 +172,6 @@ export default class CreateEventView extends React.Component {
     this.setState({ endDate: endDate })
   }
 
-
-  _mapFoodPreferences = () => {
-
-  }
-
   _handleAddressSearch = async () => {
     // cleanup address input
     let address = this.state.address.trim();
@@ -238,6 +237,7 @@ export default class CreateEventView extends React.Component {
   }
 
   _postEvent = () => {
+    const tokenStore = this.props.tokenStore;
     let foodprefs = [];
     if (this.state.glutenFree)
       foodprefs.push(1);
@@ -248,7 +248,7 @@ export default class CreateEventView extends React.Component {
     if (this.state.vegan)
       foodprefs.push(4);
 
-    body = JSON.stringify({
+    body = {
       title: this.state.title,
       details: this.state.description,
       address: this.state.address,
@@ -257,16 +257,9 @@ export default class CreateEventView extends React.Component {
       start_date: this.state.startDate,
       end_date: this.state.endDate,
       food_preferences: foodprefs,
-    });
-
-    fetch(createEventURL, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: body
-    })
+    };
+    
+    postEvent(tokenStore.accessToken, body)
     .then((response) => {
       return response.json();
     })
