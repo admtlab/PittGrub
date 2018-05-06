@@ -84,11 +84,17 @@ export default class SignupScreen extends React.Component {
 
   _signup = async () => {
     // only submit if credentials are filled in
-    if (this.state.email !== '' && this.state.password !== '') {
+    const email = this.state.email.trim();
+    const password = this.state.password;
+    if (email !== '' && password !== '') {
       let activated = false;
       let accepted = false;
       let status = '';
-      postSignup(this.state.email, this.state.password)
+      if (!email.toLowerCase().endsWith('@pitt.edu')) {
+        Alert.alert('A Pitt email address is required', {test: 'OK'});
+        return;
+      }
+      postSignup(email, password)
         .then((response) => response.json())
         .then((responseData) => {
           if (responseData['status'] && responseData['status'] >= 400) {

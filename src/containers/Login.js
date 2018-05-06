@@ -115,6 +115,7 @@ export default class LoginScreen extends React.Component {
             storeRefreshToken(refreshToken);
             storeAccessToken(accessToken);
             storeUser(user);
+            console.log('stored tokens?');
 
             // get user profile
             getUserProfile(accessToken)
@@ -131,7 +132,7 @@ export default class LoginScreen extends React.Component {
                 pantry: pantry,
                 eagerness: eager
               };
-              userStore.setUserProfile(profile);
+              userStore.setProfile(profile);
               storeProfile(profile);
             })
             registerForPushNotifications();

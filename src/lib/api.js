@@ -135,14 +135,13 @@ export async function postPasswordReset(email) {
   });
 }
 
-export async function getEvents() {
-  let token = await getToken();
+export async function getEvents(token) {
   return fetch(EVENT_ENDPOINT, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token.token,
+      'Authorization': 'Bearer ' + token,
     },
   });
 }

@@ -1,13 +1,14 @@
 /* @flow */
 
 import React from 'react';
-import { Dimensions, ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { AppState, Dimensions, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { inject, observer } from 'mobx-react';
+import { NavigationActions } from 'react-navigation';
 import { Button } from '../components/Button';
 import images from '../config/images';
-import { postTokenRequest, getUserProfile } from '../lib/api';
-import { getRefreshToken, getAccessToken, storeAccessToken } from '../lib/token';
-import { storeUser, storeProfile } from '../lib/user';
+import { postTokenValidation, postTokenRequest, getUserProfile } from '../lib/api';
+import { deleteRefreshToken, getRefreshToken, getAccessToken, storeAccessToken } from '../lib/token';
+import { getUser, getProfile, removeProfile, removeUser, storeProfile, storeUser } from '../lib/user';
 
 
 // screen dimensions
@@ -23,11 +24,64 @@ export default class WelcomeScreen extends React.Component {
       navigate: '',
     };
     this._checkNavigation = this._checkNavigation.bind(this);
+    this._appStateHandler = this._appStateHandler.bind(this);
   }
 
   componentDidMount() {
     console.log('welcome mounted');
+    this._appStateHandler();
     this._checkNavigation();
+  }
+
+  _appStateHandler = () => {
+    const tokenStore = this.props.tokenStore;
+    const userStore = this.props.userStore;
+    AppState.addEventListener('change', state => {
+      console.log('AppState is', state);
+      if (state === 'active') {
+        let refreshToken = getRefreshToken().catch(() => '');
+        let valid = postTokenValidation(refreshToken)
+        .then(response => {
+          if (!response.ok) { throw response }
+          return response.json();
+        })
+        .then(responseData => {
+          return responseData['valid'];
+        })
+        .catch(() => {
+          return false;
+        });
+        if (!valid) {
+          console.log('refresh is not valid');
+          tokenStore.setRefreshToken('');
+          tokenStore.setAccessToken('');
+          deleteRefreshToken();
+          deleteAccessToken();
+          removeUser();
+          removeProfile();
+          this.props.navigation.dispatch(NavigationActions.reset({
+            index: 0,
+            key: null,
+            actions: [
+              NavigationActions.navigate({ routeName: 'Entrance' })
+            ]
+          }));
+        }
+        console.log('refresh is valid');
+        tokenStore.setRefreshToken(
+          getRefreshToken().catch(() => '').done()
+        );
+        tokenStore.setAccessToken(
+          getAccessToken().catch(() => '').done()
+        );
+        userStore.setUser(
+          getUser().catch(() => null).done()
+        );
+        userStore.setProfile(
+          getProfile().catch(() => null).done()
+        );
+      }
+    });
   }
 
   _checkNavigation = async () => {
@@ -41,13 +95,34 @@ export default class WelcomeScreen extends React.Component {
     let refreshToken = tokenStore.refreshToken;
     if (!refreshToken) {
       // not in store, check storage
-      refreshToken
-      refreshToken = await getRefreshToken().catch(() => '');
+      refreshToken = await getRefreshToken().catch(() => '').done();
     }
     // not in store or storage
     if (!refreshToken) {
       // they have to log in
       console.log('No refresh token, keep them here');
+      return;
+    }
+
+    
+    let valid = postTokenValidation(refreshToken)
+    .then(response => {
+      if (!response.ok) { throw response }
+      return response.json();
+    })
+    .then(responseData => {
+      return responseData['valid'];
+    })
+    .catch(() => {
+      return false;
+    });
+
+    if (!valid) {
+      tokenStore.setRefreshToken('');
+      deleteRefreshToken();
+      removeUser();
+      removeProfile();
+      console.log("refresh token wasn't valid");
       return;
     }
 
@@ -92,7 +167,7 @@ export default class WelcomeScreen extends React.Component {
               pantry: pantry,
               eagerness: eager
             };
-            userStore.setUserProfile(profile);
+            userStore.setProfile(profile);
             storeProfile(profile);
           })
           // handle correct screen

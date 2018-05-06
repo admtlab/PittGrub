@@ -2,6 +2,7 @@ import React from 'react';
 import { AsyncStorage, Dimensions, Image, View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { ListItem, Icon, Card, Button, FormLabel, Grid, Col } from 'react-native-elements';
 import metrics from '../config/metrics';
+import { inject, observer } from 'mobx-react';
 import { colors } from '../config/styles';
 import images from '../config/images';
 import settings from '../config/settings';
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   },
 })
 
-
+@observer
 export default class EventDetail extends React.Component {
   constructor(props) {
     super(props);
@@ -81,6 +82,7 @@ export default class EventDetail extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     const eventId = this.props.navigation.state.params.id;
     const imageEndpoint = settings.server.url + '/events/' + eventId + '/images/';
     var food_arr = this.props.navigation.state.params.foodPreferences;
@@ -146,6 +148,7 @@ export default class EventDetail extends React.Component {
           buttonStyle={{ borderRadius: 10 }}
           onPress={
             () => {
+              this.props.navigation.state.params.event.accepted = true;
               console.log('Signed up for ' + this.props.navigation.state.params.id);
               global.refresh = true;
               AsyncStorage.getItem('user')

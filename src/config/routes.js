@@ -1,11 +1,10 @@
 /* @flow */
 
-import React from 'react';
+import React from 'react'
 import { TabNavigator, StackNavigator } from 'react-navigation';
-import CardStackStyleInterpolator from 'react-navigation/src/views/CardStack/CardStackStyleInterpolator';
 import { Icon } from 'react-native-elements';
 import CreateEvent from '../containers/CreateEvent';
-import Events from '../containers/Events'
+import Events from '../containers/Events';
 import EventDetail from '../containers/EventDetail';
 import Home from '../containers/Home';
 import LoginScreen from '../containers/Login';
@@ -13,18 +12,9 @@ import PasswordReset from '../containers/PasswordReset';
 import Profile from '../containers/Profile';
 import Signup from '../containers/Signup';
 import Verification from '../containers/Verification';
-import Waiting from '../containers/Waiting';
 import Welcome from '../containers/Welcome';
 import metrics from './metrics';
 
-
-const StackNavigatorConfig = {
-  transitionConfig: () => {
-    return {
-      screenInterpolator: CardStackStyleInterpolator.forInitial
-    }
-  }
-};
 
 export const HomeNav = StackNavigator({
   Home: {
@@ -98,13 +88,6 @@ export const WelcomeNav = StackNavigator({
       title: 'Verification',
       header: false,
     }
-  },
-  Waiting: {
-    screen: Waiting,
-    navigationOptions: {
-      title: 'Pending',
-      header: false,
-    }
   }
 });
 
@@ -133,7 +116,7 @@ export const TabNav = TabNavigator({
         />,
     },
   },
-  ProfileTab: {
+  Profile: {
     screen: Profile,
     navigationOptions: {
       tabBarLabel: 'Profile',

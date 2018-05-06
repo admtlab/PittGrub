@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Alert, AppState } from 'react-native';
 import { Permissions, Notifications } from 'expo';
 import { getUser } from './auth';
 import { postExpoToken } from './api';
@@ -36,7 +36,7 @@ export async function registerForPushNotifications() {
 export async function handleNotification(notification) {
   // this.setState({ notification: notification });
   console.log('notification context: ' + notification);
-  if (this.state.appState == 'active') {
+  if (AppState.currentState == 'active') {
     // handle foreground notification
     if (notification.data.type === 'message') {
       Alert.alert(notification.data.title + "\n\n" + notification.data.body);

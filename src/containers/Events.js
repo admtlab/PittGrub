@@ -1,6 +1,7 @@
 import React from 'react'
 import { AsyncStorage, Dimensions, RefreshControl, ListView, View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
 import metrics from '../config/metrics'
+import { inject, observer } from 'mobx-react';
 import settings from '../config/settings';
 import { colors } from '../config/styles'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -63,6 +64,8 @@ const styles = StyleSheet.create({
 
 });
 
+@inject("eventStore")
+@observer
 class Events extends React.Component {
   constructor(props) {
     super(props)
@@ -155,7 +158,7 @@ class Events extends React.Component {
     }
     return(
       <TouchableOpacity
-        onPress={() => this.props.navigation.navigate('EventDetail', { ...event })}>
+        onPress={() => this.props.navigation.navigate('EventDetail', { ...event, event: event })}>
         <View style={styles.row}>
           <Text style={styles.boldLabel}>{event.title}</Text>
           <Text style={styles.subtitle}> {
@@ -215,6 +218,7 @@ class Events extends React.Component {
   }
 
   render() {
+    const eventStore = this.props.eventStore;
     return (
       <View>
         <ScrollView
@@ -237,7 +241,7 @@ class Events extends React.Component {
           <ListView
             removeClippedSubviews={false}       // forces list to render
             keyboardShouldPersistTaps={"handled"}
-            dataSource={this.state.eventSource}
+            dataSource={eventStore.eventSource}
             renderRow={(row) => this.renderEvent(row)}
             style={{padding: 0, margin: 0}}
           />

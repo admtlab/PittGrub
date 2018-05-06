@@ -1,5 +1,6 @@
+import { Buffer } from 'buffer';
 import { action, computed, observable } from 'mobx';
-import { postLogin, postTokenValidation, postRefresh } from '../lib/api';
+import { postLogin, postTokenValidation, postTokenRequest } from '../lib/api';
 
 class TokenStore {
   @observable loading = false;
@@ -52,7 +53,7 @@ class TokenStore {
 
   @computed get accessTokenIsExpired() {
     if (!this.accessToken) { return true }
-    const parsed = this.parsedAccessToken();
+    const parsed = this.parsedAccessToken;
     const exp = parsed.payload.exp;
     const date = new Date(exp*1000);
     return new Date() >= date;
@@ -72,7 +73,7 @@ class TokenStore {
 
   @action async fetchAccessToken(email, password) {
     this.loading = true;
-    postRefresh(this.refreshToken)
+    postTokenRequest(this.refreshToken)
     .then(response => {
       if (!response.ok) { throw response }
       return response.json();
@@ -109,7 +110,7 @@ class TokenStore {
   }
 
   getOrFetchAccessToken = async () => {
-    const exp = this.parsedAccessToken().payload.exp;
+    const exp = this.parsedAccessToken.payload.exp;
     if (new Date(exp*1000) <= new Date()) {
       await this.fetchAccessToken();
     }

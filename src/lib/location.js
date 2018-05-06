@@ -56,11 +56,18 @@ export function closestPittBuilding(loc) {
   return Object.values(buildings)[closest(loc, Object.values(buildings))];
 }
 
+export function distanceMiles(loc1, loc2) {
+  return kmToMi(distance(loc1, loc2));
+}
+
 /**
  * Haversine distance between two locations
  * Implementation from: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula/27943#27943
  */
 export function distance(loc1, loc2) {
+  console.log('calculating');
+  console.log(loc1);
+  console.log(loc2);
   const R = 6371;
   let lat1 = loc1.latitude;
   let long1 = loc1.longitude;
@@ -78,6 +85,10 @@ export function distance(loc1, loc2) {
 
 function degToRad(deg) {
   return deg * (Math.PI/180);
+}
+
+function kmToMi(km) {
+  return (km * 0.62137).toFixed(2);
 }
 
 export const buildings = {

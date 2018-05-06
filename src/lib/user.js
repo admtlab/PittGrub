@@ -23,6 +23,10 @@ export async function storeUser(user) {
   AsyncStorage.setItem('user', user);
 }
 
+export async function removeUser() {
+  AsyncStorage.removeItem('user');
+}
+
 export async function getProfile() {
   const profile = await AsyncStorage.getItem('profile');
   return JSON.parse(profile);
@@ -32,6 +36,10 @@ export async function getProfile() {
 export async function storeProfile(profile) {
   profile = JSON.stringify(profile);
   AsyncStorage.setItem('profile', profile);
+}
+
+export async function removeProfile() {
+  AsyncStorage.removeItem('profile');
 }
 
 export async function activateUser() {
