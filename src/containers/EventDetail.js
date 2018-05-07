@@ -86,7 +86,6 @@ export default class EventDetail extends React.Component {
   render() {
     const tokenStore = this.props.tokenStore;
     const event = this.props.navigation.state.params.event;
-    console.log(this.props);
     const imageEndpoint = settings.server.url + '/events/' + event.id + '/images/';
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground }}>
@@ -115,7 +114,6 @@ export default class EventDetail extends React.Component {
           onPress={
             () => {
               event.accepted = true;
-              console.log('Signed up for ' + event.id);
               postAcceptEvent(tokenStore.accessToken, event.id)
               .then(() => {
                 this.props.navigation.goBack(null);

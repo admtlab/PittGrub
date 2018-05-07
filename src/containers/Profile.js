@@ -38,7 +38,8 @@ class Profile extends React.Component {
   }
 
   _logout = async () => {
-    const tokenStore = this.props.tokenStore;console.log('Logging out');
+    const tokenStore = this.props.tokenStore;
+    console.log('Logging out');
     tokenStore.setRefreshToken('');
     tokenStore.setAccessToken('');
     deleteRefreshToken();

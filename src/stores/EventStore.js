@@ -59,8 +59,6 @@ class EventStore {
       .then((responseData) => {
         const eventViews = responseData['_embedded']['eventViews'];
         this.setEvents(eventViews);
-        console.log('fetched');
-        console.log(eventViews);
       })
       .catch(error => {
         console.log('Error fetching events in event store');

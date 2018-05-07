@@ -53,7 +53,6 @@ class Events extends React.Component {
   }
 
   refreshEvents() {
-    console.log('refreshing event from event container');
     const eventStore = this.props.eventStore;
     eventStore.fetchEvents();
     this.setState({ loaded: true });
