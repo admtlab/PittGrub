@@ -2,7 +2,7 @@
   "expo": {
     "name": "PittGrubDev",
     "description": "Notifications for free food at the University of Pittsburgh.",
-    "version": "1.0.0-beta.6",
+    "version": "1.0.0",
     "platforms": [
         "android",
         "ios"
