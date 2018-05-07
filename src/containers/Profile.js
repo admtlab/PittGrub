@@ -1,35 +1,11 @@
-import React from 'react'
-import {
-  Alert,
-  AsyncStorage,
-  Switch,
-  ScrollView,
-  Text,
-  WebView,
-  Image,
-  View,
-  TouchableHighlight,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Picker,
-} from 'react-native'
-import { Button, CheckBox, FormLabel, FormInput, Slider } from 'react-native-elements';
-import { NavigationActions } from 'react-navigation';
 import { inject, observer } from 'mobx-react';
-import { Permissions, Notifications } from 'expo';
+import React from 'react'
+import { Alert, Picker, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Button, CheckBox, FormLabel } from 'react-native-elements';
+import { NavigationActions } from 'react-navigation';
 import metrics from '../config/metrics'
-import colors from '../config/styles'
-import images from '../config/images'
-import settings from '../config/settings';
-import { connect } from 'react-redux'
-import Icon from 'react-native-vector-icons/Ionicons';
-import {
-  setEagerness,
-  setFoodPreferences,
-  setPantry
-} from '../lib/user';
-import { getToken, getUser, clearAll } from '../lib/auth';
+import { deleteAccessToken, deleteRefreshToken } from '../lib/token';
+import { removeProfile, removeUser } from '../lib/user';
 import { postProfile } from '../lib/api';
 
 const FEEDBACK_LINK = 'pittgrub.org';
@@ -46,6 +22,7 @@ class Profile extends React.Component {
     }
 
     this.updatePreferences = this.updatePreferences.bind(this);
+    this._logout = this._logout.bind(this);
   }
 
   updatePreferences = async () => {
@@ -58,6 +35,25 @@ class Profile extends React.Component {
     .catch(error => {
       console.log(error);
     });
+  }
+
+  _logout = async () => {
+    const tokenStore = this.props.tokenStore;console.log('Logging out');
+    tokenStore.setRefreshToken('');
+    tokenStore.setAccessToken('');
+    deleteRefreshToken();
+    deleteAccessToken();
+    removeProfile();
+    removeUser();
+    // key must be null to go back to inital page and clear path
+    // see https://github.com/react-community/react-navigation/issues/1127#issuecomment-295841343
+    this.props.navigation.dispatch(NavigationActions.reset({
+      index: 0,
+      key: null,
+      actions: [
+        NavigationActions.navigate({ routeName: 'Entrance' })
+      ]
+    }))
   }
 
   render() {
@@ -151,19 +147,7 @@ class Profile extends React.Component {
           backgroundColor='rgba(231,76,60,1)'
           borderRadius={10}
           containerViewStyle={styles.submitButton}
-          onPress={() => {
-            console.log('Logging out');
-            clearAll();
-            // key must be null to go back to inital page and clear path
-            // see https://github.com/react-community/react-navigation/issues/1127#issuecomment-295841343
-            this.props.navigation.dispatch(NavigationActions.reset({
-              index: 0,
-              key: null,
-              actions: [
-                NavigationActions.navigate({ routeName: 'Entrance' })
-              ]
-            }))
-          }}
+          onPress={() => this._logout()}
         />
       </ScrollView>
     );
