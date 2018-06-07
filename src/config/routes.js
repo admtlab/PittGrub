@@ -17,7 +17,7 @@ import Welcome from '../containers/Welcome';
 import metrics from './metrics';
 
 const headerTitle = (title) => {
-  return(<Text style={{ fontSize: 22 }}>{title}</Text>)
+  return(<Text style={{ fontSize: 22, paddingTop: 10 }}>{title}</Text>)
 }
 
 export const HomeNav = StackNavigator({
@@ -50,7 +50,7 @@ export const EventNav = StackNavigator({
     screen: CreateEvent,
     navigationOptions: {
       title: 'Create Event',
-      headerTitle: headerTitle('Create Event'),      
+      headerTitle: headerTitle('Create Event'),
     }
   },
   EventDetail: {
@@ -67,7 +67,7 @@ export const ProfileNav = StackNavigator({
     screen: Profile,
     navigationOptions: {
       title: 'Profile',
-      headerTitle: headerTitle('Profile'),
+      headerTitle: headerTitle('Profile')
     }
   }
 });
@@ -147,12 +147,11 @@ export const TabNav = TabNavigator({
         />,
     }
   }}, {
-    initialRouteName: 'HomeTab',
-  }, {
     tabBarOptions: {
       style: {
-        height: metrics.tabBarHeight
-      }
+        height: metrics.tabBarHeight,
+        paddingBottom: metrics.tabBarPadding
+      },
     },
   },
 );

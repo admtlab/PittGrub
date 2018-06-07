@@ -46,7 +46,7 @@ class Home extends React.Component {
       Location.getCurrentPositionAsync({ enableHighAccuracy: true })
       .then((location) => {
         userStore.setLatLong(location.coords.latitude, location.coords.longitude);      
-      });
+      }).catch(() => { console.log('no access to location') });
     }
     const loc = {
       latitude: userStore.latitude,

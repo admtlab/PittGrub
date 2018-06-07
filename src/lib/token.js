@@ -18,7 +18,10 @@ export async function deleteAccessToken() {
 
 export async function getRefreshToken() {
   const token = await SecureStore.getItemAsync('refreshToken');
-  return token === undefined ? null : JSON.parse(token);
+  if (token === undefined || token === null || token === '') {
+    return null;
+  }
+  return JSON.parse(token);
 }
 
 export async function storeRefreshToken(token) {

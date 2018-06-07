@@ -1,6 +1,6 @@
 {
   "name": "PittGrubDev",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "devDependencies": {
     "babel-eslint": "^7.2.3",

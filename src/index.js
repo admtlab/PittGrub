@@ -1,6 +1,6 @@
 /* @flow */
 
-import { Notifications } from 'expo';
+import { AppLoading, Notifications } from 'expo';
 import { Provider } from 'mobx-react/native';
 import React from 'react';
 import { AppRegistry, SafeAreaView } from 'react-native';
@@ -16,6 +16,7 @@ class App extends React.Component {
     this.state = {
       notification: {},
       routeName: 'Welcome',
+      loaded: false
     };
 
     this._handleNotification = handleNotification.bind(this);
@@ -31,11 +32,27 @@ class App extends React.Component {
     }
   }
 
+  async _cacheResourcesAsync() {
+    console.log('preparing cached resources');
+    const images = [
+      require('../assets/enter.png')
+    ];
+  }
+
   componentDidMount() {
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
   }
 
   render() {
+    if (!this.state.loaded) {
+      return(
+        <AppLoading
+          startAsync={this._cacheResourcesAsync}
+          onFinish={() => this.setState({ loaded: true })}
+          onError={console.warn}
+        />
+      )
+    }
     return (
       <Provider {...stores}>
         <Route screenProps={this.state}

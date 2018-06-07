@@ -2,8 +2,10 @@ import { Dimensions, Platform } from 'react-native'
 
 const { width, height } = Dimensions.get('window')
 
+const isiPhoneX = (Platform.OS === 'ios' && (height === 812 || width === 812));
 
 const metrics = {
+  isiPhoneX: isiPhoneX,
   logoSizeLarge: width / 4,
   logoSizeSmall: width / 6,
   marginHorizontal: 10,
@@ -15,8 +17,9 @@ const metrics = {
   doubleSection: 50,
   horizontalLineHeight: 1,
   searchBarHeight: 30,
-  tabBarHeight: 45,
-  tabBarIconHeight: 25,
+  tabBarHeight: isiPhoneX ? 65 : 45,
+  tabBarPadding: isiPhoneX ? 15 : 0,
+  tabBarIconHeight: 30,
   screenWidth: width < height ? width : height,
   screenHeight: width < height ? height : width,
   navBarHeight: (Platform.OS === 'ios') ? 64 : 54,
