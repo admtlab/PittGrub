@@ -1,14 +1,14 @@
 {
   "presets": [
     "babel-preset-expo",
-    "react-native",
-    "flow"
   ],
   "plugins": [
-    "transform-decorators-legacy"
+    "transform-decorators-legacy",
   ],
-  "retainLines": true,
   "env": {
+    "production": {
+     "plugins": ["transform-remove-console"]
+    },
     "development": {
       "plugins": ["transform-react-jsx-source"]
     }
