@@ -1,176 +1,155 @@
-/* @flow */
-
-import React from 'react'
-import { Text } from 'react-native';
-import { TabNavigator, StackNavigator } from 'react-navigation';
+import React from 'react';
 import { Icon } from 'react-native-elements';
-import CreateEvent from '../containers/CreateEvent';
-import Events from '../containers/Events';
-import EventDetail from '../containers/EventDetail';
-import Home from '../containers/Home';
-import LoginScreen from '../containers/Login';
-import PasswordReset from '../containers/PasswordReset';
-import Profile from '../containers/Profile';
-import Signup from '../containers/Signup';
-import Verification from '../containers/Verification';
-import Welcome from '../containers/Welcome';
-import metrics from './metrics';
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import CreateEvent from '../screens/CreateEvent';
+import Entrance from '../screens/Entrance';
+import Events from '../screens/Events';
+import EventDetails from '../screens/EventDetails';
+import Login from '../screens/Login';
+import Home from '../screens/Home';
+import PasswordReset from '../screens/PasswordReset';
+import Settings from '../screens/Settings';
+import Signup from '../screens/Signup';
+import Verification from '../screens/Verification';
 
-const headerTitle = (title) => {
-  return(<Text style={{ fontSize: 22, paddingTop: 10 }}>{title}</Text>)
+
+const fade = ({ position, scene }) => {
+  const index = scene.index;
+  const opacity = position.interpolate({
+      inputRange: [index - 0.7, index, index + 0.7],
+      outputRange: [0.3, 1, 0.3]
+  });
+
+  return {
+    opacity,
+    transform: [{ translateX: 0 }, { translateY: 0 }]
+  };
 }
 
-export const HomeNav = StackNavigator({
+const EntryNav = createStackNavigator({
+  Entrance: { screen: Entrance },
+  Login: { screen: Login },
+  PasswordReset: { screen: PasswordReset },
+  Signup: { screen: Signup },
+  Verification: { screen: Verification },
+  }, {
+    headerMode: 'none',
+    navigationOptions: {
+      gesturesEnabled: false
+    },
+    transitionConfig: () => ({
+      screenInterpolator: (props) => {
+        return fade(props);
+      }
+    })
+  }
+);
+
+const HomeNav = createStackNavigator({
   Home: {
     screen: Home,
-    navigationOptions:({navigation}) => ({
-      title: 'PittGrub',
+    navigationOptions: () => ({
+      headerTitle: 'PittGrub',
+      headerTitleStyle: {
+        fontSize: 22
+      },
       headerBackTitle: 'Home',
-      headerTitle: headerTitle('PittGrub'),
+      tabBarIcon: ({ tintColor }) => <Icon name='home' size={30} color={tintColor} />
     })
   },
-  EventDetail: {
-    screen: EventDetail,
-    navigationOptions: ({navigation}) => ({
-      title: `Event Details`,
-      headerTitle: headerTitle('Event Details'),      
+  EventDetails: {
+    screen: EventDetails,
+    navigationOptions: () => ({
+      title: 'Event Details',
+      headerTitleStyle: {
+        fontSize: 22
+      },
     })
   },
-})
+});
 
-export const EventNav = StackNavigator({
+const EventNav = createStackNavigator({
   Events: {
     screen: Events,
-    navigationOptions: {
+    navigationOptions: () => ({
       title: 'Events',
-      headerTitle: headerTitle('Events'),
-    },
+      headerTitleStyle: {
+        fontSize: 22
+      },
+    })
+  },
+  EventDetails: {
+    screen: EventDetails,
+    navigationOptions: () => ({
+      title: 'Event Details',
+      headerTitleStyle: {
+        fontSize: 22
+      },
+    })
   },
   CreateEvent: {
     screen: CreateEvent,
-    navigationOptions: {
+    navigationOptions: () => ({
       title: 'Create Event',
-      headerTitle: headerTitle('Create Event'),
-    }
-  },
-  EventDetail: {
-    screen: EventDetail,
-    navigationOptions: ({navigation}) => ({
-      title: 'Event Details',
-      headerTitle: headerTitle('Event Details'),      
+      headerTitleStyle: {
+        fontSize: 22
+      },
     })
-  }
+  },
 });
 
-export const ProfileNav = StackNavigator({
-  Profile: {
-    screen: Profile,
-    navigationOptions: {
-      title: 'Profile',
-      headerTitle: headerTitle('Profile')
-    }
-  }
+const SettingsNav = createStackNavigator({
+  Settings: {
+    screen: Settings,
+    navigationOptions: () => ({
+      title: 'Settings',
+      headerTitleStyle: {
+        fontSize: 22
+      },
+    })
+  },
 });
 
-export const WelcomeNav = StackNavigator({
-  Welcome: {
-    screen: Welcome,
-    navigationOptions: {
-      title: 'Enter',
-      header: false,
-    }
-  },
-  Signup: {
-    screen: Signup,
-    navigationOptions: {
-      title: 'Signup',
-      header: false,
-    }
-  },
-  Login: {
-    screen: LoginScreen,
-    navigationOptions: {
-      title: 'Login',
-      header: false,
-    }
-  },
-  PasswordReset: {
-    screen: PasswordReset,
-    navigationOptions: {
-      title: 'Password Reset',
-      header: false,
-    }
-  },
-  Verification: {
-    screen: Verification,
-    navigationOptions: {
-      title: 'Verification',
-      header: false,
-    }
-  }
-});
-
-export const TabNav = TabNavigator({
+const MainNav = createBottomTabNavigator({
   HomeTab: {
     screen: HomeNav,
-    navigationOptions: {
+    navigationOptions: () => ({
       tabBarLabel: 'Home',
-      tabBarIcon: ({ tintColor }) =>
-        <Icon
-          name="home"
-          size={metrics.tabBarIconHeight}
-          color={tintColor}
-        />,
-    },
+      tabBarIcon: ({ tintColor }) => <Icon name='home' size={30} color={tintColor} />,
+    })
   },
-  EventsTab: {
+  EventTab: {
     screen: EventNav,
-    navigationOptions: {
+    navigationOptions: () => ({
       tabBarLabel: 'Events',
-      tabBarIcon: ({ tintColor }) =>
-        <Icon
-          name="event-note"
-          size={metrics.tabBarIconHeight}
-          color={tintColor}
-        />,
-    },
+      tabBarIcon: ({ tintColor }) => <Icon name='event-note' size={30} color={tintColor} />,
+    })
   },
-  ProfileTab: {
-    screen: ProfileNav,
+  SettingsTab: {
+    screen: SettingsNav,
+    navigationOptions: () => ({
+      tabBarLabel: 'Settings',
+      tabBarIcon: ({ tintColor }) => <Icon name='account-circle' size={30} color={tintColor} />,
+    })
+  },
+});
+
+const AppNav = createStackNavigator({
+  Entrance: { screen: EntryNav },
+  Main: { screen: MainNav },
+  }, {
+    headerMode: 'none',
+    initialRouteName: 'Entrance',
     navigationOptions: {
-      tabBarLabel: 'Profile',
-      tabBarIcon: ({ tintColor }) =>
-        <Icon
-          name="account-circle"
-          size={metrics.tabBarIconHeight}
-          color={tintColor}
-        />,
-    }
-  }}, {
-    tabBarOptions: {
-      style: {
-        height: metrics.tabBarHeight,
-        paddingBottom: metrics.tabBarPadding
-      },
+      gesturesEnabled: false
     },
+    transitionConfig: () => ({
+      screenInterpolator: (props) => {
+        return fade(props);
+      }
+    })
   },
 );
 
-export const AppNav = StackNavigator({
-  Entrance: {
-    screen: WelcomeNav,
-    navigationOptions: {
-      header: false
-    }
-  },
-  Main: {
-    screen: TabNav,
-    navigationOptions: {
-      header: false,
-      gesturesEnabled: false
-    }
-  }}, {
-    initialRouteName: 'Entrance',
-});
 
 export default AppNav;

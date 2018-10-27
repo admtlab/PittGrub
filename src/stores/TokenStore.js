@@ -1,62 +1,30 @@
 import { Buffer } from 'buffer';
+import { SecureStore } from 'expo';
 import { action, computed, observable } from 'mobx';
-import { postLogin, postTokenValidation, postTokenRequest } from '../lib/api';
+import { fetchAccessToken } from '../api/auth';
 
-class TokenStore {
-  @observable loading = false;
-  @observable error = false;
-  @observable errorMessage = '';
+
+const SecureProps = { keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY };
+
+
+export default class TokenStore {
   @observable refreshToken = '';
   @observable accessToken = '';
 
-  @computed get refreshIsValid() {
-    return postTokenValidation(this.refreshToken)
-    .then(response => {
-      if (!response.ok) { throw response }
-      return response.json();
-    })
-    .then(responseData => {
-      return responseData['valid'];
-    })
-    .catch(() => {
-      return false;
-    });
-  }
-
-  @computed get accessTokenIsValid() {
-    return postTokenValidation(this.accessToken)
-    .then(response => {
-      if (!response.ok) { throw response }
-      return response.json();
-    })
-    .then(responseData => {
-      return responseData['valid'];
-    })
-    .catch(() => {
-      return false;
-    });
-  }
-
-  @computed get parsedAccessToken () {
-    return {
-      header: JSON.parse(Buffer.from(this.accessToken.split('.')[0], 'base64')),
-      payload: JSON.parse(Buffer.from(this.accessToken.split('.')[1], 'base64'))
-    }
-  }
-
-  @computed get parsedRefreshToken () {
-    return {
-      header: JSON.parse(Buffer.from(this.refreshToken.split('.')[0], 'base64')),
-      payload: JSON.parse(Buffer.from(this.refreshToken.split('.')[1], 'base64'))
+  @computed get parsedAccessToken() {
+    try {
+      return {
+        header: JSON.parse(Buffer.from(this.accessToken.split('.')[0], 'base64')),
+        payload: JSON.parse(Buffer.from(this.accessToken.split('.')[1], 'base64'))
+      };
+    } catch (e) {
+      console.warn(e);
+      return {};
     }
   }
 
   @computed get accessTokenIsExpired() {
-    if (!this.accessToken) { return true }
-    const parsed = this.parsedAccessToken;
-    const exp = parsed.payload.exp;
-    const date = new Date(exp*1000);
-    return new Date() >= date;
+    return this.accessToken === '' || (new Date(this.parsedAccessToken.payload.exp * 1000) <= new Date());
   }
 
   @action setRefreshToken(token) {
@@ -67,55 +35,41 @@ class TokenStore {
     this.accessToken = token;
   }
 
-  @action async fetchRefreshToken(username, password) {
-    this.refreshToken = '';
+  @action async loadRefreshToken() {
+    try {
+      this.refreshToken = await SecureStore.getItemAsync('refreshToken') || '';
+      // this.refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsInRvayI6InJlZiJ9.eyJvd24iOjksInJvbGVzIjoiVXNlcixBZG1pbiIsImlzcyI6IlBpdHRHcnViIiwiaWF0IjoxNTM4NjIwOTY1fQ.mlVcZ4CL7fo9msOObCbVJ5Vv-7Uw235eqXQuM4oTxRo";
+      console.log(`loaded refresh token: ${this.refreshToken}`);
+    } catch (e) {
+      console.warn(`unable to load refresh token: ${JSON.stringify(e)}`);
+    }
   }
 
-  @action async fetchAccessToken(email, password) {
-    this.loading = true;
-    postTokenRequest(this.refreshToken)
-    .then(response => {
-      if (!response.ok) { throw response }
-      return response.json();
-    })
-    .then(responseData => {
-      const user = responseData['user'];
-      const token = responseData['token'];
-      action(() => {
-        this.id = user.id;
-        this.email = user.email;
-        this.name = user.name;
-        this.status = user.status;
-        this.roles = user.roles;
-        this.active = user.active;
-        this.disabled = user.disabled;
-        this.accessToken = token;
-      })
-    })
-    .catch(response => {
-      let responseData = response.json();
-      if (responseData['message']) {
-        action(() => this.errorMessage = responseData['message']);
-      } else {
-        action(() => this.errorMessage = 'Error: something went wrong');
-      }
-      action(() => {
-        this.error = true;
-        this.accessToken = '';
-      })
-    })
-    .finally(() => {
-      action(() => this.loading = false);
-    });
+  @action async clearTokens() {
+    this.refreshToken = '';
+    this.accessToken = '';
+    await this.saveRefreshToken();
+  }
+
+  @action async fetchAccessToken() {
+    fetchAccessToken(this.refreshToken)
+      .then(data => this.setAccessToken(data.access_token))
+      .catch(() => this.setAccessToken(''));
   }
 
   getOrFetchAccessToken = async () => {
-    const exp = this.parsedAccessToken.payload.exp;
-    if (new Date(exp*1000) <= new Date()) {
+    if (this.accessTokenIsExpired) {
       await this.fetchAccessToken();
     }
     return this.accessToken;
   }
-}
 
-export default TokenStore;
+  saveRefreshToken = async () => {
+    console.log('saving refresh token');
+    try {
+      await SecureStore.setItemAsync('refreshToken', this.refreshToken, SecureProps);
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+}

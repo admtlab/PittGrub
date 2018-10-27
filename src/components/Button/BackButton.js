@@ -1,20 +1,14 @@
-/* @flow */
-
-import React from 'react';
-import PropTypes from 'prop-types';
 import { ButtonIconLeft } from '../Button';
-import styles from './styles';
-import { colors } from '../../config/styles';
-
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const BackButton = (props) => {
   const { text, icon, ...childProps } = props;
   return (
     <ButtonIconLeft
-      text={text}
+      title={text}
       icon={icon}
-      {...childProps}
-    />
+      {...childProps} />
   );
 };
 
@@ -24,8 +18,8 @@ BackButton.propTypes = {
 };
 
 BackButton.defaultProps = {
-  text: "BACK",
-  icon: "navigate-before",
+  text: 'BACK',
+  icon: 'navigate-before',
 };
 
 export default BackButton;

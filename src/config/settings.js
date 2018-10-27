@@ -1,5 +1,6 @@
-// local configuration settings
-const settings = require("../../config.json");
+// local config
+const settings = require('../../config.json');
+
 // app version
 const version = require('../../app.json').expo.version;
 

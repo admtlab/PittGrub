@@ -1,16 +1,14 @@
-/* @flow */
-
-import React from 'react';
-import PropTypes from 'prop-types';
 import { Button } from '../Button';
 import { colors } from '../../config/styles';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 
 const ButtonIconLeft = (props) => {
-  const { icon, ...childProps } = props;
+  const { icon, iconColor, ...childProps } = props;
   return (
     <Button
-      icon={{name: icon, color: colors.text}}
+      icon={{name: icon, color: iconColor || colors.text}}
       {...childProps}
     />
   );

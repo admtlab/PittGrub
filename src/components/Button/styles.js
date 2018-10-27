@@ -1,18 +1,19 @@
-/* @flow */
-
-import { StyleSheet } from 'react-native';
 import { colors } from '../../config/styles';
+import { Dimensions, StyleSheet } from 'react-native';
+
+
+const { width } = Dimensions.get('window');
 
 
 export default StyleSheet.create({
   button: {
-    alignItems: 'center',
     backgroundColor: colors.theme,
-    borderRadius: 40,
-    height: 80,
-    width: 150,
+    borderRadius: 25,
+    marginTop: 20,
+    width: width - 100,
+    height: 50,
   },
   text: {
-    fontSize: 20,
+    fontSize: width / 21,
   }
 });
