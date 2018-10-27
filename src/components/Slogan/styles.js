@@ -5,9 +5,9 @@ import { colors } from '../../config/styles';
 
 
 export default StyleSheet.create({
-  logo: {
+  slogan: {
     backgroundColor: 'transparent',
-    color: colors.theme,
+    color: colors.softWhite,
     fontFamily: 'Futura',
     textShadowColor: 'black',
     textShadowRadius: 2,

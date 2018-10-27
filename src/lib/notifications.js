@@ -47,6 +47,7 @@ export async function handleNotification(notification) {
     }
   } else {
     // handle background notification
-    Notifications.presentLocalNotificationAsync(this.state.notification);
+    // Notifications.presentLocalNotificationAsync(this.state.notification);
+    Notifications.presentLocalNotificationAsync(notification);
   }
 }

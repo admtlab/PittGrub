@@ -1,9 +1,10 @@
 import { inject, observer } from 'mobx-react';
 import React from 'react'
-import { Alert, Picker, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { Button, CheckBox, FormLabel } from 'react-native-elements';
+import { Alert, DatePickerAndroid, DatePickerIOS, Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Button, ButtonGroup, CheckBox, FormLabel } from 'react-native-elements';
 import { NavigationActions } from 'react-navigation';
-import metrics from '../config/metrics'
+import { colors } from '../config/styles';
+import metrics from '../config/metrics';
 import { deleteAccessToken, deleteRefreshToken } from '../lib/token';
 import { removeProfile, removeUser } from '../lib/user';
 import { postProfile } from '../lib/api';
@@ -19,7 +20,11 @@ class Profile extends React.Component {
     this.state = {
       email: '',
       password: '',
-    }
+      status: 'student',
+      statusIndex: 0,
+      isStudent: true,
+      date: new Date()
+    };
 
     this.updatePreferences = this.updatePreferences.bind(this);
     this._logout = this._logout.bind(this);
@@ -35,6 +40,14 @@ class Profile extends React.Component {
     .catch(error => {
       console.log(error);
     });
+  }
+
+  updateStatus = (index) => {
+    if (index === 0) {
+      this.setState({statusIndex: index, status: 'student'});
+    } else {
+      this.setState({statusIndex: index, status: 'faculty/staff'});
+    }
   }
 
   _logout = async () => {
@@ -62,6 +75,7 @@ class Profile extends React.Component {
     return (
       <ScrollView style={styles.viewContainer}>
 
+        {/* Pantry setting */}
         <FormLabel labelStyle={styles.title}>Pitt Pantry</FormLabel>
         <Text style={styles.descriptionText}>
           Check this box if you are a member of The Pitt Pantry. This will increase your likelihood of being sent event notifications. This information is kept confidential.
@@ -73,6 +87,38 @@ class Profile extends React.Component {
           containerStyle={styles.checkboxContainer}
           checkedColor='#009688'
         />
+
+        {/* Status settings */}
+        <FormLabel labelStyle={styles.title}>University Status</FormLabel>
+        <Text style={styles.descriptionText}>
+          By letting us know of your status at Pitt we can better tailor your experience.
+        </Text>
+        <ButtonGroup
+          onPress={this.updateStatus}
+          selectedIndex={this.state.statusIndex}
+          selectedBackgroundColor={'#009688'}
+          textStyle={{color: '#333333'}}
+          buttons={['Student', 'Faculty/Staff']}
+        />
+
+        {/* Graduation settings */}
+        {this.state.statusIndex === 0 &&
+          <View>
+          <FormLabel labelStyle={styles.title}>Graduation Date</FormLabel>
+          <Text style={styles.descriptionText}>
+            By letting us know of your expected graduation date we can know when to stop sending you notifications.
+          </Text>
+          {Platform.OS === 'ios' ?
+            <DatePickerIOS
+              style={{marginLeft: 20, marginRight: 20}}
+              mode={'date'}
+              minimumDate={new Date()}
+              date={this.state.date}
+              onDateChange={(date) => this.setState({date})} />
+            : <DatePickerAndroid />
+          }
+          </View>
+        }
 
         {/* Food preference settings */}
         <FormLabel labelStyle={styles.title}>Food Preferences</FormLabel>
@@ -120,17 +166,18 @@ class Profile extends React.Component {
           checkedColor='#009688'
         />
 
-        {/*
-        <FormLabel labelStyle={styles.title}>Status</FormLabel>
+        {/* <FormLabel labelStyle={styles.title}>Status</FormLabel>
         <Text style={styles.descriptionText}>
         By letting us know of your status at Pitt, we can better tailor your experience.
         </Text>
-        <Picker selectedValue={'student'} >
+        <Picker
+          style={{marginTop: -70, marginRight: 20, marginLeft: 20}}
+          selectedValue={this.state.status}
+          onValueChange={(value) => this.setState({status: value})}>
           <Picker.Item label="Student" value="student" />
           <Picker.Item label="Faculty" value="faculty" />
           <Picker.Item label="Staff" value="staff" />
-        </Picker>
-        */}
+        </Picker> */}
 
         <Button
           title='SAVE'
@@ -162,7 +209,6 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     fontSize: 15,
-    margin: 5,
     marginLeft: 20,
     marginRight: 20
   },

@@ -15,7 +15,10 @@ const BEARER = 'Bearer ';
 const REQUEST_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/request';
 const VALIDATE_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/validate';
 const NOTIFICATION_TOKEN_ENDPOINT = TOKEN_ENDPOINT + '/notification';
-
+const headers = {
+  'Accept': 'application/json',
+  'Content-Type': 'application/json'
+};
 
 export async function getUserProfile(token) {
   return fetch(PROFILE_ENDPOINT, {
@@ -208,5 +211,33 @@ export async function postTokenValidation(token) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ token: token }),
+  });
+}
+
+async function getRequestSecure(endpoint, token) {
+  return fetch(endpoint, {
+    method: 'GET',
+    headers: Object.assign({'Authorization': 'Bearer ' + token}, headers)
+  });
+}
+
+async function postRequestSecure(Endpoint, token) {
+  return fetch(endpoint, {
+    method: 'POST',
+    headers: Object.assign({'Authorization': 'Bearer ' + token}, headers)
+  });
+}
+
+async function getRequest(endpoint) {
+  return fetch(endpoint, {
+    method: 'GET',
+    headers: headers
+  });
+}
+
+async function postRequest(endpoint) {
+  return fetch(endpoint, {
+    method: 'POST',
+    headers: headers
   });
 }

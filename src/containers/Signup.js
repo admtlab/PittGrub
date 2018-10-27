@@ -2,16 +2,14 @@
 
 import { inject, observer } from 'mobx-react';
 import React from 'react';
-import { ActivityIndicator, Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
 import metrics from '../config/metrics';
-import settings from '../config/settings';
 import { colors } from '../config/styles';
-import { postSignup } from '../lib/api';
+import { getVerification, postSignup } from '../lib/api';
 import { storeAccessToken, storeRefreshToken } from '../lib/token';
 import { storeUser } from '../lib/user';
-import { registerForPushNotifications } from '../lib/notifications';
 
 
 // screen dimensions
@@ -30,10 +28,10 @@ export default class SignupScreen extends React.Component {
       password: '',
       confirmPassword: '',
       loading: false,
+      enableGate: false,
     };
 
     this.logoSize = new Animated.Value(metrics.logoSizeLarge);
-
     this._keyboardWillShow = this._keyboardWillShow.bind(this);
     this._keyboardWillHide = this._keyboardWillHide.bind(this);
     this._clearState = this._clearState.bind(this);
@@ -82,6 +80,7 @@ export default class SignupScreen extends React.Component {
       email: '',
       password: '',
       loading: false,
+      enableGate: false
     });
   }
 
@@ -121,7 +120,13 @@ export default class SignupScreen extends React.Component {
           });
           // user has to verify their email
           this._clearState();
-          this.props.navigation.navigate('Verification');
+          getVerification(accessToken).then(response => {
+            if (!response.ok) {
+              this.setState({ enableGate: true });
+            } else {
+              this.props.navigation.navigate('Verification');
+            }
+          });
         })
         .catch((error) => {
           if (!error.response) {
@@ -151,7 +156,8 @@ export default class SignupScreen extends React.Component {
           behavior='padding'
           style={styles.view}>
           <Logo size={this.logoSize} />
-          <TextInput
+          {this.state.enableGate && <Text style={styles.gateText}>Thanks for siging up for PittGrub! We will notify you once your account has been approved.</Text>}
+          {!this.state.enableGate && <TextInput
             ref="EmailInput"
             style={styles.input}
             marginTop={5}
@@ -167,8 +173,8 @@ export default class SignupScreen extends React.Component {
             onSubmitEditing={(event) => {
               this.refs.PasswordInput.focus();
             }}
-            value={this.state.email} />
-          <TextInput
+            value={this.state.email} />}
+          {!this.state.enableGate && <TextInput
             ref="PasswordInput"
             style={styles.input}
             inputStyle={{ fontSize: 20 }}
@@ -185,10 +191,10 @@ export default class SignupScreen extends React.Component {
               this._signup();
               this.setState({ loading: false });
             }}
-            value={this.state.password} />
+            value={this.state.password} />}
           {!this.state.loading &&
             <View>
-              <Button text="ENTER"
+              {!this.state.enableGate && <Button text="ENTER"
                 disabled={!isEnabled}
                 onPress={() => {
                   Keyboard.dismiss();
@@ -197,7 +203,7 @@ export default class SignupScreen extends React.Component {
                   this.setState({ loading: false });
                 }}
                 buttonStyle={styles.button}
-                textStyle={styles.buttonText} />
+                textStyle={styles.buttonText} />}
               <BackButton
                 onPress={() => { Keyboard.dismiss(); this.props.navigation.goBack(null) }}
                 buttonStyle={styles.button}
@@ -226,6 +232,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: width / 20,
+  },
+  gateText: {
+    fontSize: width / 18,
+    color: colors.softGrey,
+    marginLeft: 10,
+    marginRight: 10
   },
   input: {
     borderRadius: 1,

@@ -10,9 +10,11 @@ class EventStore {
     this.tokenStore = tokenStore;
   }
   
-  eventDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1.id !== r2.id });
-  acceptedDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1.id !== r2.id });
-  recommendedDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1.id !== r2.id });
+  rowChanged = (r1, r2) => r1.id !== r2.id;
+
+  eventDataSource = new ListView.DataSource({ rowHasChanged: rowChanged });
+  acceptedDataSource = new ListView.DataSource({ rowHasChanged: rowChanged });
+  recommendedDataSource = new ListView.DataSource({ rowHasChanged: rowChanged });
 
   @computed get eventSource() {
     return this.eventDataSource.cloneWithRows(
@@ -45,7 +47,11 @@ class EventStore {
   }
 
   @action setEvents(newEvents) {
-    this.events.splice(0, this.events.length, ...newEvents);
+    if (newEvents === null || newEvents === undefined) {
+      this.events.splice([]);
+    } else {
+      this.events.splice(0, this.events.length, ...newEvents);
+    }
   }
 
   @action fetchEvents() {

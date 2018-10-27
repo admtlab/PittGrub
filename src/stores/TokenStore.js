@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { action, computed, observable } from 'mobx';
-import { postLogin, postTokenValidation, postTokenRequest } from '../lib/api';
+import { postTokenValidation, postTokenRequest } from '../lib/api';
 
 class TokenStore {
   @observable loading = false;

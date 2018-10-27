@@ -1,5 +1,5 @@
 {
-  "name": "PittGrubDev",
+  "name": "PittGrub",
   "version": "1.0.1",
   "private": true,
   "devDependencies": {
@@ -8,11 +8,11 @@
     "babel-preset-expo": "^4.0.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.50.0",
-    "jest-expo": "^22.0.1",
+    "jest-expo": "^24.0.0",
     "react-native-scripts": "0.0.30",
     "react-test-renderer": "^16.0.0"
   },
-  "main": "./src/index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "react-native-scripts start",
     "eject": "react-native-scripts eject",
@@ -27,19 +27,19 @@
   },
   "dependencies": {
     "aws-sdk": "^2.141.0",
-    "expo": "^22.0.0",
+    "expo": "^24.0.0",
     "fsevents": "^1.2.2",
     "mobx": "^4.2.0",
     "mobx-react": "^5.0.0",
     "npm": "^5.8.0",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
-    "react-native": "^0.50.3",
+    "react-native": "^0.51.0",
     "react-native-action-button": "^2.8.1",
     "react-native-elements": "^0.17.0",
     "react-native-maps": "^0.15.3",
     "react-native-modal": "^5.4.0",
-    "react-native-modal-datetime-picker": "^4.13.0",
+    "react-native-modal-datetime-picker": "^6.0.0",
     "react-navigation": "^1.0.0-beta.15",
     "websql": "^0.4.4"
   }

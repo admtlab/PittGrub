@@ -8,6 +8,7 @@ import images from '../config/images';
 import settings from '../config/settings';
 import { NavigationActions } from 'react-navigation';
 import { postAcceptEvent } from '../lib/api';
+import { buildUrl } from '../lib/event';
 import lib from '../lib/scripts';
 
 const server = settings.server.url;
@@ -86,7 +87,7 @@ export default class EventDetail extends React.Component {
   render() {
     const tokenStore = this.props.tokenStore;
     const event = this.props.navigation.state.params.event;
-    const imageEndpoint = settings.server.url + '/events/' + event.id + '/images/';
+    const imageEndpoint = buildUrl(event.image_url);
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground }}>
         {/* <Card> */}

@@ -4,13 +4,14 @@ import React from 'react';
 import { Animated } from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './styles';
+import metrics from '../../config/metrics';
 
 
 const Logo = (props) => {
-  const { size, ...childProps } = props;
+  const { size, style, ...childProps } = props;
   return (
     <Animated.Text
-      style={[styles.logo, {fontSize: size}]}
+      style={[style, styles.logo, {fontSize: size}]}
       {...childProps}>
       PittGrub
     </Animated.Text>
@@ -25,7 +26,7 @@ Logo.propTypes = {
 };
 
 Logo.defaultProps = {
-  size: 94,
+  size: metrics.logoSizeLarge,
 };
 
 export default Logo;

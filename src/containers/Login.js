@@ -7,10 +7,10 @@ import { Button, BackButton } from '../components/Button';
 import Logo from '../components/Logo';
 import metrics from '../config/metrics';
 import { colors } from '../config/styles';
-import { postLogin, getUserProfile } from '../lib/api';
-import { registerForPushNotifications } from '../lib/notifications';
+import { getVerification, postLogin, getUserProfile } from '../lib/api';
+// import { registerForPushNotifications } from '../lib/notifications';
 import { storeAccessToken, storeRefreshToken, getRefreshToken } from '../lib/token';
-import { isHost, getProfile, storeProfile, storeUser } from '../lib/user';
+import { storeProfile, storeUser } from '../lib/user';
 
 
 // screen dimensions
@@ -29,6 +29,7 @@ export default class LoginScreen extends React.Component {
       password: '',
       loading: false,
       correctCredentials: false,
+      enableGate: false
     };
 
     this.logoSize = new Animated.Value(metrics.logoSizeLarge);
@@ -80,7 +81,8 @@ export default class LoginScreen extends React.Component {
       email: '',
       password: '',
       loading: false,
-      correctCredentials: false
+      correctCredentials: false,
+      enableGate: false
     });
   }
 
@@ -126,17 +128,26 @@ export default class LoginScreen extends React.Component {
         
         // go to next screen
         this._clearState();
-        if (!user.active) {
-          this.props.navigation.navigate('Verification');
-        } else {
+        if (user.active) {
           this.props.navigation.navigate('Main');
+        } else {
+          getVerification(accessToken).then(response => {
+            if (!response.ok) {
+              console.log(response);
+              this.setState({ enableGate: true });
+            } else {
+              this.props.navigation.navigate('Verification');
+            }
+          })
         }
       })
       .catch(error => {
         if (!error.response) {
           // no response object (other error)
           Alert.alert('Error', 'Something went wrong', {text: 'OK'});
-        } else {          
+        } else {
+          console.log('printing error');
+          console.log(error);
           const body = JSON.parse(error.response['_bodyText']);
           const msg = body.message;
           if (msg && msg.startsWith('Error: Incorrect')) {
@@ -167,7 +178,8 @@ export default class LoginScreen extends React.Component {
           behavior='padding'
           style={styles.view}>
           <Logo size={this.logoSize} />
-          <TextInput
+          {this.state.enableGate && <Text style={styles.gateText}>Thanks for siging up for PittGrub! We will notify you once your account has been approved.</Text>}
+          {!this.state.enableGate && <TextInput
             ref="EmailInput"
             style={styles.input}
             marginTop={5}
@@ -182,8 +194,8 @@ export default class LoginScreen extends React.Component {
             onSubmitEditing={(event) => {
               this.refs.PasswordInput.focus();
             }}
-            value={this.state.email} />
-          <TextInput
+            value={this.state.email} />}
+          {!this.state.enableGate && <TextInput
             ref="PasswordInput"
             style={styles.input}
             inputStyle={{ fontSize: 20 }}
@@ -199,20 +211,20 @@ export default class LoginScreen extends React.Component {
               this.setState({ loading: true });
               this._login();
             }}
-            value={this.state.password} />
+            value={this.state.password} />}
           </KeyboardAvoidingView>
-          <View style={styles.forgotPasswordView}>
+          {!this.state.enableGate && <View style={styles.forgotPasswordView}>
             <Text style={styles.forgotPassword}
               onPress={() => this.props.navigation.navigate('PasswordReset')}>
               Forgot your password?
             </Text>
-          </View>
+          </View>}
           <KeyboardAvoidingView
             behavior='padding'
             style={styles.view}>
           {!this.state.loading &&
             <View justifyContent='space-between' alignItems='center'>
-              <Button text="ENTER"
+              {!this.state.enableGate && <Button text="ENTER"
                 disabled={!(isEnabled)}
                 onPress={() => {
                   Keyboard.dismiss();
@@ -220,7 +232,7 @@ export default class LoginScreen extends React.Component {
                   this._login();
                 }}
                 buttonStyle={styles.button}
-                textStyle={styles.buttonText} />
+                textStyle={styles.buttonText} />}
               <BackButton
                 onPress={() => { Keyboard.dismiss(); this.props.navigation.goBack(null) }}
                 buttonStyle={styles.button}
@@ -236,18 +248,18 @@ export default class LoginScreen extends React.Component {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: colors.softBlue,
-    height: height,
     width: width,
+    height: height,
+    backgroundColor: colors.softBlue,
   },
   view: {
     flex: 1,
     alignItems: 'center'
   },
   button: {
-    marginTop: 20,
     width: width - 100,
     height: 40,
+    marginTop: 20,
   },
   buttonText: {
     fontSize: width / 20,
@@ -262,6 +274,12 @@ const styles = StyleSheet.create({
     fontSize: width / 22,
     fontStyle: 'italic',
     color: colors.softGrey
+  },
+  gateText: {
+    fontSize: width / 18,
+    color: colors.softGrey,
+    marginLeft: 10,
+    marginRight: 10
   },
   input: {
     borderRadius: 1,

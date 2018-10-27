@@ -1,16 +1,15 @@
 /* @flow */
 
-import { AppLoading, Notifications } from 'expo';
+import { AppLoading, Asset, Notifications, registerRootComponent } from 'expo';
 import { Provider } from 'mobx-react/native';
 import React from 'react';
-import { AppRegistry, SafeAreaView } from 'react-native';
 import Route from './config/routes';
 import { handleNotification } from './lib/notifications';
 import stores from './stores';
 
 
-class App extends React.Component {
-  constructor(props) {
+export default class App extends React.Component {
+  constructor (props) {
     super(props);
 
     this.state = {
@@ -18,8 +17,15 @@ class App extends React.Component {
       routeName: 'Welcome',
       loaded: false
     };
-
+  
     this._handleNotification = handleNotification.bind(this);
+  };
+
+  
+  _loadResources = async () => {
+    return Promise.all([
+      Asset.loadAsync([require('../assets/background-dark.png')])
+    ]);
   };
 
   _onNavigationStateChange = (newState) => {
@@ -27,40 +33,33 @@ class App extends React.Component {
       this._onNavigationStateChange(newState.routes[newState.index]);
     } else {
       // set current route
+      console.info('Route: ' + newState.routeName);
       this.setState({ routeName: newState.routeName })
-      console.log('Route: ' + newState.routeName);
     }
   }
 
-  async _cacheResourcesAsync() {
-    console.log('preparing cached resources');
-    const images = [
-      require('../assets/enter.png')
-    ];
-  }
-
-  componentDidMount() {
+  componentDidMount () {
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
   }
 
-  render() {
+  render () {
     if (!this.state.loaded) {
-      return(
-        <AppLoading
-          startAsync={this._cacheResourcesAsync}
-          onFinish={() => this.setState({ loaded: true })}
-          onError={console.warn}
-        />
-      )
+      // prepare app until loaded
+      return (
+        <AppLoading startAsync={this._loadResources}
+                    onFinish={() => this.setState({ loaded: true })}
+                    onError={console.warn} />
+      );
     }
+
+    // load app
     return (
       <Provider {...stores}>
         <Route screenProps={this.state}
-          onNavigationStateChange={(prevState, newState) => this._onNavigationStateChange(newState)}
-        />
+               onNavigationStateChange={(_, newState) => this._onNavigationStateChange(newState)} />
       </Provider>
     );
   }
 }
 
-AppRegistry.registerComponent("main", () => App);
+registerRootComponent(App);

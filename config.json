@@ -1,19 +1,17 @@
 {
+  "//": "DO NOT COMMIT THESE VALUES",
   "debug": false,
-  "requireApproval": false,
   "server": {
     "url": "https://dev.pittgrub.com"
   },
   "aws": {
     "s3": {
-      "apiVersion": "",
-      "accessKeyId": "",
-      "secretAccessKey": "",
-      "region": "",
-      "params": {
-        "Bucket": "",
-        "Key": ""
-      }
+      "apiVersion": "2006-03-01",
+      "accessKeyId": "AKIAJ4VHDXKESVHCJTWA",
+      "secretAccessKey": "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",
+      "region": "us-east-1",
+      "bucket": "pittgrub-dev",
+      "directory": "event/image/"
     }
   }
 }

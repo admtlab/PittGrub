@@ -5,10 +5,14 @@ import { AppState, Dimensions, ImageBackground, StyleSheet, Text, View } from 'r
 import { inject, observer } from 'mobx-react';
 import { NavigationActions } from 'react-navigation';
 import { Button } from '../components/Button';
+import Logo from '../components/Logo';
+import Slogan from '../components/Slogan';
 import images from '../config/images';
+import metrcis from '../config/metrics';
 import { postTokenValidation, postTokenRequest, getUserProfile } from '../lib/api';
 import { deleteRefreshToken, deleteAccessToken, getRefreshToken, getAccessToken, storeAccessToken } from '../lib/token';
 import { getUser, getProfile, removeProfile, removeUser, storeProfile, storeUser } from '../lib/user';
+import metrics from '../config/metrics';
 
 
 // screen dimensions
@@ -222,7 +226,10 @@ export default class WelcomeScreen extends React.Component {
             } else {
               this.props.navigation.navigate('Main');          
             }
-          })
+          }).catch(err => { 
+            console.log('did not log user in');
+            console.log(err);
+          });
         }
       })
     } else {
@@ -251,14 +258,17 @@ export default class WelcomeScreen extends React.Component {
     if (!this.state.loaded) {
       return (
         <View style={styles.view}>
-          <ImageBackground source={images.enter} style={styles.backgroundImage} />
+          <ImageBackground source={images.background} style={styles.backgroundImage}>
+            <Logo style={{marginTop: 160}} />
+            <Slogan />
+          </ImageBackground>
         </View>
       );
     } else {
       return (
         <View style={styles.view}>
-          <ImageBackground source={images.enter} style={styles.backgroundImage}>
-            <Text>{"\n\n\n\n"}{"\n\n\n\n"}</Text>
+          <ImageBackground source={images.background} style={styles.backgroundImage}>
+            <Logo style={{marginTop: 160}} />
             <Button text="LOG IN"
               onPress={() => this.props.navigation.navigate('Login')}
               buttonStyle={styles.button}
@@ -282,15 +292,14 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     height: height,
-    justifyContent: 'center',
     alignItems: 'center'
   },
   button: {
     marginTop: 20,
     width: width - 100,
-    height: 50
+    height: metrics.iPhoneType === 'SE' ? 40 : 50
   },
   buttonText: {
-    fontSize: width / 18,
+    fontSize: metrics.fontSize,
   }
 });

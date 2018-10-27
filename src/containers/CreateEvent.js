@@ -1,6 +1,4 @@
-// import moment from 'moment';
-import React from 'react';
-
+import React, { Component } from 'react';
 import { View, Dimensions, Image, StyleSheet, Text, ScrollView, TouchableHighlight, TextInput } from 'react-native'
 import { FormLabel, FormInput, CheckBox, Button, Grid, Col, Slider } from 'react-native-elements'
 import { ImagePicker, MapView, Permissions, Location } from 'expo';
@@ -12,9 +10,12 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { NavigationActions } from 'react-navigation';
 import lib from '../lib/scripts';
 import { postEvent } from '../lib/api';
+import { registerForCamera } from '../lib/camera';
 import { findBuilding, closest } from '../lib/location';
+import { uploadImage } from '../lib/event';
 import images from '../config/images';
-var AWS = require('aws-sdk/dist/aws-sdk-react-native');
+import { Buffer } from 'buffer';
+import AWS from 'aws-sdk/dist/aws-sdk-react-native';
 
 const createEventURL = settings.server.url + '/events';
 const { width, height } = Dimensions.get('window')
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
 
 @inject("tokenStore")
 @observer
-export default class CreateEventView extends React.Component {
+export default class CreateEventView extends Component {
 
   constructor(props) {
     super(props);
@@ -257,18 +258,21 @@ export default class CreateEventView extends React.Component {
       start_date: this.state.startDate,
       end_date: this.state.endDate,
       food_preferences: foodprefs,
+      image: this.state.image !== null,
     };
     
     postEvent(tokenStore.accessToken, body)
-    .then((response) => {
+    .then(response => {
+      console.log(response);
       return response.json();
     })
-    .then((json) => {
-      return json.id;
-    })
-    .then((eventId) => {
-      console.log('POSTing image to event: ' + eventId);
-      this._postImage(eventId);
+    .then(event => {
+      console.log(event);
+      if (event.image_url === true) {
+        console.log('uploading image to url: ' + event.image_url);
+        const buf = Buffer.from(this.state.image.base64, 'base64');
+        uploadImage(event.image_url, buf);
+      }
     })
     .catch((error) => {
       console.log('Error: ' + error);
@@ -276,12 +280,21 @@ export default class CreateEventView extends React.Component {
   }
 
   _getImage = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: false,
-    });
-    console.log(result);
-    if (!result.cancelled) {
-      this.setState({ image: result.uri });
+    const permission = await registerForCamera();
+    if (permission) {
+      let result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        base64: true
+      });
+      console.log(result);
+      if (!result.cancelled) {
+        this.setState({ image: result });
+      }
+
+      // const buf = Buffer.from(result.base64, 'base64');
+      // uploadImage('phototest', buf);
+
+      // console.log('uploaded');
     }
   }
 
