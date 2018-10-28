@@ -9,6 +9,12 @@ export const parseDate = (date) => (
 
 export const parseDateRange = (start, end) => `${parseDate(start)} - ${parseDate(end)}`;
 
+export const parseTime = (date) => (
+  date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+  })
+)
 
 export const parseMonthYear = (date) => (
   date.toLocaleDateString('en-US', {
@@ -17,9 +23,17 @@ export const parseMonthYear = (date) => (
   })
 );
 
-export const parseDayMonth = (date) => (
+export const parseMonthDay = (date) => (
   date.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
   })
 );
+
+export const parseMonthDayYear = (date) => (
+  date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+)

@@ -4,10 +4,10 @@ import { AppLoading, Asset, Notifications } from 'expo';
 import { Provider } from 'mobx-react/native';
 import { SafeAreaView, StyleSheet} from 'react-native';
 import Route from './config/routes';
-import React from 'react';
+import React, { Component } from 'react';
 import stores from './stores';
 
-export default class App extends React.Component {
+export default class App extends Component {
   constructor (props) {
     super(props);
     
@@ -25,6 +25,10 @@ export default class App extends React.Component {
 
   componentDidMount() {
     this._notificationSubscription = Notifications.addListener(this._notificationListener);
+  }
+
+  componentWillUnmount() {
+    this._notificationSubscription.remove();
   }
 
   _loadData = async () => {

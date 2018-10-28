@@ -1,17 +1,16 @@
-import { Button } from '../components/Button';
 import { colors } from '../config/styles';
-import { parseDayMonth } from '../lib/time';
+import { parseMonthDayYear, parseTime } from '../lib/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import {
+  Alert,
   Dimensions,
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
-import { FormInput, FormLabel } from 'react-native-elements';
+import { Button, CheckBox, FormInput, FormLabel } from 'react-native-elements';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
 
@@ -22,30 +21,42 @@ const { width } = Dimensions.get('screen');
 @observer
 export default class CreateEvent extends Component {
   state = {
+    loading: false,
     dayPickerVisible: false,
+    startPickerVisible: false,
+    endPickerVisible: false,
     image: null,
     title: '',
+    description: '',
+    servings: null,
     organization: '',
     address: '',
     location: '',
-    text: '',
-    servings: null,
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: null,
+    endDate: null,
+    glutenFree: false,
+    dairyFree: false,
+    vegetarian: false,
+    vegan: false,
   };
+
+  componentWillMount() {
+    // setting initial event times
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setHours(endDate.getHours() + 1);
+    this.setState({ startDate, endDate });
+  }
 
   getImage = () => {
     console.log('...getting image');
   }
 
-  showDayPicker = () => {
-    console.log('showing');
-    this.setState({ dayPickerVisible: true })
-  };
-
   setTitle = (title) => this.setState({ title });
 
   setDescription = (description) => this.setState({ description });
+
+  setServings = (servings) => this.setState({ servings });
 
   setOrganization = (organization) => this.setState({ organization });
 
@@ -53,11 +64,94 @@ export default class CreateEvent extends Component {
 
   setLocation = (location) => this.setState({ location });
 
-  setServings = (servings) => this.setState({ servings });
+  showDayPicker = () => this.setState({ dayPickerVisible: true });
+
+  hideDayPicker = () => this.setState({ dayPickerVisible: false });
+
+  showStartPicker = () => this.setState({ startPickerVisible: true });
+
+  hideStartPicker = () => this.setState({ startPickerVisible: false });
+
+  showEndPicker = () => this.setState({ endPickerVisible: true });
+
+  hideEndPicker = () => this.setState({ endPickerVisible: false });
+
+  setDay = (date) => {
+    this.hideDayPicker();
+    const start = this.state.startDate;
+    const end = this.state.endDate;
+    start.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+    end.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+    this.setState({ startDate: start, endDate: end });
+  }
+
+  setStartTime = (time) => {
+    this.hideStartPicker();
+    const startDate = this.state.startDate;
+    startDate.setHours(time.getHours());
+    startDate.setMinutes(time.getMinutes());
+    const endDate = startDate > this.state.endDate ? new Date(startDate) : this.state.endDate;
+    this.setState({ startDate, endDate });
+  }
+
+  setEndTime = (time) => {
+    this.hideEndPicker();
+    const end = this.state.endDate;
+    end.setHours(time.getHours());
+    end.setMinutes(time.getMinutes());
+    this.setState({ endDate: end });
+  }
+
+  toggleGlutenFree = () => this.setState({ glutenFree: !this.state.glutenFree });
+
+  toggleDairyFree = () => {
+    const value = !this.state.dairyFree;
+    this.setState({ dairyFree: value, vegan: value && this.state.vegan });
+  }
+
+  toggleVegetarian = () => {
+    const value = !this.state.vegetarian;
+    this.setState({ vegetarian: value, vegan: value && this.state.vegan });
+  }
+
+  toggleVegan = () => {
+    const value = !this.state.vegan;
+    this.setState({
+      vegan: value,
+      dairyFree: value || this.state.dairyFree,
+      vegetarian: value || this.state.vegetarian,
+    });
+  }
+
+  submit = () => {
+    console.log('creating event...');
+    this.setState({ loading: true });
+    setTimeout(() => {
+      this.setState({ loading: false });
+      Alert.alert('Success', 'Created...', { text: 'OK' });
+    }, 2000);
+  }
+
+  cancel = () => {
+    this.props.navigation.goBack();
+  }
+
+  validate = () => {
+    return this.state.title &&
+           this.state.description &&
+           this.state.servings &&
+           this.state.organization &&
+           this.state.address &&
+           this.state.location;
+  }
 
   render() {
     return (
-      <ScrollView width={width}>
+      <ScrollView
+        keyboardShouldPersistTaps='never'
+        width={width}
+        backgroundColor={colors.lightBackground}
+      >
         {this.state.image ? (
           <Image source={{ uri: this.state.image }} style={{ width, height: width }} />
         ) : (
@@ -66,9 +160,8 @@ export default class CreateEvent extends Component {
               title='Add photo'
               icon={{ name: 'camera', size: 18, color: colors.softWhite }}
               onPress={this.getImage}
-              buttonStyle={{ backgroundColor: colors.red }}
+              buttonStyle={[styles.button, { width: width / 1.5, backgroundColor: colors.red }]}
               textStyle={{ color: colors.softWhite }}
-              containerStyle={{ backgroundColor: 'transparent' }}
             />
           </View>
         )}
@@ -77,6 +170,7 @@ export default class CreateEvent extends Component {
         <FormInput
           placeholder='E.g., "Best Tacos in Town"'
           maxLength={150}
+          autoCapitalize='words'
           onChangeText={this.setTitle}
           inputStyle={styles.input}
         />
@@ -87,14 +181,25 @@ export default class CreateEvent extends Component {
           maxLength={500}
           onChangeText={this.setDescription}
           multiline
+          autoCapitalize='sentences'
           style={styles.inputLarge}
+          inputStyle={styles.inputLarge}
+          width={width - 20}
+        />
+
+        <FormLabel labelStyle={styles.label}>Available Servings</FormLabel>
+        <FormInput
+          placeholder='E.g., 25 people'
+          maxLength={3}
+          onChangeText={this.setServings}
+          keyboardType='number-pad'
           inputStyle={styles.input}
         />
 
         <FormLabel labelStyle={styles.label}>Organization</FormLabel>
         <FormInput
           placeholder='E.g., University of Pittsburgh'
-          maxLength={20}
+          maxLength={50}
           onChangeText={this.setOrganization}
           inputStyle={styles.input}
         />
@@ -114,34 +219,113 @@ export default class CreateEvent extends Component {
           maxLength={255}
           onChangeText={this.setLocation}
           inputStyle={styles.input}
-        />
-
-        <FormLabel labelStyle={styles.label}>Available Servings</FormLabel>
-        <FormInput
-          placeholder='E.g., 25 people'
-          maxLength={3}
-          onChangeText={this.setServings}
-          keyboardType='number-pad'
-          inputStyle={styles.input}
+          style={{ borderColor: colors.red, borderWidth: 1 }}
         />
 
         <DateTimePicker
-          isVisible={this.state.dayPickerVisible}
           mode='date'
+          minimumDate={new Date()}
+          isVisible={this.state.dayPickerVisible}
           date={this.state.startDate}
-          onConfirm={console.log}
-          onCancel={console.log}
+          onConfirm={this.setDay}
+          onCancel={this.hideDayPicker}
+        />
+        <DateTimePicker
+          mode='time'
+          minimumDate={new Date()}
+          isVisible={this.state.startPickerVisible}
+          date={this.state.startDate}
+          onConfirm={this.setStartTime}
+          onCancel={this.hideStartPicker}
+        />
+        <DateTimePicker
+          mode='time'
+          minimumDate={this.state.startDate}
+          isVisible={this.state.endPickerVisible}
+          date={this.state.endDate}
+          onConfirm={this.setEndTime}
+          onCancel={this.hideEndPicker}
         />
 
-        <FormLabel labelStyle={styles.textLabel}>Date</FormLabel>
+        <FormLabel labelStyle={styles.label}>Date</FormLabel>
         <Button
-          title={parseDayMonth(this.state.startDate)}
-          onPress={this._showDayPicker}
-          borderRadius={10}
-          backgroundColor='#FFC107'
-          color='#607D8B'
-          containerViewStyle={styles.submit}
+          title={parseMonthDayYear(this.state.startDate)}
+          onPress={this.showDayPicker}
+          buttonStyle={styles.button}
+          backgroundColor={colors.blue}
+          color={colors.softGrey}
         />
+
+
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ flex: 1, flexDirection: 'column' }}>
+            <FormLabel labelStyle={[styles.label, { marginTop: 10 }]}>Start Time</FormLabel>
+            <Button
+              title={parseTime(this.state.startDate)}
+              onPress={this.showStartPicker}
+              buttonStyle={styles.button}
+              backgroundColor={colors.blue}
+              color={colors.softGrey}
+            />
+          </View>
+          <View style={{ flex: 1, flexDirection: 'column' }}>
+            <FormLabel labelStyle={[styles.label, { marginTop: 10 }]}>End Time</FormLabel>
+            <Button
+              title={parseTime(this.state.endDate)}
+              onPress={this.showEndPicker}
+              buttonStyle={styles.button}
+              backgroundColor={colors.blue}
+              color={colors.softGrey}
+            />
+          </View>
+        </View>
+
+
+        <FormLabel labelStyle={styles.label}>Food Preferences</FormLabel>
+        <CheckBox
+          title='Gluten Free'
+          checked={this.state.glutenFree}
+          onPress={this.toggleGlutenFree}
+          containerStyle={styles.checkbox}
+          checkedColor={colors.blue}
+        />
+        <CheckBox
+          title='Dairy Free'
+          checked={this.state.dairyFree}
+          onPress={this.toggleDairyFree}
+          containerStyle={styles.checkbox}
+          checkedColor={colors.blue}
+        />
+        <CheckBox
+          title='Vegetarian'
+          checked={this.state.vegetarian}
+          onPress={this.toggleVegetarian}
+          containerStyle={styles.checkbox}
+          checkedColor={colors.blue}
+        />
+        <CheckBox
+          title='Vegan'
+          checked={this.state.vegan}
+          onPress={this.toggleVegan}
+          containerStyle={styles.checkbox}
+          checkedColor={colors.blue}
+        />
+
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+          <Button
+            title='CANCEL'
+            onPress={this.cancel}
+            backgroundColor={colors.red}
+            buttonStyle={[styles.button, { width: width / 2.5, marginBottom: 20}]}
+          />
+          <Button
+            title='SUBMIT'
+            onPress={this.submit}
+            backgroundColor='#009688'
+            buttonStyle={[styles.button, { width: width / 2.5, marginBottom: 20}]}
+            disabled={!this.validate()}
+          />
+        </View>
       </ScrollView>
     );
   }
@@ -151,16 +335,26 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     color: colors.darkGrey,
+    marginTop: 20,
   },
   input: {
     fontSize: 16,
     color: '#607D8B',
-    marginHorizontal: 10,
   },
   inputLarge: {
     fontSize: 16,
-    height: 50,
+    height: 100,
     color: '#607D8B',
-    marginHorizontal: 10
+  },
+  button: {
+    borderRadius: 10,
+    paddingTop: 10,
+    marginVertical: 10,
+  },
+  required: {
+    fontSize: 16,
+    color: '#607D8B',
+    borderColor: colors.red,
+    borderWidth: 1
   }
 });

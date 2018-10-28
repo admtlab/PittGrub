@@ -55,7 +55,8 @@ export default class Login extends PureComponent {
     .then(() => {
       if (this.props.userStore.account.active) {
         // continue to verification if user account is active
-        this.props.navigation.navigate('Verification')
+        console.log('navigate to main');
+        this.props.navigation.navigate('Main')
       } else {
         // show gate if not
         this.setState({ enableGate: true });

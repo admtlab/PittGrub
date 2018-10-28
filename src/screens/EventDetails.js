@@ -3,7 +3,7 @@ import { colors } from '../config/styles';
 import { parseDateRange } from '../lib/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Icon } from 'react-native-elements';
 
 
@@ -18,13 +18,24 @@ export default class EventDetails extends Component {
   _acceptEvent = async () => {
     const { event } = this.props.navigation.state.params;
     this.setState({ loading: true });
-    event.accepted = true;
     const token = await this.props.tokenStore.getOrFetchAccessToken();
-    setTimeout(() => this.setState({ loading: false }), 2000);
+    setTimeout(() => {
+      this.setState({ loading: false })
+      event.accepted = true;
+    }, 2000);
     // acceptEvent(token, event.id)
     // .then(() => event.accepted = true))
     // .catch(this._handleError)
     // .finally(() => this.setState({loading: false}))
+  }
+
+  removeEvent = () => {
+    const { event } = this.props.navigation.state.params;
+    this.setState({ loading: true });
+    setTimeout(() => {
+      this.setState({ loading: false })
+      event.accepted = false;
+    }, 2000);
   }
 
   _handleError = () => {
@@ -77,16 +88,30 @@ export default class EventDetails extends Component {
           <View alignItems='center'>
             <Text style={[styles.details, {marginBottom: 15}]}>{description}</Text>
           </View>
-          <Button 
-            title='INTERESTED'
-            icon={!accepted && !this.state.loading ? { name: 'done' } : null}
-            onPress={this._acceptEvent}
-            loading={this.state.loading}
-            borderRadius={8}
-            paddingTop={10}
-            backgroundColor='#03A9F4'
-            disabled={accepted}
-          />
+          <View style={{ flex: 1, flexDirection: accepted ? 'row' : 'column', justifyContent: 'space-evenly'}}>
+            <Button 
+              title='INTERESTED'
+              icon={accepted && !this.state.loading ? { name: 'done' } : null}
+              onPress={this._acceptEvent}
+              loading={this.state.loading}
+              borderRadius={8}
+              backgroundColor='#03A9F4'
+              disabled={accepted}
+            />
+            {accepted && (
+              <Button
+              alignItems='center'
+              alignContent='center'
+                title='REMOVE'
+                iconRight={{ name: 'delete' }}
+                onPress={this.removeEvent}
+                borderRadius={8}
+                backgroundColor={colors.red}
+                textStyle={{ alignItems: 'center' }}
+                disabled={this.state.loading}
+              />
+            )}
+        </View>
         </Card>
         <Card title='Details' titleStyle={styles.cardTitle}>
           <View marginBottom={20}>
