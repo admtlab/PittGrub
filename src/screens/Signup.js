@@ -1,4 +1,4 @@
-import { signup } from '../api/auth';
+import { checkGated, signup } from '../api/auth';
 import { BackButton, Button } from '../components/Button';
 import { EmailInput, PasswordInput } from '../components/Input';
 import { EntryForm } from '../components/Form';
@@ -51,8 +51,9 @@ export default class Signup extends PureComponent {
         // continue if user account is active
         this.props.navigation.navigate('Home')
       } else {
-        // show gate if not
-        this.setState({ enableGate: true });
+        this.props.tokenStore.getOrFetchAccessToken()
+        .then(checkGated)
+        .then(gated => gated ? this.setState({ enableGate: true }) : this.props.navigation.navigate('Verification'));
       }
     })
     .catch(this._handleError)

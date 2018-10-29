@@ -1,10 +1,10 @@
+import { updateProfile } from '../api/user';
 import { colors } from '../config/styles';
 import { parseMonthYear } from '../lib/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Button, ButtonGroup, CheckBox, FormLabel } from 'react-native-elements';
-import { NavigationActions } from 'react-navigation';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
 @inject('tokenStore', 'userStore')
@@ -37,11 +37,15 @@ export default class Settings extends Component {
 
   updatePreferences = () => {
     const { tokenStore, userStore } = this.props;
+    console.log(userStore);
     this.setState({ loading: true });
-    // post profile
-    setTimeout(() => {
-      this.setState({ loading: false });
-    }, 1500);
+    tokenStore.getOrFetchAccessToken()
+    .then(token => updateProfile(token, {
+      food_preferences: userStore.foodPreferences,
+      pantry: userStore.pantry
+    }))
+    .catch(this._handleError)
+    .finally(() => this.setState({ loading: false }));
   }
 
   logout = () => {
@@ -49,6 +53,14 @@ export default class Settings extends Component {
     tokenStore.clearTokens();
     userStore.clearUser();
     this.props.navigation.navigate('Entrance');
+  }
+
+  _handleError = () => {
+    Alert.alert(
+      'Error',
+      'An error occurred. Please try again later',
+      { text: 'OK' },
+    );
   }
 
   render() {

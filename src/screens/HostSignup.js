@@ -1,4 +1,4 @@
-import { hostAffiliations, hostSignup } from '../api/auth';
+import { checkGated, hostAffiliations, hostSignup } from '../api/auth';
 import { BackButton, Button } from '../components/Button';
 import { EntryForm } from '../components/Form';
 import { EmailInput, EntryInput, PasswordInput } from '../components/Input';
@@ -10,6 +10,7 @@ import {
   Dimensions,
   Keyboard,
   StyleSheet,
+  Text,
   View
 } from 'react-native';
 import { FormLabel, FormInput } from 'react-native-elements';
@@ -70,15 +71,16 @@ export default class HostSignup extends PureComponent {
   submit = () => {
     Keyboard.dismiss();
     this.setState({ loading: true });
-    signup(this.state.email, this.state.password, this.props.tokenStore, this.props.userStore)
+    hostSignup(this.state.email, this.state.password, this.state.name, this.state.affiliation, this.state.directory, this.state.reason)
     .then(this.props.userStore.loadUserProfile)
     .then(() => {
       if (this.props.userStore.account.active) {
         // continue if user account is active
         this.props.navigation.navigate('Home')
       } else {
-        // show gate if not
-        this.setState({ enableGate: true });
+        this.props.tokenStore.getOrFetchAccessToken()
+        .then(checkGate)
+        .then(gated => gated ? this.setState({ enableGate: true }) : this.props.navigation.navigate('Verification'));
       }
     })
     .catch(this._handleError)
@@ -167,10 +169,13 @@ export default class HostSignup extends PureComponent {
           inputStyle={styles.inputLarge}
           containerStyle={{borderBottomWidth: 0}}
         />
+        <View style={{alignContent: 'center', alignItems: 'center', marginTop: 5}}>
+          <Text style={{fontSize: 18, color: colors.softGrey}}>By clicking "SUBMIT" you agree to the terms and conditions of hosting food on PittGrub.</Text>
+        </View>
         <View height={142}>
           {this.state.loading ? <ActivityIndicator color='#fff' size='large' marginTop={50} /> : (
             <Fragment>
-              <Button text='REQUEST HOST' onPress={this.submit} disabled={!this.validate()} />
+              <Button text='SUBMIT' onPress={this.submit} disabled={!this.validate()} />
               <BackButton onPress={this.goBack} />
             </Fragment>
           )}
