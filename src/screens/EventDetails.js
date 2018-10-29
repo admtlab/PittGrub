@@ -3,7 +3,7 @@ import { colors } from '../config/styles';
 import { parseDateRange } from '../lib/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Icon } from 'react-native-elements';
 
 
@@ -19,14 +19,10 @@ export default class EventDetails extends Component {
     const { event } = this.props.navigation.state.params;
     this.setState({ loading: true });
     const token = await this.props.tokenStore.getOrFetchAccessToken();
-    setTimeout(() => {
-      this.setState({ loading: false })
-      event.accepted = true;
-    }, 2000);
-    // acceptEvent(token, event.id)
-    // .then(() => event.accepted = true))
-    // .catch(this._handleError)
-    // .finally(() => this.setState({loading: false}))
+    acceptEvent(token, event.id)
+    .then(() => event.accepted = true)
+    .catch(this._handleError)
+    .finally(() => this.setState({ loading: false }));
   }
 
   removeEvent = () => {
@@ -76,12 +72,12 @@ export default class EventDetails extends Component {
 
   render() {
     const { event } = this.props.navigation.state.params;
-    const { title, description, address, location, start_date, end_date, food_preferences, accepted } = event;
+    const { title, image, description, address, location, start_date, end_date, food_preferences, accepted } = event;
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground, paddingBottom: 20 }}>
         <Card
           title={title}
-          image={require('../../assets/garfield.jpg')}
+          image={image ? image : undefined}
           titleStyle={styles.title}
           imageStyle={{height: 300}}
         >
@@ -103,7 +99,7 @@ export default class EventDetails extends Component {
               alignItems='center'
               alignContent='center'
                 title='REMOVE'
-                iconRight={{ name: 'delete' }}
+                icon={{ name: 'delete' }}
                 onPress={this.removeEvent}
                 borderRadius={8}
                 backgroundColor={colors.red}

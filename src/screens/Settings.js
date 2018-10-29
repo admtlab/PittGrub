@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Button, ButtonGroup, CheckBox, FormLabel } from 'react-native-elements';
+import { NavigationActions } from 'react-navigation';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
 @inject('tokenStore', 'userStore')
@@ -47,7 +48,7 @@ export default class Settings extends Component {
     const { tokenStore, userStore } = this.props;
     tokenStore.clearTokens();
     userStore.clearUser();
-    this.props.navigation.popToTop();
+    this.props.navigation.navigate('Entrance');
   }
 
   render() {
@@ -149,7 +150,7 @@ export default class Settings extends Component {
           onPress={this.logout}
           backgroundColor='rgb(231, 76, 60)'
           borderRadius={10}
-          containerViewStyle={styles.button}
+          containerViewStyle={[styles.button, { marginBottom: 20 }]}
         />
       </ScrollView>
     );
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 5,
+    marginTop: 20,
   },
   description: {
     fontSize: 16,

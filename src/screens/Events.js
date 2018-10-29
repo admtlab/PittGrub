@@ -76,12 +76,7 @@ export default class Events extends Component {
     this.setState({ refreshing: false });
   }
 
-  _fetchEvents = async () => {
-    console.log('fetching events from events page...');
-  }
-
   createEvent = () => {
-    console.log('creating event ...');
     this.props.navigation.navigate('CreateEvent');
   }
 
@@ -92,23 +87,20 @@ export default class Events extends Component {
   _eventKeyExtractor = (event) => String(event.id);
 
   _renderEvent = ({ item }) => {
-    return (
-      <TouchableOpacity style={styles.eventItem} onPress={() => this._viewEvent(item)}>
-        <ListItem
-          key={item.id}
-          title={item.title}
-          subtitle={parseDateRange(item.start_date, item.end_date)}
-          subtitleStyle={{ paddingTop: 5 }}
-        />
-      </TouchableOpacity>
-    );
-    // console.log(`searching for item ${JSON.stringify(item.name.toLocaleLowerCase())}`);
-    // console.log(item);
-    // if (!this.state.searchText.length || item.name.toLocaleLowerCase().includes(this.state.searchText.toLocaleLowerCase())) {
-    //   return (
-    //   );
-    // }
-    // return <View/>;
+    if (!this.state.searchText.length || item.title.toLocaleLowerCase().includes(this.state.searchText.toLocaleLowerCase())) {
+      return (
+        <TouchableOpacity style={styles.eventItem} onPress={() => this._viewEvent(item)}>
+          <ListItem
+            key={item.id}
+            title={item.title}
+            subtitle={parseDateRange(item.start_date, item.end_date)}
+            subtitleStyle={{ paddingTop: 5 }}
+          />
+        </TouchableOpacity>
+      );
+    } else {
+      return <View />;
+    }
   }
 
   _renderEmptyList = () => (
@@ -130,7 +122,6 @@ export default class Events extends Component {
 
   render() {
     const { userStore } = this.props;
-    console.log('events rendering...');
     
     return (
       <SafeAreaView styles={globalStyles.container}>
@@ -159,7 +150,7 @@ export default class Events extends Component {
         />
         {(userStore.isHost || userStore.isAdmin) && (
           <ActionButton
-            style={{ marginBottom: metrics.tabBarHeight }}
+            style={{ marginBottom: 20 }}
             buttonColor={colors.red}
           >
             <ActionButton.Item
@@ -183,8 +174,8 @@ export default class Events extends Component {
 const styles = StyleSheet.create({
   eventList: {
     backgroundColor: colors.Background,
-    minHeight: height - metrics.tabBarHeight - Header.HEIGHT,
-    maxHeight: height - metrics.tabBarHeight - Header.HEIGHT,
+    minHeight: height - metrics.tabBarHeight - Header.HEIGHT - 50,
+    maxHeight: height - metrics.tabBarHeight - Header.HEIGHT - 50,
   },
   eventItem: {
     backgroundColor: 'snow',

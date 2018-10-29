@@ -21,9 +21,11 @@ import metrics from '../config/metrics';
 const { height } = Dimensions.get('window');
 
 
-@inject('eventStore', 'tokenStore', 'userStore')
+@inject('eventStore', 'featureStore', 'tokenStore', 'userStore')
 @observer
 export default class Home extends Component {
+  static interval = null;
+
   state = {
     refreshing: false,
     loading: false,

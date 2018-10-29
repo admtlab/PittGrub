@@ -3,6 +3,8 @@ import { baseUrl, get, post } from './http';
 
 const LOGIN_ENDPOINT = `${baseUrl}/login`;
 const SIGNUP_ENDPOINT = `${baseUrl}/signup`;
+const HOST_SIGNUP_ENDPOINT = `${SIGNUP_ENDPOINT}/host`;
+const HOST_AFFILIATIONS_ENDPOINT = `${HOST_SIGNUP_ENDPOINT}/affiliations`;
 const TOKEN_VALIDATION_ENDPOINT = `${baseUrl}/token/validate`;
 const REQUEST_TOKEN_ENDPOINT = `${baseUrl}/token/request`;
 const VERIFICATION_ENDPOINT = `${baseUrl}/users/verify`;
@@ -20,6 +22,23 @@ export async function signup(email, password, tokenStore, userStore) {
   }).then(response => setUserData(response, tokenStore, userStore));
 }
 
+export async function hostSignup(email, password, name, affiliation, directory, reason) {
+  return post(HOST_SIGNUP_ENDPOINT, {
+    body: {
+      email,
+      password,
+      name,
+      directory,
+      reason,
+      primary_affiliation: affiliation,
+    }
+  });
+}
+
+export async function hostAffiliations() {
+  return get(HOST_AFFILIATIONS_ENDPOINT).then(response => response._embedded.primaryAffiliations);
+}
+
 export async function validateToken(token) {
   return post(TOKEN_VALIDATION_ENDPOINT, {
     body: { token }
@@ -35,6 +54,18 @@ export async function submitVerification(token, code) {
     token,
     body: { code }
   });
+}
+
+export async function checkGated(token) {
+  return resendVerification(token)
+  .then(() => false)
+  .catch(err => {
+    if (err.status === 403) {
+      return true;
+    } else {
+      throw err;
+    }
+  })
 }
 
 export async function fetchAccessToken(refreshToken) {

@@ -22,6 +22,7 @@
     "react-native-elements": "^0.19.1",
     "react-native-keyboard-spacer": "^0.4.1",
     "react-native-modal-datetime-picker": "^6.0.0",
+    "react-native-picker-dropdown": "^0.1.2",
     "react-navigation": "^2.17.0",
     "validator": "^10.8.0"
   },

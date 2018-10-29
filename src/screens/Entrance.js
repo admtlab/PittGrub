@@ -15,20 +15,16 @@ const { width } = Dimensions.get('window');
 export default class Entrance extends Component {
 
   componentDidMount() {
-    const valid = this.props.screenProps.validSession || false;
+    const valid = this.props.screenProps.validSession;
     const { account } = this.props.userStore;
     if (valid && account.active && !account.disabled) {
       this.props.navigation.navigate('Main');
     }
   }
 
-  loginScreen = () => {
-    this.props.navigation.navigate('Login');
-  }
+  loginScreen = () => this.props.navigation.navigate('Login');
 
-  signupScreen = () => {
-    this.props.navigation.navigate('Signup');
-  }
+  signupScreen = () => this.props.navigation.navigate('Signup');
 
   render() {
     return (

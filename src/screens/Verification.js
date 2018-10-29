@@ -39,7 +39,7 @@ export default class Verification extends PureComponent {
     this.setState({ loading: true });
     this.props.tokenStore.getOrFetchAccessToken()
     .then(token => submitVerification(token, this.state.code))
-    .then(() => this.props.navigation.navigate('Entrance'))
+    .then(() => this.props.navigation.navigate('Main'))
     .catch(this._handleError)
     .finally(() => this.setState({ loading: false }));
   }

@@ -38,7 +38,7 @@ function _headers(request = {}) {
 
 function _parse(response) {
   if (!response.ok) { throw response; }
-  return response.json();
+  return response.status === 204 ? response : response.json();
 }
 
 function _log(response) {
@@ -47,6 +47,6 @@ function _log(response) {
 }
 
 function _error(err) {
-  console.log(`Response ::: ${JSON.stringify(err)}`);
+  console.log(`Error response ::: ${JSON.stringify(err)}`);
   throw err;
 }

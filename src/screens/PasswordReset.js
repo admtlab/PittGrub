@@ -14,15 +14,11 @@ export default class PasswordReset extends PureComponent {
     email: '',
   };
 
-  _goBack = () => {
-    this.props.navigation.goBack();
-  }
+  goBack = () => this.props.navigation.goBack();
 
-  _setEmail = (email) => {
-    this.setState({ email });
-  }
+  setEmail = (email) => this.setState({ email });
 
-  _submit = async () => {
+  submit = async () => {
     Keyboard.dismiss();
     this.setState({
       requestSent: true,
@@ -36,17 +32,17 @@ export default class PasswordReset extends PureComponent {
     return (
       <EntryForm>
         <View height={80} style={{ justifyContent: 'center' }}>
-          <EmailInput value={this.state.email} onChangeText={this._setEmail} submit={this._submit}/>
+          <EmailInput value={this.state.email} onChangeText={this.setEmail} submit={this.submit}/>
         </View>
         {this.state.loading ? <ActivityIndicator size='large' color='#fff' marginTop={50} /> : (
           <Fragment>
             <ButtonIconRight
               text={this.state.buttonText}
               icon='mail'
-              onPress={this._submit}
+              onPress={this.submit}
               disabled={!isEnabled}
             />
-            <BackButton onPress={this._goBack} />
+            <BackButton onPress={this.goBack} />
           </Fragment>
         )}
       </EntryForm>

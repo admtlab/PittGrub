@@ -78,12 +78,10 @@ export default class App extends Component {
     }
 
     // launch app
-    console.log('Launching app...');
-    console.log(`Session valid? ${this.state.valid}`);
     return (
       <Provider {...stores}>
         <Route
-          screenProps={{validSession: this.state.valid}} //, notification: this.state.notification}}
+          screenProps={{ validSession: this.state.valid, currentScreen: this.state.currentScreen }} //, notification: this.state.notification}}
           onNavigationStateChange={this._navigationStateChange} />
       </Provider>
     );

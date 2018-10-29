@@ -8,12 +8,12 @@ const NOTIFICATION_TOKEN_ENDPOINT =  `${baseUrl}/token/notification`;
 
 // from: https://docs.expo.io/versions/v30.0.0/guides/push-notifications
 export async function registerForNotifications() {
-  const { existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-  let finalStatus = existingStatus;
+  const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+  let finalStatus = status;
 
   // only ask for permissions if undetermined
   // iOS will not necessarily ask a second time
-  if (existingStatus !== 'granted') {
+  if (status !== 'granted') {
     // Android notification permissions are granted on app install
     // this will only prompt on iOS
     const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);

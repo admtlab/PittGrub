@@ -1,8 +1,10 @@
+import { parseEvent, postEvent } from '../api/event';
 import { colors } from '../config/styles';
 import { parseMonthDayYear, parseTime } from '../lib/time';
 import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -126,14 +128,53 @@ export default class CreateEvent extends Component {
   submit = () => {
     console.log('creating event...');
     this.setState({ loading: true });
-    setTimeout(() => {
-      this.setState({ loading: false });
-      Alert.alert('Success', 'Created...', { text: 'OK' });
-    }, 2000);
+    this.props.tokenStore.getOrFetchAccessToken()
+    .then(token => postEvent(token, this.postData()))
+    .then(event => this.props.eventStore.addEvent(parseEvent(event)))
+    .then(() => this.props.navigation.goBack())
+    .catch(this._handleError)
+    .finally(() => this.setState({ loading: false }));
+  }
+
+  postData = () => {
+    const foodPrefs = [];
+    if (this.state.glutenFree) {
+      foodPrefs.push(1);
+    }
+    if (this.state.dairyFree) {
+      foodPrefs.push(2);
+    }
+    if (this.state.vegetarian) {
+      foodPrefs.push(3);
+    }
+    if (this.state.vegan) {
+      foodPrefs.push(4);
+    }
+    return {
+      title: this.state.title,
+      details: this.state.description,
+      servings: this.state.servings,
+      address: this.state.address,
+      location: this.state.location,
+      start_date: this.state.startDate,
+      end_date: this.state.endDate,
+      address: this.state.address,
+      food_preferences: foodPrefs,
+      latitude: '',
+      longitude: '',
+    };
   }
 
   cancel = () => {
     this.props.navigation.goBack();
+  }
+
+  _handleError = (err) => {
+    Alert.alert(
+      'Error',
+      'An error occurred. Please try again later.',
+      { text: 'OK' },
+    );
   }
 
   validate = () => {
@@ -160,7 +201,7 @@ export default class CreateEvent extends Component {
               title='Add photo'
               icon={{ name: 'camera', size: 18, color: colors.softWhite }}
               onPress={this.getImage}
-              buttonStyle={[styles.button, { width: width / 1.5, backgroundColor: colors.red }]}
+              buttonStyle={[styles.button, { width: width * 0.8, backgroundColor: colors.red }]}
               textStyle={{ color: colors.softWhite }}
             />
           </View>
@@ -256,7 +297,6 @@ export default class CreateEvent extends Component {
           color={colors.softGrey}
         />
 
-
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <View style={{ flex: 1, flexDirection: 'column' }}>
             <FormLabel labelStyle={[styles.label, { marginTop: 10 }]}>Start Time</FormLabel>
@@ -311,21 +351,23 @@ export default class CreateEvent extends Component {
           checkedColor={colors.blue}
         />
 
-        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
-          <Button
-            title='CANCEL'
-            onPress={this.cancel}
-            backgroundColor={colors.red}
-            buttonStyle={[styles.button, { width: width / 2.5, marginBottom: 20}]}
-          />
-          <Button
-            title='SUBMIT'
-            onPress={this.submit}
-            backgroundColor='#009688'
-            buttonStyle={[styles.button, { width: width / 2.5, marginBottom: 20}]}
-            disabled={!this.validate()}
-          />
-        </View>
+        {this.state.loading ? <ActivityIndicator size='large' color={colors.darkGrey} marginVertical={30} /> : (
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+            <Button
+              title='CANCEL'
+              onPress={this.cancel}
+              backgroundColor={colors.red}
+              buttonStyle={[styles.button, { width: width / 2.5, marginBottom: 20}]}
+            />
+            <Button
+              title='SUBMIT'
+              onPress={this.submit}
+              backgroundColor='#009688'
+              buttonStyle={[styles.button, { width: width / 2.5, marginBottom: 20}]}
+              disabled={!this.validate()}
+            />
+          </View>
+        )}
       </ScrollView>
     );
   }

@@ -7,6 +7,7 @@ import Events from '../screens/Events';
 import EventDetails from '../screens/EventDetails';
 import Login from '../screens/Login';
 import Home from '../screens/Home';
+import HostSignup from '../screens/HostSignup';
 import PasswordReset from '../screens/PasswordReset';
 import Settings from '../screens/Settings';
 import Signup from '../screens/Signup';
@@ -29,6 +30,7 @@ const fade = ({ position, scene }) => {
 const EntryNav = createStackNavigator({
   Entrance: { screen: Entrance },
   Login: { screen: Login },
+  HostSignup: { screen: HostSignup },
   PasswordReset: { screen: PasswordReset },
   Signup: { screen: Signup },
   Verification: { screen: Verification },

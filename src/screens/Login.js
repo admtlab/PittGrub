@@ -1,4 +1,5 @@
-import { login } from '../api/auth';
+import { checkGated, login } from '../api/auth';
+import { registerForNotifications, setExpoPushToken } from '../api/notification';
 import { BackButton, Button } from '../components/Button';
 import { EmailInput, PasswordInput } from '../components/Input';
 import { EntryForm } from '../components/Form';
@@ -22,7 +23,7 @@ const { width, height } = Dimensions.get('window');
 const footer = height - 230;
 
 
-@inject('tokenStore', 'userStore')
+@inject('featureStore', 'tokenStore', 'userStore')
 export default class Login extends PureComponent {
   state = {
     loading: false,
@@ -31,23 +32,15 @@ export default class Login extends PureComponent {
     enableGate: false
   };
 
-  _goBack = () => {
-    this.props.navigation.goBack();
-  }
+  goBack = () => this.props.navigation.goBack();
 
-  _passwordInputFocus = () => {
-    this.refs.passwordInput.focus();
-  }
+  passwordInputFocus = () => this.refs.passwordInput.focus();
 
-  _setEmail = (email) => {
-    this.setState({ email });
-  }
+  setEmail = (email) => this.setState({ email });
 
-  _setPassword = (password) => {
-    this.setState({ password });
-  }
+  setPassword = (password) => this.setState({ password });
 
-  _submit = () => {
+  submit = () => {
     Keyboard.dismiss();
     this.setState({ loading: true });
     login(this.state.email, this.state.password, this.props.tokenStore, this.props.userStore)
@@ -55,11 +48,22 @@ export default class Login extends PureComponent {
     .then(() => {
       if (this.props.userStore.account.active) {
         // continue to verification if user account is active
-        console.log('navigate to main');
         this.props.navigation.navigate('Main')
       } else {
-        // show gate if not
-        this.setState({ enableGate: true });
+        this.props.tokenStore.getOrFetchAccessToken()
+        .then(checkGated)
+        .then(gated => gated ? this.setState({ enableGate: true }) : this.props.navigation.navigate('Verification'))
+      }
+    })
+    .then(() => {
+      if (!this.props.featureStore.notifications) {
+        registerForNotifications()
+        .then(granted => {
+          this.props.featureStore.setFeatures({ notifications: granted });
+          if (granted) {
+            this.props.tokenStore.getOrFetchAccessToken().then(setExpoPushToken);
+          }
+        })
       }
     })
     .catch(this._handleError)
@@ -74,32 +78,32 @@ export default class Login extends PureComponent {
     );
   }
 
-  _passwordResetScreen = () => {
+  passwordResetScreen = () => {
     this.props.navigation.navigate('PasswordReset');
   }
 
   render() {
     // show gate
     if (this.state.enableGate) {
-      return <Gate back={this._goBack} />;
+      return <Gate back={this.goBack} />;
     }
 
     const enableSubmit = isEmail(this.state.email) && this.state.password.length > 0;
 
     return (
       <EntryForm>
-        <EmailInput value={this.state.email} onChangeText={this._setEmail} submit={this._passwordInputFocus} />
-        <PasswordInput ref='passwordInput' value={this.state.password} onChangeText={this._setPassword} submit={this._submit} />
+        <EmailInput value={this.state.email} onChangeText={this.setEmail} submit={this.passwordInputFocus} />
+        <PasswordInput ref='passwordInput' value={this.state.password} onChangeText={this.setPassword} submit={this.submit} />
         <View height={142}>
           {this.state.loading ? <ActivityIndicator size='large' color='#fff' marginTop={50} /> : (
             <Fragment>
-              <Button text='LOG IN' onPress={this._submit} disabled={!enableSubmit} />
-              <BackButton onPress={this._goBack} />
+              <Button text='LOG IN' onPress={this.submit} disabled={!enableSubmit} />
+              <BackButton onPress={this.goBack} />
             </Fragment>
           )}
         </View>
         <View style={styles.footer}>
-          <Text onPress={this._passwordResetScreen} style={styles.forgotPassword}>
+          <Text onPress={this.passwordResetScreen} style={styles.footerText}>
             Forgot your password?
           </Text>
         </View>
@@ -114,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     top: footer,
   },
-  forgotPassword: {
+  footerText: {
     alignSelf: 'center',
     fontSize: width / 24,
     color: colors.softGrey,
