@@ -73,13 +73,13 @@ export default class CreateEvent extends Component {
             type: 'image/jpeg',
             name: 'testPhotoName'
           });
-          post(`${baseUrl}/events/test`, {
-            headers: {
-              Accept: 'application/json',
-              // 'Content-Type': 'multipart/form-data'
-            },
-            body: data
-          }).catch(console.warn);
+          // post(`${baseUrl}/events/test`, {
+          //   headers: {
+          //     Accept: 'application/json',
+          //     // 'Content-Type': 'multipart/form-data'
+          //   },
+          //   body: data
+          // }).catch(console.warn);
         });
       });
     } else {
@@ -94,13 +94,13 @@ export default class CreateEvent extends Component {
             type: 'image/jpeg',
             name: 'testPhotoName'
           });
-          post('http://localhost:21000', {
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'multipart/form-data'
-            },
-            body: data
-          }).catch(console.warn);
+          // post(`${baseUrl}/events/test`, {
+          //   headers: {
+          //     Accept: 'application/json',
+          //     // 'Content-Type': 'multipart/form-data'
+          //   },
+          //   body: data
+          // }).catch(console.warn);
     }
   }
 
