@@ -1,4 +1,5 @@
-import  { resendVerification, submitVerification } from '../api/auth';
+import { resendVerification, submitVerification } from '../api/auth';
+import { registerForNotifications, setExpoPushToken } from '../api/notification';
 import { Button, ButtonIconRight } from '../components/Button';
 import { EntryForm } from '../components/Form';
 import { colors } from '../config/styles';
@@ -17,7 +18,7 @@ import React, { Fragment, PureComponent } from 'react';
 const { width } = Dimensions.get('window');
 
 
-@inject('tokenStore', 'userStore')
+@inject('featureStore', 'tokenStore', 'userStore')
 export default class Verification extends PureComponent {
   state = {
     loading: false,
@@ -39,6 +40,16 @@ export default class Verification extends PureComponent {
     this.setState({ loading: true });
     this.props.tokenStore.getOrFetchAccessToken()
     .then(token => submitVerification(token, this.state.code))
+    .then(() => {
+      if (!this.props.featureStore.features.notifications) {
+        registerForNotifications().then(granted => {
+          this.props.featureStore.setFeatures({ notifications: granted });
+          if (granted) {
+            this.props.tokenStore.getOrFetchAccessToken().then(setExpoPushToken);
+          }
+        })
+      }
+    })
     .then(() => this.props.navigation.navigate('Main'))
     .catch(this._handleError)
     .finally(() => this.setState({ loading: false }));

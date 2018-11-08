@@ -1,8 +1,10 @@
+import { captureImage, registerForCamera } from '../api/camera';
 import { parseEvent, postEvent } from '../api/event';
+import { baseUrl, post } from '../api/http';
 import { colors } from '../config/styles';
 import { parseMonthDayYear, parseTime } from '../lib/time';
 import { inject, observer } from 'mobx-react';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,7 +21,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 const { width } = Dimensions.get('screen');
 
 
-@inject('eventStore', 'tokenStore')
+@inject('eventStore', 'featureStore', 'tokenStore')
 @observer
 export default class CreateEvent extends Component {
   state = {
@@ -50,8 +52,56 @@ export default class CreateEvent extends Component {
     this.setState({ startDate, endDate });
   }
 
-  getImage = () => {
+  captureEventImage = async () => {
     console.log('...getting image');
+    // check for registered status
+    console.log(this.props.featureStore);
+    if (!this.props.featureStore.features.camera) {
+      console.log('not enabled');
+      registerForCamera().then(granted => {
+        this.props.featureStore.setFeatures({ camera: granted });
+      }).then(() => {
+        captureImage({ aspect: [width, width] }).then((image => {
+          this.setState({ image: image.cancelled ? null : image });
+          return image;
+        }))
+        .then((image) => {
+          const data = new FormData();
+          data.append('name', 'testName');
+          data.append('photo', {
+            uri: image.uri,
+            type: 'image/jpeg',
+            name: 'testPhotoName'
+          });
+          post(`${baseUrl}/events/test`, {
+            headers: {
+              Accept: 'application/json',
+              // 'Content-Type': 'multipart/form-data'
+            },
+            body: data
+          }).catch(console.warn);
+        });
+      });
+    } else {
+      console.log('enabled');
+      const image = await captureImage({ aspect: [width, width] });
+      this.setState({ image: image.cancelled ? null : image });
+      console.log(image);
+      const data = new FormData();
+          data.append('name', 'testName');
+          data.append('photo', {
+            uri: image.uri,
+            type: 'image/jpeg',
+            name: 'testPhotoName'
+          });
+          post('http://localhost:21000', {
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'multipart/form-data'
+            },
+            body: data
+          }).catch(console.warn);
+    }
   }
 
   setTitle = (title) => this.setState({ title });
@@ -165,11 +215,9 @@ export default class CreateEvent extends Component {
     };
   }
 
-  cancel = () => {
-    this.props.navigation.goBack();
-  }
+  cancel = () => this.props.navigation.goBack();
 
-  _handleError = (err) => {
+  _handleError = () => {
     Alert.alert(
       'Error',
       'An error occurred. Please try again later.',
@@ -194,13 +242,13 @@ export default class CreateEvent extends Component {
         backgroundColor={colors.lightBackground}
       >
         {this.state.image ? (
-          <Image source={{ uri: this.state.image }} style={{ width, height: width }} />
+          <Image source={{ uri: this.state.image.uri }} style={{ width, height: width }} />
         ) : (
           <View width={width} alignItems='center'>
             <Button
               title='Add photo'
               icon={{ name: 'camera', size: 18, color: colors.softWhite }}
-              onPress={this.getImage}
+              onPress={this.captureEventImage}
               buttonStyle={[styles.button, { width: width * 0.8, backgroundColor: colors.red }]}
               textStyle={{ color: colors.softWhite }}
             />

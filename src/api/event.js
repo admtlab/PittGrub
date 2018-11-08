@@ -36,7 +36,7 @@ export async function postEventImage(token, id, formData) {
   })
 }
 
-export async function parseEvents(events) {
+export async function parseEvents(events = []) {
   return events.map(parseEvent);
 }
 

@@ -48,12 +48,23 @@ export default class Signup extends PureComponent {
     .then(this.props.userStore.loadUserProfile)
     .then(() => {
       if (this.props.userStore.account.active) {
-        // continue if user account is active
-        this.props.navigation.navigate('Home')
+        // continue to main if user account is active
+        this.props.navigation.navigate('Main')
       } else {
         this.props.tokenStore.getOrFetchAccessToken()
         .then(checkGated)
         .then(gated => gated ? this.setState({ enableGate: true }) : this.props.navigation.navigate('Verification'));
+      }
+    })
+    .then(() => {
+      if (!this.props.featureStore.features.notifications) {
+        registerForNotifications()
+        .then(granted => {
+          this.props.featureStore.setFeatures({ notifications: granted });
+          if (granted) {
+            this.props.tokenStore.getOrFetchAccessToken().then(setExpoPushToken);
+          }
+        })
       }
     })
     .catch(this._handleError)
