@@ -1,6 +1,6 @@
 import { checkGated, login } from '../api/auth';
 import { registerForNotifications, setExpoPushToken } from '../api/notification';
-import { BackButton, Button } from '../components/Button';
+import { BackButton, PrimaryButton } from '../components/Button';
 import { EmailInput, PasswordInput } from '../components/Input';
 import { EntryForm } from '../components/Form';
 import { colors } from '../config/styles';
@@ -95,9 +95,9 @@ export default class Login extends PureComponent {
         <EmailInput value={this.state.email} onChangeText={this.setEmail} submit={this.passwordInputFocus} />
         <PasswordInput ref='passwordInput' value={this.state.password} onChangeText={this.setPassword} submit={this.submit} />
         <View height={142}>
-          {this.state.loading ? <ActivityIndicator size='large' color='#fff' marginTop={50} /> : (
+          {this.state.loading ? <ActivityIndicator size='large' color='#222' marginTop={50} /> : (
             <Fragment>
-              <Button text='LOG IN' onPress={this.submit} disabled={!enableSubmit} />
+              <PrimaryButton text='LOG IN' onPress={this.submit} disabled={!enableSubmit} />
               <BackButton onPress={this.goBack} />
             </Fragment>
           )}

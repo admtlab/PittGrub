@@ -35,9 +35,9 @@ export default class EntryForm extends PureComponent {
 
   render() {
     return (
-      <KeyboardAvoidingContainer style={{ backgroundColor: colors.softBlue }}>
+      <KeyboardAvoidingContainer style={{ backgroundColor: colors.blue }}>
         <KeyboardEventContainer keyboardWillShow={this._keyboardWillShow} keyboardWillHide={this._keyboardWillHide} />
-        <View style={{ alignItems: 'center', backgroundColor: colors.softBlue }}>
+        <View style={{ alignItems: 'center', backgroundColor: colors.blue }}>
           <Logo size={this.logoSize} style={{textShadowOffset: { height: EntryForm.shadowHeight }}}/>
           {this.props.children}
         </View>

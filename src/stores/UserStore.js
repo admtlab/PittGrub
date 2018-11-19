@@ -1,5 +1,9 @@
 import { getUserProfile } from '../api/user';
+import { SecureStore } from 'expo';
 import { action, computed, observable } from 'mobx';
+
+
+const SecureProps = { keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY };
 
 
 export default class UserStore {
@@ -77,6 +81,14 @@ export default class UserStore {
 
   @action removeUser() {
     Object.keys(this.account).forEach(key => this.account[key] = null);
+  }
+
+  saveUser = async () => {
+    try {
+      await SecureStore.setItemAsync('userId', this.account.id, SecureProps);
+    } catch (e) {
+      console.warn(e);
+    }
   }
 
   loadUserProfile = async () => {

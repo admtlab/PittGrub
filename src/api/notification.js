@@ -1,5 +1,5 @@
 import { baseUrl, post } from './http';
-import { Permissions, Notifications } from 'expo';
+import { Permissions, Notifications, SecureStore } from 'expo';
 import { Alert, AppState } from 'react-native';
 
 
@@ -34,6 +34,14 @@ export async function setExpoPushToken(accessToken) {
 
 export async function handleNotification(notification) {
   console.log(`notification: ${JSON.stringify(notification)}`);
+  
+  // check that user is signed in
+  // and user id is correct
+  const token = await SecureStore.getItemAsync('refreshToken');
+  if (token == null || token === '' || notification.data.user_id !== await SecureStore.getItemAsync('userId')) {
+    return;
+  }
+
   if (AppState.currentState === 'active') {
     const ok = { text: 'OK' };
     if (notification.data.type === 'message') {

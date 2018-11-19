@@ -8,6 +8,7 @@ import EventDetails from '../screens/EventDetails';
 import Login from '../screens/Login';
 import Home from '../screens/Home';
 import HostSignup from '../screens/HostSignup';
+import HostTraining from '../screens/HostTraining';
 import PasswordReset from '../screens/PasswordReset';
 import Settings from '../screens/Settings';
 import Signup from '../screens/Signup';
@@ -31,6 +32,7 @@ const EntryNav = createStackNavigator({
   Entrance: { screen: Entrance },
   Login: { screen: Login },
   HostSignup: { screen: HostSignup },
+  HostTraining: { screen: HostTraining },
   PasswordReset: { screen: PasswordReset },
   Signup: { screen: Signup },
   Verification: { screen: Verification },

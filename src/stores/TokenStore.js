@@ -38,7 +38,6 @@ export default class TokenStore {
   @action async loadRefreshToken() {
     try {
       this.refreshToken = await SecureStore.getItemAsync('refreshToken') || '';
-      // this.refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsInRvayI6InJlZiJ9.eyJvd24iOjksInJvbGVzIjoiVXNlcixBZG1pbiIsImlzcyI6IlBpdHRHcnViIiwiaWF0IjoxNTM4NjIwOTY1fQ.mlVcZ4CL7fo9msOObCbVJ5Vv-7Uw235eqXQuM4oTxRo";
       console.log(`loaded refresh token: ${this.refreshToken}`);
     } catch (e) {
       console.warn(`unable to load refresh token: ${JSON.stringify(e)}`);
