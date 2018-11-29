@@ -22,7 +22,7 @@ export async function signup(email, password, tokenStore, userStore) {
   }).then(response => setUserData(response, tokenStore, userStore));
 }
 
-export async function hostSignup(email, password, name, affiliation, directory, reason) {
+export async function hostSignup(email, password, name, affiliation, directory, reason, tokenStore, userStore) {
   return post(HOST_SIGNUP_ENDPOINT, {
     body: {
       email,
@@ -32,7 +32,7 @@ export async function hostSignup(email, password, name, affiliation, directory, 
       reason,
       primary_affiliation: affiliation,
     }
-  });
+  }).then(response => setUserData(response, tokenStore, userStore));
 }
 
 export async function hostAffiliations() {
