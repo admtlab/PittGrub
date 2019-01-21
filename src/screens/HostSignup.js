@@ -28,7 +28,6 @@ export default class HostSignup extends PureComponent {
     password: '',
     name: '',
     affiliation: null,
-    directory: '',
     reason: '',
   };
 
@@ -58,8 +57,6 @@ export default class HostSignup extends PureComponent {
 
   setAffiliation = (affiliation) => this.setState({ affiliation });
 
-  setDirectory = (directory) => this.setState({ directory });
-
   setReason = (reason) => this.setState({ reason });
 
   hostTraining = () => this.props.navigation.navigate('HostTraining', {...this.state});
@@ -68,8 +65,7 @@ export default class HostSignup extends PureComponent {
     return isEmail(this.state.email) &&
           this.state.password &&
           this.state.name &&
-          this.state.affiliation &&
-          this.state.directory;
+          this.state.affiliation;
   }
 
   render() {
@@ -115,13 +111,6 @@ export default class HostSignup extends PureComponent {
               );
             })}
           </Picker>
-          <EntryInput
-            ref='directoryInput'
-            placeholder='Directory'
-            value={this.state.directory}
-            onChangeText={this.setDirectory}
-            returnKeyType='next'
-          />
           <FormLabel labelStyle={styles.label}>Reason</FormLabel>
           <FormInput
             ref='reasonInput'

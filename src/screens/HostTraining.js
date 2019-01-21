@@ -17,20 +17,31 @@ import {
 import { Card } from 'react-native-elements';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import images from '../config/images';
+import metrics from '../config/metrics';
 
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
 
 function wp (percentage) {
   return Math.round((percentage * width) / 100);
 }
 
+const multiplier = function() {
+  const type = metrics.iPhoneType;
+  if (type === '-') {
+    return 5;
+  } else if (type === 'SE') {
+    return 7;
+  } else {
+    return 2;
+  }
+}();
 const itemHorizontalMargin = wp(2);
 const slideHeight = height * 0.36;
 const sliderWidth = width;
 const slideWidth = wp(75);
-const itemWidth = slideWidth + itemHorizontalMargin * 2;
+const itemWidth = slideWidth + itemHorizontalMargin * multiplier;
 
 @inject('tokenStore', 'userStore')
 export default class HostTraining extends PureComponent {
@@ -71,9 +82,9 @@ export default class HostTraining extends PureComponent {
  
   _renderItem ({ item }) {
     return (
-      <Card title={item.title} titleStyle={{fontSize: 20}} style={{alignItems: 'center', alignContent: 'center'}}>
-        <Image source={item.image} style={{width: 220, height: 220, marginHorizontal: 20}} />
-        <View marginTop={40} marginBottom={20} marginHorizontal={30}>
+      <Card title={item.title} titleStyle={{fontSize: 18}} style={{alignItems: 'center', alignContent: 'center'}}>
+        <Image source={item.image} style={{width: 180, height: 180, marginHorizontal: 20}} />
+        <View marginTop={10} marginBottom={5} marginHorizontal={30}>
           <Text>{item.subtitle}</Text>
         </View>
       </Card>
@@ -87,8 +98,8 @@ export default class HostTraining extends PureComponent {
   submit = () => {
     Keyboard.dismiss();
     this.setState({ loading: true });
-    const { email, password, name, affiliation, directory, reason } = this.props.navigation.state.params;
-    hostSignup(email, password, name, affiliation, directory, reason, this.props.tokenStore, this.props.userStore)
+    const { email, password, name, affiliation, reason } = this.props.navigation.state.params;
+    hostSignup(email, password, name, affiliation, reason, this.props.tokenStore, this.props.userStore)
     .then(this.props.userStore.loadUserProfile)
     .then(() => {
       if (this.props.userStore.account.active) {
@@ -119,9 +130,6 @@ export default class HostTraining extends PureComponent {
       return <Gate back={this.goBack} />;
     }
 
-    console.log(this.props.navigation.state.params);
-    console.log(this.state);
-
     return (
       <View backgroundColor={colors.blue} height={height}>
         <View style={{backgroundColor: colors.blue, alignItems: 'center', width: width}}>
@@ -130,12 +138,15 @@ export default class HostTraining extends PureComponent {
             data={HostTraining.TrainingComponents}
             renderItem={this._renderItem}
             onSnapToItem={this.snapToItem}
+            sliderHeight={sliderWidth}
             sliderWidth={sliderWidth}
+            itemHeight={40}
             itemWidth={itemWidth}
-            marginTop={40}
-            height={450}
+            marginTop={20}
+            height={400}
           />
           <Pagination
+            containerStyle={styles.paginationContainer}
             dotsLength={HostTraining.TrainingComponents.length}
             activeDotIndex={this.state.activeSlide}
             dotColor={'rgba(255, 255, 255, 0.92)'}
@@ -143,11 +154,14 @@ export default class HostTraining extends PureComponent {
             inactiveDotColor={'#333'}
             inactiveDotOpacity={0.4}
             inactiveDotScale={0.6}
+            tappableDots={false}
             carouselRef={this._carousel}
             tappableDots={!!this._carousel}
           />
-          <PrimaryButton disabled={!this.state.reachedEnd} text='Continue' onPress={this.submit} />
-          <BackButton onPress={this.goBack} />
+          <View style={styles.buttonView}>
+            <PrimaryButton disabled={!this.state.reachedEnd} text='CONTINUE' onPress={this.submit} buttonStyle={styles.buttonAdjuster} textStyle={styles.buttonTextAdjuster} />
+            <BackButton onPress={this.goBack} buttonStyle={styles.buttonAdjuster} textStyle={styles.buttonTextAdjuster} />
+          </View>
         </View>
       </View>
     );
@@ -176,7 +190,8 @@ const styles = StyleSheet.create({
       textAlign: 'center'
   },
   paginationContainer: {
-      paddingVertical: 8
+      paddingVertical: 20,
+      marginBottom: 30
   },
   paginationDot: {
       width: 8,
@@ -184,4 +199,17 @@ const styles = StyleSheet.create({
       borderRadius: 4,
       marginHorizontal: 8
   },
+  buttonView: {
+    marginTop: metrics.iPhoneType === '-' ? -30 : metrics.iPhoneType === 'SE' ? -45 : 0,
+  },
+  buttonAdjuster: {
+    backgroundColor: colors.theme,
+    borderRadius: 25,
+    marginTop: metrics.iPhoneType === 'SE' ? 10 : 20,
+    width: metrics.iPhoneType === 'SE' ? Dimensions.get('window').width - 120 : Dimensions.get('window').width - 100,
+    height: metrics.iPhoneType === 'SE' ? 35 : 50,
+  },
+  buttonTextAdjuster: {
+    fontSize: metrics.iPhoneType === 'SE' ? 12: Dimensions.get('window').width / 21
+  }
 });

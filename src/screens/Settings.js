@@ -116,7 +116,7 @@ export default class Settings extends Component {
         {/* Food preference settings */}
         <FormLabel labelStyle={styles.title}>Food Preferences</FormLabel>
         <Text style={styles.description}>
-          We will only send notifications for food eents that match your preferences.
+          We will only send notifications for food events that match your preferences.
         </Text>
         <CheckBox
           title='Gluten Free'

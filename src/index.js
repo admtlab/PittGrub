@@ -34,7 +34,7 @@ export default class App extends Component {
   _loadData = async () => {
     // check refresh token validity
     return stores.tokenStore.loadRefreshToken()
-    .then(() => validateToken(stores.tokenStore.refreshToken))
+    .then(() => stores.tokenStore.refreshToken && validateToken(stores.tokenStore.refreshToken))
     .then(valid => {
       this.setState({ valid });
       // load data if valid

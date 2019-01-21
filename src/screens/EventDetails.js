@@ -1,4 +1,4 @@
-import { acceptEvent } from '../api/event';
+import { acceptEvent, unacceptEvent } from '../api/event';
 import { colors } from '../config/styles';
 import { parseDateRange } from '../lib/time';
 import { inject, observer } from 'mobx-react';
@@ -25,13 +25,14 @@ export default class EventDetails extends Component {
     .finally(() => this.setState({ loading: false }));
   }
 
-  removeEvent = () => {
+  removeEvent = async () => {
     const { event } = this.props.navigation.state.params;
     this.setState({ loading: true });
-    setTimeout(() => {
-      this.setState({ loading: false })
-      event.accepted = false;
-    }, 2000);
+    const token = await this.props.tokenStore.getOrFetchAccessToken();
+    unacceptEvent(token, event.id)
+    .then(() => event.accepted = false)
+    .catch(this._handleError)
+    .finally(() => this.setState({ loading: false }));
   }
 
   _handleError = () => {
@@ -73,6 +74,7 @@ export default class EventDetails extends Component {
   render() {
     const { event } = this.props.navigation.state.params;
     const { title, image, description, address, location, start_date, end_date, food_preferences, accepted } = event;
+    const name = event.organizer_name, affiliation = event.organizer_affiliation;
     return (
       <ScrollView style={{ backgroundColor: colors.lightBackground, paddingBottom: 20 }}>
         <Card
@@ -119,11 +121,20 @@ export default class EventDetails extends Component {
             <Text style={styles.details}>{location}</Text>
           </View>
 
-          <View style={styles.headerView}>
-            <Text style={styles.header}>Date and Time</Text>
-            <Icon name='access-time' size={20} color={colors.darkGrey} marginLeft={5} />
+          <View marginBottom={20}>
+            <View style={styles.headerView}>
+              <Text style={styles.header}>Date and Time</Text>
+              <Icon name='access-time' size={20} color={colors.darkGrey} marginLeft={5} />
+            </View>
+            <Text style={styles.details}>{parseDateRange(start_date, end_date)}</Text>
           </View>
-          <Text style={styles.details}>{parseDateRange(start_date, end_date)}</Text>
+
+          <View style={styles.headerView}>
+            <Text style={styles.header}>Organizer</Text>
+            <Icon name='person' type='octicons' size={20} color={colors.darkGrey} marginLeft={5} />
+          </View>
+          <Text style={styles.details}>{name}</Text>
+          <Text style={styles.details}>{affiliation}</Text>
         </Card>
 
         <Card title='Food Preferences' titleStyle={styles.cardTitle} containerStyle={{marginBottom: 20}}>

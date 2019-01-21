@@ -154,6 +154,18 @@ export default class CreateEvent extends Component {
     this.setState({ endDate: end });
   }
 
+  minStartTime = () => {
+    const date = this.state.startDate;
+    const curr = new Date();
+    if (date.getFullYear() > curr.getFullYear() || date.getMonth() > curr.getMonth() || date.getDate() > curr.getDate()) {
+      curr.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+      curr.setHours(0, 0, 0, 0);
+    }
+
+    console.log(`min start time ${curr}`)
+    return curr;
+  }
+
   toggleGlutenFree = () => this.setState({ glutenFree: !this.state.glutenFree });
 
   toggleDairyFree = () => {
@@ -180,7 +192,8 @@ export default class CreateEvent extends Component {
     this.setState({ loading: true });
     this.props.tokenStore.getOrFetchAccessToken()
     .then(token => postEvent(token, this.postData()))
-    .then(event => this.props.eventStore.addEvent(parseEvent(event)))
+    .then(() => this.props.eventStore.fetchEvents())
+    // .then(event => this.props.eventStore.addEvent(parseEvent(event)))
     .then(() => this.props.navigation.goBack())
     .catch(this._handleError)
     .finally(() => this.setState({ loading: false }));
@@ -228,7 +241,7 @@ export default class CreateEvent extends Component {
   validate = () => {
     return this.state.title &&
            this.state.description &&
-           this.state.servings &&
+           this.state.servings > 0 &&
            this.state.organization &&
            this.state.address &&
            this.state.location;
@@ -321,7 +334,7 @@ export default class CreateEvent extends Component {
         />
         <DateTimePicker
           mode='time'
-          minimumDate={new Date()}
+          // minimumDate={this.minStartTime()}
           isVisible={this.state.startPickerVisible}
           date={this.state.startDate}
           onConfirm={this.setStartTime}

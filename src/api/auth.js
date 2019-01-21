@@ -22,17 +22,17 @@ export async function signup(email, password, tokenStore, userStore) {
   }).then(response => setUserData(response, tokenStore, userStore));
 }
 
-export async function hostSignup(email, password, name, affiliation, directory, reason, tokenStore, userStore) {
+export async function hostSignup(email, password, name, affiliation, reason, tokenStore, userStore) {
   return post(HOST_SIGNUP_ENDPOINT, {
     body: {
       email,
       password,
       name,
-      directory,
       reason,
       primary_affiliation: affiliation,
     }
-  }).then(response => setUserData(response, tokenStore, userStore));
+  }).then(response => setUserData(response, tokenStore, userStore))
+  .catch(err => console.log(err.json()));
 }
 
 export async function hostAffiliations() {

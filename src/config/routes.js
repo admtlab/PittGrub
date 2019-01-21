@@ -140,6 +140,7 @@ const MainNav = createBottomTabNavigator({
 
 const AppNav = createStackNavigator({
   Entrance: { screen: EntryNav },
+  // Entrance: { screen: HostTraining },
   Main: { screen: MainNav },
   }, {
     headerMode: 'none',

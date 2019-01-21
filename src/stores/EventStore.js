@@ -59,13 +59,15 @@ export default class EventStore {
     .then(events => {
       events.push({
         id: 1,
-        image: require('../../assets/garfield.jpg'),
+        image: require('../../assets/mockpizza.jpg'),
         title: 'Great Pizza for Everyone',
         description: 'Free pizza at the William Pitt Union!',
         address: '500 Grant Street',
         location: '12th Floor Conference Room',
         start_date: new Date(),
         end_date: new Date(),
+        organizer_name: 'Mark Silvis',
+        organizer_affiliation: 'Department of Computer Science',
         food_preferences: [
           { id: 1, name: 'Gluten Free' },
           { id: 2, name: 'Dairy Free' },

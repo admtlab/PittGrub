@@ -1,4 +1,4 @@
-import { baseUrl, get, post } from './http';
+import { baseUrl, get, post, del } from './http';
 
 
 const EVENT_ENDPOINT = `${baseUrl}/events`;
@@ -12,6 +12,13 @@ export async function getEvents(token) {
 
 export async function acceptEvent(token, id) {
   return post(ACCEPT_EVENT_ENDPOINT, {
+    token,
+    body: { event_id: id }
+  });
+}
+
+export async function unacceptEvent(token, id) {
+  return del(ACCEPT_EVENT_ENDPOINT, {
     token,
     body: { event_id: id }
   });

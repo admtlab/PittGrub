@@ -42,6 +42,8 @@ export async function handleNotification(notification) {
     return;
   }
 
+  console.log(`current state ${AppState.currentState}`);
+
   if (AppState.currentState === 'active') {
     const ok = { text: 'OK' };
     if (notification.data.type === 'message') {

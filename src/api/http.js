@@ -19,6 +19,12 @@ export async function post(endpoint, request) {
   return fetch(endpoint, req).then(_parse).then(_log).catch(_error);
 }
 
+export async function del(endpoint, request) {
+  const req = _request({...request, method: 'DELETE'});
+  console.log(`Request ::: ${JSON.stringify(req)} >>> ${endpoint}`);
+  return fetch(endpoint, req).then(_parse).then(_log).catch(_error);
+}
+
 function _request(request) {
   return {
     method: request.method || 'GET',

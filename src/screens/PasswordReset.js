@@ -24,7 +24,6 @@ export default class PasswordReset extends PureComponent {
       requestSent: true,
       buttonText: 'CHECK YOUR EMAIL'
     });
-    this.props.navigation.navigate('Main');
   }
 
   render() {
