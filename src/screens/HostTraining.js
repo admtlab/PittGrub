@@ -1,4 +1,5 @@
 import { checkGated, hostSignup } from '../api/auth';
+import { hostTrainingSlides } from '../api/data';
 import { colors } from '../config/styles';
 import { BackButton, PrimaryButton } from '../components/Button';
 import Gate from '../components/Gate';
@@ -45,53 +46,153 @@ const itemWidth = slideWidth + itemHorizontalMargin * multiplier;
 
 @inject('tokenStore', 'userStore')
 export default class HostTraining extends PureComponent {
-  static TrainingComponents = [
-    {
-      title: 'Food Storage',
-      subtitle: 'Please store your food safely! Food should be stored at a safe temperature, and covered and protected from the elements.',
-      image: images.logo,
-    }, {
-      title: 'Food Handling',
-      subtitle: 'Please handle your food safely',
-      image: images.background,
-    }, {
-      title: 'Have Fun',
-      subtitle: 'We hope you enjoy using PittGrub!',
-      image: images.logo,
-    }, {
-      title: 'Agreement',
-      subtitle: (
-        <View>
-          <Text>By clicking "Continue" you agree to the terms and conditions of hosting food on PittGrub.{' '}
-            <Text onPress={() => Linking.openURL('https://pittgrub.com')} style={{textDecorationLine: 'underline', textDecorationColor: '#333'}}>
-              Review PittGrub's terms and conditions.
-            </Text>
-          </Text>
-        </View>
-      ),
-      image: images.logo,
-    }
-  ];
 
-  state = {
-    loading: false,
-    activeSlide: 0,
-    reachedEnd: false,
-    showGate: false,
+ // static TrainingComponents = [
+  //   {
+  //     title: 'Food Storage',
+  //     subtitle: 'Please store your food safely! Food should be stored at a safe temperature, and covered and protected from the elements.',
+  //     image: images.logo,
+  //   }, {
+  //     title: 'Food Handling',
+  //     subtitle: 'Please handle your food safely',
+  //     image: images.background,
+  //   }, {
+  //     title: 'Have Fun',
+  //     subtitle: 'We hope you enjoy using PittGrub!',
+  //     image: images.logo,
+  //   }, {
+  //     title: 'Agreement',
+  //     subtitle: (
+  //       <View>
+  //         <Text>By clicking "Continue" you agree to the terms and conditions of hosting food on PittGrub.{' '}
+  //           <Text onPress={() => Linking.openURL('https://pittgrub.com')} style={{textDecorationLine: 'underline', textDecorationColor: '#333'}}>
+  //             Review PittGrub's terms and conditions.
+  //           </Text>
+  //         </Text>
+  //       </View>
+  //     ),
+  //     image: images.logo,
+  //   }
+  // ];
+  constructor (props) {
+    super(props);
+    
+    this.state = {
+      loading: false,
+      activeSlide: 0,
+      reachedEnd: false,
+      showGate: false,
+      trainingSlides: []
+    };
+
+    this.parseSubtitle = this.parseSubtitle.bind(this);
+    this._renderItem = this._renderItem.bind(this);
   };
+
+  componentDidMount() {
+    console.log('getting training slides');
+    if (!this.state.trainingSlides.length) {
+      // make call
+      hostTrainingSlides()
+        .then(slides => this.setState({ trainingSlides: slides }))
+        .finally(() => {console.log('got slides'); console.log(this.state.trainingSlides)});
+    }
+  }
+
+  _renderSlide(slide) {
+
+  }
  
   _renderItem ({ item }) {
+    console.log('rendering item');
+    const subtitle = this.parseSubtitle(item.subtitle);
     return (
       <Card title={item.title} titleStyle={{fontSize: 18}} style={{alignItems: 'center', alignContent: 'center'}}>
-        <Image source={item.image} style={{width: 180, height: 180, marginHorizontal: 20}} />
-        <View marginTop={10} marginBottom={5} marginHorizontal={30}>
-          <Text>{item.subtitle}</Text>
-        </View>
+        {/* <Image source={item.image} style={{width: 180, height: 180, marginHorizontal: 20}} /> */}
+        <Text marginTop={10} marginBottom={5} marginHorizontal={30} style={{flexDirection: 'row'}}>
+          {subtitle}
+        </Text>
       </Card>
     );
   }
 
-  snapToItem = (index) => this.setState({ activeSlide: index, reachedEnd: this.state.reachedEnd || index === HostTraining.TrainingComponents.length - 1 })
+  parseSubtitle (subtitle) {
+    const links = this.parseMarkdownLinks(subtitle);
+    console.log('parseSubtitle links: ' + links)
+    if (!links || !links.length) {
+      console.log('no links...');
+      return (<Text>{subtitle}</Text>);
+    }
+    
+    return (<Text>{this.convertSubtitle(subtitle, links)}</Text>);
+  }
+
+  convertSubtitle(subtitle, links) {
+    console.log(`subtitle: ${subtitle}`);
+    links.forEach(link => console.log(`link text at index ${link.index}: ${link[0]}`));
+    const elements = [];
+    let textKey = 0;
+    // add first element if text
+    if (links[0].index !== 0) {
+      elements.push(<Text key={textKey}>{this.createSubtitleText(subtitle, 0, links[0].index || subtitle.length)}</Text>);
+    }
+
+    links.forEach((link, index) => {
+      console.log(`converting link: ${link[0]}`);
+      console.log(index);
+      const text = this.parseMarkdownLinkText(link);
+      const url = this.parseMarkdownLinkUrl(link);
+      console.log(`text ${text} and url ${url}`);
+      elements.push(this.createSubtitleLink(text, url, link.index));
+      const next = links[index+1] ? links[index+1].index : subtitle.length+1;
+      elements.push(this.createSubtitleText(subtitle, link.index + link[0].length, next, ++textKey));
+      // elements.push(subtitle.substring(link.index + text.length));
+    });
+
+    return elements;
+  }
+
+  createSubtitleLink =(text, url, key) => (
+      <Text key={key} onPress={() => Linking.openURL(url)} style={{textDecorationLine: 'underline', textDecorationColor: '#333'}}>{text}</Text>
+  );
+
+  createSubtitleText(subtitle, start, end, key) {
+    return (<Text key={key}>{subtitle.substring(start, end)}</Text>);
+  }
+
+  parseMarkdownLinks(text) {
+    const re = /\[[\w+\d+0-9 ]+\]\(https?(:\/\/)[^\ )]+\.[^\)]+\)/g;
+    const links = [];
+    let res = null;
+
+    // collect regex results
+    do {
+      res = re.exec(text);
+      if (res) {
+        links.push(res);
+      }
+    } while (res);
+
+    return links;
+  }
+
+  parseMarkdownLinkText(text) {
+    console.log('parsing link : ' + text);
+    const re = /\[.+\]/g;
+    const x = re.exec(text)[0].slice(1, -1);
+    console.log('got: ' + x);
+    return x;
+  }
+
+  parseMarkdownLinkUrl(text) {
+    console.log('parsing link URL: ' + text);
+    const re = /\(.+\)/g;
+    const x =  re.exec(text)[0].slice(1, -1);
+    console.log('got: ' + x);
+    return x;
+  }
+
+  snapToItem = (index) => this.setState({ activeSlide: index, reachedEnd: this.state.reachedEnd || index === this.state.trainingSlides.length - 1 })
 
   goBack = () => this.props.navigation.goBack();
 
@@ -135,7 +236,7 @@ export default class HostTraining extends PureComponent {
         <View style={{backgroundColor: colors.blue, alignItems: 'center', width: width}}>
           <Carousel
             ref={(c) => { this._carousel = c; }}
-            data={HostTraining.TrainingComponents}
+            data={this.state.trainingSlides}
             renderItem={this._renderItem}
             onSnapToItem={this.snapToItem}
             sliderHeight={sliderWidth}
@@ -147,7 +248,7 @@ export default class HostTraining extends PureComponent {
           />
           <Pagination
             containerStyle={styles.paginationContainer}
-            dotsLength={HostTraining.TrainingComponents.length}
+            dotsLength={this.state.trainingSlides.length}
             activeDotIndex={this.state.activeSlide}
             dotColor={'rgba(255, 255, 255, 0.92)'}
             dotStyle={styles.paginationDot}

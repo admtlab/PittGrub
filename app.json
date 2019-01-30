@@ -2,7 +2,7 @@
   "expo": {
     "name": "PittGrub",
     "description": "Notifications for free food at the University of Pittsburgh.",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "platforms": [
       "ios"
     ],
@@ -12,7 +12,7 @@
     "orientation": "portrait",
     "ios": {
       "bundleIdentifier": "edu.pitt.cs.admt.pittgrub",
-      "buildNumber": "1.0.5",
+      "buildNumber": "1.0.6",
       "supportsTablet": false
     },
     "android": {

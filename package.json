@@ -1,6 +1,6 @@
 {
-  "name": "PittGrubMobile",
-  "version": "1.0.5",
+  "name": "PittGrub",
+  "version": "1.0.6",
   "private": true,
   "main": "./App.js",
   "scripts": {

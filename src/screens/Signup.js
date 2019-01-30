@@ -1,4 +1,5 @@
 import { checkGated, signup } from '../api/auth';
+import { registerForNotifications, setExpoPushToken } from '../api/notification';
 import { BackButton, Button } from '../components/Button';
 import { EmailInput, PasswordInput } from '../components/Input';
 import { EntryForm } from '../components/Form';
@@ -22,7 +23,7 @@ const { width, height } = Dimensions.get('window');
 const footer = height - 230;
 
 
-@inject('tokenStore', 'userStore')
+@inject('featureStore', 'tokenStore', 'userStore')
 export default class Signup extends PureComponent {
   state = {
     loading: false,
@@ -72,6 +73,8 @@ export default class Signup extends PureComponent {
   }
 
   _handleError = (err) => {
+    console.log(err);
+
     Alert.alert(
       'Error',
       err.status === 400 ? 'Invalid email address.' : 'An error occurred, please try again later.',
