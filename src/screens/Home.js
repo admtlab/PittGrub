@@ -1,4 +1,5 @@
-import { parseDateRange } from '../lib/time';
+import { inject, observer } from 'mobx-react';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import {
   Dimensions,
@@ -13,46 +14,49 @@ import {
 } from 'react-native';
 import { Icon, ListItem } from 'react-native-elements';
 import { Header } from 'react-navigation';
-import { inject, observer } from 'mobx-react';
-import { colors, globalStyles } from '../config/styles';
+import { parseDateRange } from '../common/time';
 import metrics from '../config/metrics';
+import { colors, globalStyles } from '../config/styles';
 
 
 const { height } = Dimensions.get('window');
 
 
-@inject('eventStore', 'featureStore', 'tokenStore', 'userStore')
+@inject('eventStore')
 @observer
 export default class Home extends Component {
+  static propTypes = {
+    navigation: PropTypes.shape({ navigate: PropTypes.func.isRequired }).isRequired,
+    eventStore: PropTypes.any.isRequired,
+  };
   static interval = null;
 
   state = {
     refreshing: false,
-    loading: false,
   };
 
   componentDidMount() {
-    this._onRefresh();
+    this.onRefresh();
   }
 
-  _goToEvents = () => {
+  goToEvents = () => {
     this.props.navigation.navigate('Events');
   }
 
-  _onRefresh = () => {
+  onRefresh = () => {
     this.setState({ refreshing: true });
     this.props.eventStore.fetchEvents();
     this.setState({ refreshing: false });
   }
 
-  _viewEvent = (event) => {
+  viewEvent = (event) => {
     this.props.navigation.navigate('EventDetails', { event });
   }
 
-  _eventKeyExtractor = (event) => String(event.id);
+  eventKeyExtractor = event => String(event.id);
 
-  _renderEvent = ({ item }) => (
-    <TouchableOpacity style={styles.sectionItem} onPress={() => this._viewEvent(item)}>
+  renderEvent = ({ item }) => (
+    <TouchableOpacity style={styles.sectionItem} onPress={() => this.viewEvent(item)}>
       <ListItem
         key={item.id}
         title={item.title}
@@ -62,21 +66,21 @@ export default class Home extends Component {
     </TouchableOpacity>
   );
 
-  _renderSectionHeader = ({ section }) => (
+  renderSectionHeader = ({ section }) => (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{`${section.title}`}</Text>
     </View>
   );
-  
-  _renderEmptyList = () => (
+
+  renderEmptyList = () => (
     <View style={styles.emptyList}>
-      <Text style={{fontSize: 20, paddingTop: 30}}>
-        You have not signed up for any events yet. Check out what's happening!
+      <Text style={{ fontSize: 20, paddingTop: 30 }}>
+        {"You have not signed up for any events yet. Check out what's happening!"}
       </Text>
       <View style={{ alignItems: 'center' }}>
-        <TouchableOpacity style={styles.eventButton} onPress={this._goToEvents}>
-          <Icon name='event-note' size={150} color={colors.softWhite} marginHorizontal={30} marginTop={10} />
-          <Text style={{fontSize: 20, marginBottom: 10, color: colors.softWhite }}>Go to events</Text>
+        <TouchableOpacity style={styles.eventButton} onPress={this.goToEvents}>
+          <Icon name="event-note" size={150} color={colors.softWhite} marginHorizontal={30} marginTop={10} />
+          <Text style={{ fontSize: 20, marginBottom: 10, color: colors.softWhite }}>Go to events</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -87,12 +91,12 @@ export default class Home extends Component {
       <SafeAreaView styles={globalStyles.container}>
         <StatusBar containerStyle={{ minHeight: 80 }} hidden={false} />
         <SectionList
-          renderItem={this._renderEvent}
-          renderSectionHeader={this._renderSectionHeader}
+          renderItem={this.renderEvent}
+          renderSectionHeader={this.renderSectionHeader}
           sections={this.props.eventStore.eventSections}
-          keyExtractor={this._eventKeyExtractor}
-          ListEmptyComponent={this._renderEmptyList}
-          refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this._onRefresh} />}
+          keyExtractor={this.eventKeyExtractor}
+          ListEmptyComponent={this.renderEmptyList}
+          refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
           style={styles.sectionList}
         />
       </SafeAreaView>
@@ -108,7 +112,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0, 0, 0, 0.12)',
-    backgroundColor: colors.blue
+    backgroundColor: colors.blue,
   },
   sectionTitle: {
     color: colors.softWhite,

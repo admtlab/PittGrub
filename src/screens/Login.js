@@ -66,11 +66,11 @@ export default class Login extends PureComponent {
         })
       }
     })
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
-  _handleError = (err) => {
+  handleError = (err) => {
     Alert.alert(
       'Error',
       err.status === 401 ? 'Incorrect username or password' : 'An error occurred, please try again later',

@@ -1,6 +1,6 @@
-import { getUserProfile } from '../api/user';
 import { SecureStore } from 'expo';
 import { action, computed, observable } from 'mobx';
+import { getUserProfile } from '../api/user';
 
 
 const SecureProps = { keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY };
@@ -14,11 +14,13 @@ export default class UserStore {
     name: null,
     status: null,
     active: null,
-    disabled: null
+    disabled: null,
   };
   @observable roles = [];
+  @observable pantry = false;
   @observable foodPreferences = [];
-  @observable pantry = null;
+  @observable status = 0;
+  @observable graduationDate = null;
   @observable latitude = null;
   @observable longitude = null;
 
@@ -35,8 +37,7 @@ export default class UserStore {
   }
 
   @action setUser(newUser) {
-    console.log(`newUser: ${JSON.stringify(newUser)}`)
-    let user = { ...newUser };
+    const user = { ...newUser };
     if (user.roles) {
       this.roles.splice(0, this.roles.length, ...user.roles);
       delete user.roles;
@@ -45,33 +46,21 @@ export default class UserStore {
   }
 
   @action clearUser() {
-    Object.keys(this.account).forEach(key => this.account[key] = null);
+    Object.keys(this.account).forEach((key) => { this.account[key] = null; });
     this.roles.splice(0);
     this.foodPreferences.splice(0);
-    this.pantry = null;
+    this.pantry = false;
+    this.status = 0;
+    this.graduationDate = null;
     this.latitude = null;
     this.longitude = null;
   }
 
-  @action toggleFoodPreference(foodPreference) {
-    // try to remove food pantry
-    if (!this.foodPreferences.remove(foodPreference)) {
-      // if not removed (wasn't present), add it
-      this.foodPreferences.push(foodPreference);
-    }
-  }
-
-  @action togglePantry() {
-    console.log(`toggling pantry to ${!this.pantry}`)
-    this.pantry = !this.pantry;
-  }
-
   @action setProfile(profile) {
     this.pantry = profile.pantry;
-    this.foodPreferences = profile.foodPreferences.splice(
-      0,
-      this.foodPreferences.length,
-      ...profile.foodPreferences);
+    this.foodPreferences = [...profile.foodPreferences];
+    this.status = profile.status;
+    this.graduationDate = profile.graduationDate;
   }
 
   @action setLatLong(lat, long) {
@@ -80,7 +69,7 @@ export default class UserStore {
   }
 
   @action removeUser() {
-    Object.keys(this.account).forEach(key => this.account[key] = null);
+    Object.keys(this.account).forEach((key) => { this.account[key] = null; });
   }
 
   saveUser = async () => {
@@ -93,10 +82,12 @@ export default class UserStore {
 
   loadUserProfile = async () => {
     const token = await this.tokenStore.getOrFetchAccessToken();
+    console.log('loading profile');
     getUserProfile(token).then(profile => this.setProfile({
-        pantry: profile.pantry || false,
-        foodPreferences: profile.foodPreferences || []
-      })
-    ).catch(console.warn);
+      pantry: profile.pitt_pantry || false,
+      foodPreferences: profile.food_preferences.map(f => f.id) || [],
+      status: profile.status || 0,
+      graduationDate: profile.graduationDate || null,
+    })).catch(console.warn);
   }
 }

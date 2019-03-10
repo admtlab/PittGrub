@@ -9,5 +9,5 @@ export async function getUserProfile(token) {
 }
 
 export async function updateProfile(token, profile) {
-  return post(PROFILE_ENDPOINT, {token, body: profile});
+  return post(PROFILE_ENDPOINT, { token, body: profile });
 }

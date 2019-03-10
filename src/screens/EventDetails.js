@@ -1,6 +1,6 @@
 import { acceptEvent, unacceptEvent } from '../api/event';
 import { colors } from '../config/styles';
-import { parseDateRange } from '../lib/time';
+import { parseDateRange } from '../common/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -21,7 +21,7 @@ export default class EventDetails extends Component {
     const token = await this.props.tokenStore.getOrFetchAccessToken();
     acceptEvent(token, event.id)
     .then(() => event.accepted = true)
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
@@ -31,11 +31,11 @@ export default class EventDetails extends Component {
     const token = await this.props.tokenStore.getOrFetchAccessToken();
     unacceptEvent(token, event.id)
     .then(() => event.accepted = false)
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
-  _handleError = () => {
+  handleError = () => {
     Alert.alert(
       'Error',
       'Unable to complete your request. Please try again later.',
@@ -51,7 +51,7 @@ export default class EventDetails extends Component {
       </Text>
     </View>
   );
-  
+
   _foodPreferenceDetails = (prefs) => (
     <Fragment>
       {prefs.length > 2 ? (
@@ -87,7 +87,7 @@ export default class EventDetails extends Component {
             <Text style={[styles.details, {marginBottom: 15}]}>{description}</Text>
           </View>
           <View style={{ flex: 1, flexDirection: accepted ? 'row' : 'column', justifyContent: 'space-evenly'}}>
-            <Button 
+            <Button
               title='INTERESTED'
               icon={accepted && !this.state.loading ? { name: 'done' } : null}
               onPress={this._acceptEvent}

@@ -1,31 +1,42 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import About from '../screens/About';
 import CreateEvent from '../screens/CreateEvent';
 import Entrance from '../screens/Entrance';
 import Events from '../screens/Events';
 import EventDetails from '../screens/EventDetails';
+import FoodPreferenceSettings from '../screens/FoodPreferenceSettings';
 import Login from '../screens/Login';
 import Home from '../screens/Home';
 import HostSignup from '../screens/HostSignup';
 import HostTraining from '../screens/HostTraining';
+import HostTrainingReview from '../screens/HostTrainingReview';
 import PasswordReset from '../screens/PasswordReset';
+import ProfileSettings from '../screens/ProfileSettings';
 import Settings from '../screens/Settings';
 import Signup from '../screens/Signup';
 import Verification from '../screens/Verification';
 
 
 const fade = ({ position, scene }) => {
-  const index = scene.index;
+  const { index } = scene;
   const opacity = position.interpolate({
-      inputRange: [index - 0.7, index, index + 0.7],
-      outputRange: [0.3, 1, 0.3]
+    inputRange: [index - 0.7, index, index + 0.7],
+    outputRange: [0.3, 1, 0.3],
   });
 
   return {
     opacity,
-    transform: [{ translateX: 0 }, { translateY: 0 }]
+    transform: [{ translateX: 0 }, { translateY: 0 }],
   };
+};
+
+const headerTitleStyle = { fontSize: 22 };
+
+// eslint-disable-next-line react/prop-types
+function tabBarIcon({ tintColor }, name) {
+  return <Icon name={name} size={30} color={tintColor} />;
 }
 
 const EntryNav = createStackNavigator({
@@ -36,39 +47,32 @@ const EntryNav = createStackNavigator({
   PasswordReset: { screen: PasswordReset },
   Signup: { screen: Signup },
   Verification: { screen: Verification },
-  }, {
-    headerMode: 'none',
-    navigationOptions: {
-      gesturesEnabled: false
-    },
-    transitionConfig: () => ({
-      screenInterpolator: (props) => {
-        return fade(props);
-      }
-    })
-  }
-);
+}, {
+  headerMode: 'none',
+  navigationOptions: {
+    gesturesEnabled: false,
+  },
+  transitionConfig: () => ({
+    screenInterpolator: props => fade(props),
+  }),
+});
 
 const HomeNav = createStackNavigator({
   Home: {
     screen: Home,
     navigationOptions: () => ({
       headerTitle: 'PittGrub',
-      headerTitleStyle: {
-        fontSize: 22
-      },
+      headerTitleStyle,
       headerBackTitle: 'Home',
-      tabBarIcon: ({ tintColor }) => <Icon name='home' size={30} color={tintColor} />
-    })
+      tabBarIcon: i => tabBarIcon(i, 'home'),
+    }),
   },
   EventDetails: {
     screen: EventDetails,
     navigationOptions: () => ({
       title: 'Event Details',
-      headerTitleStyle: {
-        fontSize: 22
-      },
-    })
+      headerTitleStyle,
+    }),
   },
 });
 
@@ -77,28 +81,22 @@ const EventNav = createStackNavigator({
     screen: Events,
     navigationOptions: () => ({
       title: 'Events',
-      headerTitleStyle: {
-        fontSize: 22
-      },
-    })
+      headerTitleStyle,
+    }),
   },
   EventDetails: {
     screen: EventDetails,
     navigationOptions: () => ({
       title: 'Event Details',
-      headerTitleStyle: {
-        fontSize: 22
-      },
-    })
+      headerTitleStyle,
+    }),
   },
   CreateEvent: {
     screen: CreateEvent,
     navigationOptions: () => ({
       title: 'Create Event',
-      headerTitleStyle: {
-        fontSize: 22
-      },
-    })
+      headerTitleStyle,
+    }),
   },
 });
 
@@ -107,11 +105,31 @@ const SettingsNav = createStackNavigator({
     screen: Settings,
     navigationOptions: () => ({
       title: 'Settings',
-      headerTitleStyle: {
-        fontSize: 22
-      },
-    })
+      headerTitleStyle,
+    }),
   },
+  About: {
+    screen: About,
+    navigationOptions: () => ({
+      title: 'About',
+      headerTitleStyle,
+    }),
+  },
+  ProfileSettings: {
+    screen: ProfileSettings,
+    navigationOptions: () => ({
+      title: 'Profile Settings',
+      headerTitleStyle,
+    }),
+  },
+  FoodPreferenceSettings: {
+    screen: FoodPreferenceSettings,
+    navigationOptions: () => ({
+      title: 'Food Preference Settings',
+      headerTitleStyle,
+    }),
+  },
+  HostTrainingReview: { screen: HostTrainingReview },
 });
 
 const MainNav = createBottomTabNavigator({
@@ -119,42 +137,38 @@ const MainNav = createBottomTabNavigator({
     screen: HomeNav,
     navigationOptions: () => ({
       tabBarLabel: 'Home',
-      tabBarIcon: ({ tintColor }) => <Icon name='home' size={30} color={tintColor} />,
-    })
+      tabBarIcon: i => tabBarIcon(i, 'home'),
+    }),
   },
   EventTab: {
     screen: EventNav,
     navigationOptions: () => ({
       tabBarLabel: 'Events',
-      tabBarIcon: ({ tintColor }) => <Icon name='event-note' size={30} color={tintColor} />,
-    })
+      tabBarIcon: i => tabBarIcon(i, 'event-note'),
+    }),
   },
   SettingsTab: {
     screen: SettingsNav,
     navigationOptions: () => ({
       tabBarLabel: 'Settings',
-      tabBarIcon: ({ tintColor }) => <Icon name='account-circle' size={30} color={tintColor} />,
-    })
+      tabBarIcon: i => tabBarIcon(i, 'account-circle'),
+    }),
   },
 });
 
 const AppNav = createStackNavigator({
-  // Entrance: { screen: EntryNav },
-  Entrance: { screen: HostTraining },
+  Entrance: { screen: EntryNav },
   Main: { screen: MainNav },
-  }, {
-    headerMode: 'none',
-    initialRouteName: 'Entrance',
-    navigationOptions: {
-      gesturesEnabled: false
-    },
-    transitionConfig: () => ({
-      screenInterpolator: (props) => {
-        return fade(props);
-      }
-    })
+}, {
+  headerMode: 'none',
+  initialRouteName: 'Entrance',
+  navigationOptions: {
+    gesturesEnabled: false,
   },
-);
+  transitionConfig: () => ({
+    screenInterpolator: props => fade(props),
+  }),
+});
 
 
 export default AppNav;

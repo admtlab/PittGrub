@@ -51,7 +51,7 @@ export default class Verification extends PureComponent {
       }
     })
     .then(() => this.props.navigation.navigate('Main'))
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
@@ -61,11 +61,11 @@ export default class Verification extends PureComponent {
     this.props.tokenStore.getOrFetchAccessToken()
     .then(resendVerification)
     .then(() => this.setState({ resended: true, resendText: 'CHECK YOUR EMAIL' }))
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
-  _handleError = () => {
+  handleError = () => {
     Alert.alert('Error', 'An error occurred, please try again later.', { text: 'OK' });
   }
 

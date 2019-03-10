@@ -68,11 +68,11 @@ export default class Signup extends PureComponent {
         })
       }
     })
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
-  _handleError = (err) => {
+  handleError = (err) => {
     console.log(err);
 
     Alert.alert(

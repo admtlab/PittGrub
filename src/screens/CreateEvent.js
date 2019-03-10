@@ -2,7 +2,7 @@ import { captureImage, registerForCamera } from '../api/camera';
 import { parseEvent, postEvent } from '../api/event';
 import { baseUrl, post } from '../api/http';
 import { colors } from '../config/styles';
-import { parseMonthDayYear, parseTime } from '../lib/time';
+import { parseMonthDayYear, parseTime } from '../common/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import {
@@ -195,7 +195,7 @@ export default class CreateEvent extends Component {
     .then(() => this.props.eventStore.fetchEvents())
     // .then(event => this.props.eventStore.addEvent(parseEvent(event)))
     .then(() => this.props.navigation.goBack())
-    .catch(this._handleError)
+    .catch(this.handleError)
     .finally(() => this.setState({ loading: false }));
   }
 
@@ -230,7 +230,7 @@ export default class CreateEvent extends Component {
 
   cancel = () => this.props.navigation.goBack();
 
-  _handleError = () => {
+  handleError = () => {
     Alert.alert(
       'Error',
       'An error occurred. Please try again later.',

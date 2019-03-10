@@ -1,10 +1,8 @@
-import { inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import {
   Alert,
   Dimensions,
-  Keyboard,
   Linking,
   StyleSheet,
   Text,
@@ -12,34 +10,19 @@ import {
 } from 'react-native';
 import { Card } from 'react-native-elements';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import { checkGated, hostSignup } from '../api/auth';
 import { hostTrainingSlides } from '../api/data';
-import { BackButton, PrimaryButton } from '../components/Button';
-import Gate from '../components/Gate';
 import metrics from '../config/metrics';
 import { colors } from '../config/styles';
 
 
 const { width, height } = Dimensions.get('screen');
 
-@inject('tokenStore', 'userStore')
-export default class HostTraining extends PureComponent {
+export default class HostTrainingReview extends PureComponent {
   static propTypes = {
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       goBack: PropTypes.func.isRequired,
-      state: PropTypes.shape({
-        params: PropTypes.shape({
-          email: PropTypes.string.isRequired,
-          password: PropTypes.string.isRequired,
-          name: PropTypes.string.isRequired,
-          affiliation: PropTypes.string.isRequired,
-          reason: PropTypes.string.isRequired,
-        }).isRequired,
-      }).isRequired,
     }).isRequired,
-    tokenStore: PropTypes.any.isRequired,
-    userStore: PropTypes.any.isRequired,
   };
 
   static parseMarkdownLinks(text) {
@@ -64,12 +47,8 @@ export default class HostTraining extends PureComponent {
     this.state = {
       loading: false,
       activeSlide: 0,
-      reachedEnd: false,
-      showGate: false,
       trainingSlides: [],
     };
-
-    console.log(props.navigation.state.params);
 
     this.parseSubtitle = this.parseSubtitle.bind(this);
     this.renderItem = this.renderItem.bind(this);
@@ -102,34 +81,7 @@ export default class HostTraining extends PureComponent {
 
   parseMarkdownLinkUrl = text => (/\(.+\)/g.exec(text)[0].slice(1, -1));
 
-  snapToItem = index => this.setState(prevState => ({
-    activeSlide: index,
-    reachedEnd: prevState.reachedEnd || index === prevState.trainingSlides.length - 1,
-  }));
-
-  goBack = () => this.props.navigation.goBack();
-
-  submit = () => {
-    Keyboard.dismiss();
-    this.setState({ loading: true });
-    const { email, password, name, affiliation, reason } = this.props.navigation.state.params;
-    hostSignup(email, password, name, affiliation, reason, this.props.tokenStore, this.props.userStore)
-      .then(this.props.userStore.loadUserProfile)
-      .then(() => {
-        if (this.props.userStore.account.active) {
-          // continue if user account is active
-          this.props.navigation.navigate('Main');
-        } else {
-          this.props.tokenStore.getOrFetchAccessToken()
-            .then(checkGated)
-            .then(gated => (gated
-              ? this.setState({ enableGate: true })
-              : this.props.navigation.navigate('Verification')));
-        }
-      })
-      .catch(this.handleError)
-      .finally(() => this.setState({ loading: false }));
-  }
+  snapToItem = activeSlide => this.setState({ activeSlide });
 
   handleError = (err) => {
     console.log(err);
@@ -141,7 +93,7 @@ export default class HostTraining extends PureComponent {
   }
 
   parseSubtitle(subtitle) {
-    const links = HostTraining.parseMarkdownLinks(subtitle);
+    const links = HostTrainingReview.parseMarkdownLinks(subtitle);
 
     if (!links || !links.length) {
       return (<Text>{subtitle}</Text>);
@@ -184,14 +136,9 @@ export default class HostTraining extends PureComponent {
   }
 
   render() {
-    // show gate
-    if (this.state.enableGate) {
-      return <Gate back={this.goBack} />;
-    }
-
     return (
-      <View backgroundColor={colors.blue} height={height}>
-        <View style={{ backgroundColor: colors.blue, alignItems: 'center', width }}>
+      <View height={height}>
+        <View style={{ alignItems: 'center', width }}>
           <Carousel
             ref={(c) => { this.carousel = c; }}
             data={this.state.trainingSlides}
@@ -202,34 +149,20 @@ export default class HostTraining extends PureComponent {
             itemHeight={120}
             itemWidth={width * 0.9}
             marginTop={20}
-            height={400}
+            height={height - 200}
           />
           <Pagination
             containerStyle={styles.paginationContainer}
             dotsLength={this.state.trainingSlides.length}
             activeDotIndex={this.state.activeSlide}
-            dotColor="rgba(255, 255, 255, 0.92)"
+            dotColor={colors.blue}
             dotStyle={styles.paginationDot}
             inactiveDotColor="#333"
             inactiveDotOpacity={0.4}
             inactiveDotScale={0.6}
             carouselRef={this.carousel}
-            tappableDots={false}
+            tappableDots={!!this.carousel}
           />
-          <View style={styles.buttonView}>
-            <PrimaryButton
-              text="CONTINUE"
-              onPress={this.submit}
-              disabled={!this.state.reachedEnd}
-              buttonStyle={styles.buttonAdjuster}
-              textStyle={styles.buttonTextAdjuster}
-            />
-            <BackButton
-              onPress={this.goBack}
-              buttonStyle={styles.buttonAdjuster}
-              textStyle={styles.buttonTextAdjuster}
-            />
-          </View>
         </View>
       </View>
     );
