@@ -1,7 +1,7 @@
-import { ButtonIconLeft } from '../Button';
-import { colors } from '../../config/styles';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { ButtonIconLeft } from '../Button';
+import { colors } from '../../config/styles';
 
 const BackButton = (props) => {
   const { text, icon, ...childProps } = props;
@@ -9,8 +9,9 @@ const BackButton = (props) => {
     <ButtonIconLeft
       title={text}
       icon={icon}
-      buttonStyle={{backgroundColor: colors.softGrey}}
-      {...childProps} />
+      buttonStyle={{ backgroundColor: colors.softGrey }}
+      {...childProps}
+    />
   );
 };
 

@@ -1,19 +1,15 @@
+import { inject } from 'mobx-react';
+import React, { Component } from 'react';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 import { Button } from '../components/Button';
-import { globalStyles } from '../config/styles';
-import { Dimensions, ImageBackground, StyleSheet, View } from 'react-native';
 import Logo from '../components/Logo';
 import Slogan from '../components/Slogan';
 import images from '../config/images';
-import React, { Component } from 'react';
-import { inject } from 'mobx-react';
-
-
-const { width } = Dimensions.get('window');
+import { globalStyles } from '../config/styles';
 
 
 @inject('userStore')
 export default class Entrance extends Component {
-
   componentDidMount() {
     const valid = this.props.screenProps.validSession;
     const { account } = this.props.userStore;
@@ -36,7 +32,7 @@ export default class Entrance extends Component {
             text="LOG IN"
             onPress={this.loginScreen}
             buttonStyle={[styles.button, { marginTop: 44 }]}
-            textStyle={styles.buttonText} 
+            textStyle={styles.buttonText}
           />
           <Button
             text="CREATE ACCOUNT"
@@ -55,6 +51,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 1
+    marginBottom: 1,
   },
 });

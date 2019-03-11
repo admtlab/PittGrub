@@ -11,7 +11,7 @@
         "max-len": [2, { "code": 120, "tabWidth": 2, "ignoreUrls": true }],
         "no-console": "off",
         "no-underscore-dangle": ["error", {
-            "allow": ["_"],
+            "allow": ["_", "_embedded"],
             "enforceInMethodNames": true }
         ],
         "no-use-before-define": "off",

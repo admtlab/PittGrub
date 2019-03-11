@@ -1,10 +1,5 @@
-import { checkGated, signup } from '../api/auth';
-import { registerForNotifications, setExpoPushToken } from '../api/notification';
-import { BackButton, Button } from '../components/Button';
-import { EmailInput, PasswordInput } from '../components/Input';
-import { EntryForm } from '../components/Form';
-import { colors } from '../config/styles';
 import { inject } from 'mobx-react';
+import React, { Fragment, PureComponent } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,9 +9,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import Gate from '../components/Gate';
-import React, { Fragment, PureComponent } from 'react';
 import isEmail from 'validator/lib/isEmail';
+import { registerForNotifications, setExpoPushToken } from '../api/notification';
+import { checkGated, signup } from '../api/auth';
+import { BackButton, Button } from '../components/Button';
+import { EntryForm } from '../components/Form';
+import Gate from '../components/Gate';
+import { EmailInput, PasswordInput } from '../components/Input';
+import { colors } from '../config/styles';
 
 
 const { width, height } = Dimensions.get('window');
@@ -29,16 +29,16 @@ export default class Signup extends PureComponent {
     loading: false,
     email: '',
     password: '',
-    enableGate: false
+    enableGate: false,
   };
 
   goBack = () => this.props.navigation.goBack();
 
   passwordInputFocus = () => this.refs.passwordInput.focus();
 
-  setEmail = (email) => this.setState({ email });
+  setEmail = email => this.setState({ email });
 
-  setPassword = (password) => this.setState({ password });
+  setPassword = password => this.setState({ password });
 
   hostSignupScreen = () => this.props.navigation.navigate('HostSignup');
 
@@ -78,7 +78,7 @@ export default class Signup extends PureComponent {
     Alert.alert(
       'Error',
       err.status === 400 ? 'Invalid email address.' : 'An error occurred, please try again later.',
-      { text: 'OK' }
+      { text: 'OK' },
     );
   }
 
@@ -93,22 +93,22 @@ export default class Signup extends PureComponent {
     return (
       <EntryForm>
         <EmailInput
-          placeholder='Pitt Email Address'
+          placeholder="Pitt Email Address"
           value={this.state.email}
           onChangeText={this.setEmail}
           submit={this.passwordInputFocus}
         />
         <PasswordInput
           ref='passwordInput'
-          placeholder='Choose a Secure Password'
+          placeholder="Choose a Secure Password"
           value={this.state.password}
           onChangeText={this.setPassword}
           submit={this.submit}
         />
         <View height={142}>
-          {this.state.loading ? <ActivityIndicator color='#fff' size='large' marginTop={50} /> : (
+          {this.state.loading ? <ActivityIndicator color="#fff" size="large" marginTop={50} /> : (
             <Fragment>
-              <Button text='CREATE ACCOUNT' onPress={this.submit} disabled={!enableSubmit} />
+              <Button text="CREATE ACCOUNT" onPress={this.submit} disabled={!enableSubmit} />
               <BackButton onPress={this.goBack} />
             </Fragment>
           )}
@@ -128,9 +128,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     top: footer,
-  },footerText: {
+  },
+  footerText: {
     alignSelf: 'center',
     fontSize: width / 24,
     color: colors.softGrey,
   },
-})
+});

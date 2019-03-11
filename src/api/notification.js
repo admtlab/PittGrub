@@ -1,9 +1,9 @@
-import { baseUrl, post } from './http';
-import { Permissions, Notifications, SecureStore } from 'expo';
+import { Permissions, Notifications } from 'expo';
 import { Alert, AppState } from 'react-native';
+import { baseUrl, post } from './http';
 
 
-const NOTIFICATION_TOKEN_ENDPOINT =  `${baseUrl}/token/notification`;
+const NOTIFICATION_TOKEN_ENDPOINT = `${baseUrl}/token/notification`;
 
 
 // from: https://docs.expo.io/versions/v30.0.0/guides/push-notifications
@@ -25,34 +25,41 @@ export async function registerForNotifications() {
 }
 
 export async function setExpoPushToken(accessToken) {
-  let pushToken = await Notifications.getExpoPushTokenAsync();
+  const pushToken = await Notifications.getExpoPushTokenAsync();
   return post(NOTIFICATION_TOKEN_ENDPOINT, {
     token: accessToken,
-    body: { token: pushToken }
+    body: { token: pushToken },
   });
 }
 
-export async function handleNotification(notification) {
+export async function handleNotification(notification, eventStore, navigation, refreshToken, userId = '') {
   console.log(`notification: ${JSON.stringify(notification)}`);
-  
+
   // check that user is signed in
   // and user id is correct
-  const token = await SecureStore.getItemAsync('refreshToken');
-  if (token == null || token === '' || notification.data.user_id !== await SecureStore.getItemAsync('userId')) {
+  if (!refreshToken || (userId && userId !== notification.data.user_id)) {
     return;
   }
 
-  console.log(`current state ${AppState.currentState}`);
-
   if (AppState.currentState === 'active') {
-    const ok = { text: 'OK' };
+    const ok = { text: 'View' };
+    const dismiss = { text: 'Dismiss', style: 'cancel' };
     if (notification.data.type === 'message') {
       Alert.alert(notification.data.title, notification.data.body, ok);
     } else if (notification.data.type === 'event') {
-      Alert.alert(notification.data.title, notification.data.event, ok);
+      Alert.alert(
+        notification.data.title,
+        `${notification.data.event}: ${notification.data.eventDetails}`,
+        [ok, dismiss],
+      );
     } else {
-      Alert.alert("Else", "Other notification type", ok);
+      Alert.alert('Else', 'Other notification type', ok);
     }
+  } else if (notification.data.type === 'event') {
+    Notifications.presentLocalNotificationAsync({
+      title: notification.data.title,
+      body: `${notification.data.event}: ${notification.data.eventDetails}`,
+    });
   } else {
     Notifications.presentLocalNotificationAsync(notification);
   }

@@ -4,23 +4,23 @@ import settings from '../config/settings';
 export const baseUrl = settings.server;
 
 export async function healthRequest() {
-  return get(`${setting.server}/health`);
+  return get(`${settings.server}/health`);
 }
 
 export async function get(endpoint, request) {
-  const req = _request({...request, method: 'GET'});
+  const req = _request({ ...request, method: 'GET' });
   console.log(`Request ::: ${JSON.stringify(req)} >>> ${endpoint}`);
   return fetch(endpoint, req).then(_parse).then(_log).catch(_error);
 }
 
 export async function post(endpoint, request) {
-  const req = _request({...request, method: 'POST'});
+  const req = _request({ ...request, method: 'POST' });
   console.log(`Request ::: ${JSON.stringify(req)} >>> ${endpoint}`);
   return fetch(endpoint, req).then(_parse).then(_log).catch(_error);
 }
 
 export async function del(endpoint, request) {
-  const req = _request({...request, method: 'DELETE'});
+  const req = _request({ ...request, method: 'DELETE' });
   console.log(`Request ::: ${JSON.stringify(req)} >>> ${endpoint}`);
   return fetch(endpoint, req).then(_parse).then(_log).catch(_error);
 }

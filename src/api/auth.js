@@ -12,13 +12,13 @@ const VERIFICATION_ENDPOINT = `${baseUrl}/users/verify`;
 
 export async function login(email, password, tokenStore, userStore) {
   return post(LOGIN_ENDPOINT, {
-    body: { email, password}
+    body: { email, password },
   }).then(response => setUserData(response, tokenStore, userStore));
 }
 
 export async function signup(email, password, tokenStore, userStore) {
   return post(SIGNUP_ENDPOINT, {
-    body: { email, password}
+    body: { email, password },
   }).then(response => setUserData(response, tokenStore, userStore));
 }
 
@@ -30,9 +30,9 @@ export async function hostSignup(email, password, name, affiliation, reason, tok
       name,
       reason,
       primary_affiliation: affiliation,
-    }
+    },
   }).then(response => setUserData(response, tokenStore, userStore))
-  .catch(err => console.log(err.json()));
+    .catch(err => console.log(err.json()));
 }
 
 export async function hostAffiliations() {
@@ -41,7 +41,7 @@ export async function hostAffiliations() {
 
 export async function validateToken(token) {
   return post(TOKEN_VALIDATION_ENDPOINT, {
-    body: { token }
+    body: { token },
   }).then(data => data.valid).catch(() => false);
 }
 
@@ -52,38 +52,35 @@ export async function resendVerification(token) {
 export async function submitVerification(token, code) {
   return post(VERIFICATION_ENDPOINT, {
     token,
-    body: { code }
+    body: { code },
   });
 }
 
 export async function checkGated(token) {
   return resendVerification(token)
-  .then(() => false)
-  .catch(err => {
-    if (err.status === 403) {
-      return true;
-    } else {
+    .then(() => false)
+    .catch((err) => {
+      if (err.status === 403) {
+        return true;
+      }
       throw err;
-    }
-  })
+    });
 }
 
 export async function fetchAccessToken(refreshToken) {
   return post(REQUEST_TOKEN_ENDPOINT, {
-    body: { token: refreshToken }
+    body: { token: refreshToken },
   });
 }
 
 export async function loadData(refreshToken) {
   return fetchAccessToken(refreshToken)
-  .then(data => {
-    return { user: data.user, token: data.access_token };
-  });
+    .then(data => ({ user: data.user, token: data.access_token }));
 }
 
 function setUserData(response, tokenStore, userStore) {
-    tokenStore.setRefreshToken(response.refresh_token);
-    tokenStore.setAccessToken(response.access_token);
-    userStore.setUser(response.user);
-    tokenStore.saveRefreshToken();
+  tokenStore.setRefreshToken(response.refresh_token);
+  tokenStore.setAccessToken(response.access_token);
+  userStore.setUser(response.user);
+  tokenStore.saveRefreshToken();
 }

@@ -1,10 +1,5 @@
-import { checkGated, login } from '../api/auth';
-import { registerForNotifications, setExpoPushToken } from '../api/notification';
-import { BackButton, PrimaryButton } from '../components/Button';
-import { EmailInput, PasswordInput } from '../components/Input';
-import { EntryForm } from '../components/Form';
-import { colors } from '../config/styles';
 import { inject } from 'mobx-react';
+import React, { Fragment, PureComponent } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,11 +7,16 @@ import {
   Keyboard,
   StyleSheet,
   Text,
-  View
+  View,
 } from 'react-native';
-import Gate  from '../components/Gate';
-import React, { Fragment, PureComponent } from 'react';
 import isEmail from 'validator/lib/isEmail';
+import { checkGated, login } from '../api/auth';
+import { registerForNotifications, setExpoPushToken } from '../api/notification';
+import { BackButton, PrimaryButton } from '../components/Button';
+import { EntryForm } from '../components/Form';
+import Gate from '../components/Gate';
+import { EmailInput, PasswordInput } from '../components/Input';
+import { colors } from '../config/styles';
 
 
 const { width, height } = Dimensions.get('window');
@@ -29,16 +29,16 @@ export default class Login extends PureComponent {
     loading: false,
     email: '',
     password: '',
-    enableGate: false
+    enableGate: false,
   };
 
   goBack = () => this.props.navigation.goBack();
 
   passwordInputFocus = () => this.refs.passwordInput.focus();
 
-  setEmail = (email) => this.setState({ email });
+  setEmail = email => this.setState({ email });
 
-  setPassword = (password) => this.setState({ password });
+  setPassword = password => this.setState({ password });
 
   submit = () => {
     Keyboard.dismiss();
@@ -74,7 +74,7 @@ export default class Login extends PureComponent {
     Alert.alert(
       'Error',
       err.status === 401 ? 'Incorrect username or password' : 'An error occurred, please try again later',
-      { text: 'OK' }
+      { text: 'OK' },
     );
   }
 
@@ -95,9 +95,9 @@ export default class Login extends PureComponent {
         <EmailInput value={this.state.email} onChangeText={this.setEmail} submit={this.passwordInputFocus} />
         <PasswordInput ref='passwordInput' value={this.state.password} onChangeText={this.setPassword} submit={this.submit} />
         <View height={142}>
-          {this.state.loading ? <ActivityIndicator size='large' color='#222' marginTop={50} /> : (
+          {this.state.loading ? <ActivityIndicator size="large" color="#222" marginTop={50} /> : (
             <Fragment>
-              <PrimaryButton text='LOG IN' onPress={this.submit} disabled={!enableSubmit} />
+              <PrimaryButton text="LOG IN" onPress={this.submit} disabled={!enableSubmit} />
               <BackButton onPress={this.goBack} />
             </Fragment>
           )}
@@ -122,5 +122,5 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: width / 24,
     color: colors.softGrey,
-  }
+  },
 });

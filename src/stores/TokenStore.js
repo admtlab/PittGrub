@@ -15,7 +15,7 @@ export default class TokenStore {
     try {
       return {
         header: JSON.parse(Buffer.from(this.accessToken.split('.')[0], 'base64')),
-        payload: JSON.parse(Buffer.from(this.accessToken.split('.')[1], 'base64'))
+        payload: JSON.parse(Buffer.from(this.accessToken.split('.')[1], 'base64')),
       };
     } catch (e) {
       console.warn(e);

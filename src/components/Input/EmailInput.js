@@ -1,8 +1,8 @@
-import { TextInput } from 'react-native';
-import { colors } from '../../config/styles';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { TextInput } from 'react-native';
 import styles from './styles';
+import { colors } from '../../config/styles';
 
 
 const EmailInput = (props) => {
@@ -12,15 +12,15 @@ const EmailInput = (props) => {
     <TextInput
       placeholder={placeholder}
       value={value}
-      autoCapitalize='none'
+      autoCapitalize="none"
       autoCorrect={false}
-      keyboardType='email-address'
-      returnKeyType='next'
+      keyboardType="email-address"
+      returnKeyType="next"
       enablesReturnKeyAutomatically
       onChangeText={onChangeText}
       onSubmitEditing={submit}
       blurOnSubmit={false}
-      clearButtonMode='while-editing'
+      clearButtonMode="while-editing"
       style={styles.input}
       marginBottom={10}
       inputStyle={{ fontSize: 20 }}
@@ -28,7 +28,7 @@ const EmailInput = (props) => {
       {...childProps}
     />
   );
-}
+};
 
 EmailInput.propTypes = {
   value: PropTypes.string.isRequired,
@@ -38,7 +38,7 @@ EmailInput.propTypes = {
 };
 
 EmailInput.defaultProps = {
-  placeholder: 'Email Address'
+  placeholder: 'Email Address',
 };
 
 export default EmailInput;

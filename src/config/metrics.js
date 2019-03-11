@@ -1,7 +1,7 @@
-import { Dimensions, Platform } from 'react-native'
+import { Dimensions, Platform } from 'react-native';
 
 
-const { width, height } = Dimensions.get('window')
+const { width, height } = Dimensions.get('window');
 console.log(`width: ${width}, height: ${height}`);
 
 const iPhoneType = (() => {
@@ -29,7 +29,7 @@ const metrics = {
   logoSizeSmall: iPhoneType === 'SE' ? 52 : 62,
   sloganSize: iPhoneType === 'SE' ? 36 : 42,
   fontSize: iPhoneType === 'SE' ? 16 : 20,
-  fontSizeSmall : iPhoneType === 'SE' ? 14 : 18,
+  fontSizeSmall: iPhoneType === 'SE' ? 14 : 18,
   tabBarHeight: (iPhoneType === 'X' || iPhoneType === 'MAX') ? 65 : 50,
   tabBarPadding: (iPhoneType === 'X' || iPhoneType === 'MAX') ? 15 : 0,
   tabBarIconHeight: 30,

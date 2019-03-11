@@ -1,7 +1,7 @@
-import { TextInput } from 'react-native';
-import { colors } from '../../config/styles';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { TextInput } from 'react-native';
+import { colors } from '../../config/styles';
 import styles from './styles';
 
 
@@ -35,7 +35,7 @@ EntryInput.propTypes = {
 };
 
 EntryInput.defaultProps = {
-  placeholder: 'Input'
+  placeholder: 'Input',
 };
 
 export default EntryInput;

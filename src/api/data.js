@@ -1,4 +1,4 @@
-import { baseUrl, get, post, del } from './http';
+import { baseUrl, get } from './http';
 
 
 const DATA_ENDPOINT = `${baseUrl}/data`;

@@ -1,9 +1,9 @@
-import { colors } from '../../config/styles';
-import { Text, ViewPropTypes } from 'react-native';
-import { Button } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Text, ViewPropTypes } from 'react-native';
+import { Button } from 'react-native-elements';
 import styles from './styles';
+import { colors } from '../../config/styles';
 
 
 const StyledButton = (props) => {

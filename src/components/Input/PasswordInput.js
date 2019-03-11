@@ -1,8 +1,8 @@
-import { TextInput } from 'react-native';
-import { colors } from '../../config/styles';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { TextInput } from 'react-native';
 import styles from './styles';
+import { colors } from '../../config/styles';
 
 
 const PasswordInput = React.forwardRef((props, ref) => {
@@ -14,9 +14,9 @@ const PasswordInput = React.forwardRef((props, ref) => {
       placeholder={placeholder}
       value={value}
       secureTextEntry
-      autoCapitalize='none'
+      autoCapitalize="none"
       autoCorrect={false}
-      returnKeyType='send'
+      returnKeyType="send"
       enablesReturnKeyAutomatically
       onChangeText={onChangeText}
       onSubmitEditing={submit}
@@ -38,7 +38,7 @@ PasswordInput.propTypes = {
 };
 
 PasswordInput.defaultProps = {
-  placeholder: 'Password'
+  placeholder: 'Password',
 };
 
 export default PasswordInput;

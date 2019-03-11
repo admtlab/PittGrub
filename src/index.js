@@ -1,79 +1,85 @@
-import { loadData, validateToken } from './api/auth';
-import { handleNotification } from './api/notification';
 import { AppLoading, Asset, Notifications } from 'expo';
 import { Provider } from 'mobx-react/native';
-import { SafeAreaView, StyleSheet} from 'react-native';
-import Route from './config/routes';
 import React, { Component } from 'react';
+import { loadData, validateToken } from './api/auth';
+import { handleNotification } from './api/notification';
+import Route from './config/routes';
 import stores from './stores';
 
 export default class App extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
-    
+
     this.state = {
-      notification: {},
       currentScreen: '',
       loaded: false,
-      valid: false
+      valid: false,
     };
+    console.log('loading index');
 
-    this._loadData = this._loadData.bind(this);
-    this._navigationStateChange = this._navigationStateChange.bind(this);
-    this._notificationListener = handleNotification.bind(this);
-  };
+    console.log(props);
+
+    this.loadData = this.loadData.bind(this);
+    this.navigationStateChange = this.navigationStateChange.bind(this);
+    this.notificationListener = handleNotification.bind(this);
+  }
 
   componentDidMount() {
-    this._notificationSubscription = Notifications.addListener(this._notificationListener);
+    this.notificationSubscription = Notifications.addListener(this.notificationSubscription);
   }
 
   componentWillUnmount() {
-    this._notificationSubscription.remove();
+    this.notificationSubscription.remove();
   }
 
-  _loadData = async () => {
+  notificationSubscription = (notification) => {
+    stores.eventStore.fetchEvents();
+    return this.notificationListener(notification, stores.eventStore, stores.tokenStore.refreshToken, stores.userStore.account.id);
+  };
+
+  loadData = async () => (
     // check refresh token validity
-    return stores.tokenStore.loadRefreshToken()
-    .then(() => stores.tokenStore.refreshToken && validateToken(stores.tokenStore.refreshToken))
-    .then(valid => {
-      this.setState({ valid });
-      // load data if valid
-      if (valid) {
-        return loadData(stores.tokenStore.refreshToken)
-        .then(data => {
-          stores.tokenStore.setAccessToken(data.token);
-          stores.userStore.setUser(data.user);
-        }).then(() => stores.userStore.loadUserProfile());
-      } else {
+    stores.tokenStore.loadRefreshToken()
+      .then(() => stores.tokenStore.refreshToken && validateToken(stores.tokenStore.refreshToken))
+      .then((valid) => {
+        this.setState({ valid });
+        // load data if valid
+        if (valid) {
+          return loadData(stores.tokenStore.refreshToken)
+            .then((data) => {
+              stores.tokenStore.setAccessToken(data.token);
+              stores.userStore.setUser(data.user);
+            }).then(() => stores.userStore.loadUserProfile());
+        }
         return Promise.resolve();
-      }
-    });
-  }
+      })
+  );
 
-  _loadResources = async () => {
-    return Promise.all([
-      this._loadData(),
+  loadResources = async () => (
+    Promise.all([
+      this.loadData(),
       Asset.loadAsync([require('../assets/background-dark.png')])
-    ]);
-  }
+    ])
+  );
 
-  _navigationStateChange = (route) => {
+  navigationStateChange = (route) => {
     if (route.hasOwnProperty('index')) {
-      this._navigationStateChange(route.routes[route.index]);
+      this.navigationStateChange(route.routes[route.index]);
     } else {
-      console.log(`Navigated to: ${route.routeName}`)
-      this.setState({ currentScreen : route.routeName });
-     }
+      console.log(`Navigated to: ${route.routeName}`);
+      this.setState({ currentScreen: route.routeName });
+    }
   }
 
-  render () {
+  render() {
     if (!this.state.loaded) {
       // prepare app until loaded
       return (
         <AppLoading
-          startAsync={this._loadResources}
+          startAsync={this.loadResources}
           onFinish={() => this.setState({ loaded: true })}
-          onError={console.warn} />
+          onError={console.warn}
+        />
       );
     }
 
@@ -81,20 +87,10 @@ export default class App extends Component {
     return (
       <Provider {...stores}>
         <Route
-          screenProps={{ validSession: this.state.valid, currentScreen: this.state.currentScreen }} //, notification: this.state.notification}}
-          onNavigationStateChange={this._navigationStateChange} />
+          screenProps={{ validSession: this.state.valid, currentScreen: this.state.currentScreen }}
+          onNavigationStateChange={this.navigationStateChange}
+        />
       </Provider>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  safeAreaView: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});

@@ -7,28 +7,29 @@ const ACCEPT_EVENT_ENDPOINT = `${EVENT_ENDPOINT}/accept`;
 
 export async function getEvents(token) {
   return get(EVENT_ENDPOINT, { token })
-  .then(response => response._embedded.eventViews);
+    .then(response => response._embedded.eventViews);
 }
 
 export async function acceptEvent(token, id) {
   return post(ACCEPT_EVENT_ENDPOINT, {
     token,
-    body: { event_id: id }
+    body: { event_id: id },
   });
 }
 
 export async function unacceptEvent(token, id) {
   return del(ACCEPT_EVENT_ENDPOINT, {
     token,
-    body: { event_id: id }
+    body: { event_id: id },
   });
 }
 
 export async function postEvent(token, event) {
-  event.image = false;  // disable image uploading
+  // disable image uploading
+  event.image = false;
   return post(EVENT_ENDPOINT, {
     token,
-    body: event
+    body: event,
   });
 }
 
@@ -37,10 +38,10 @@ export async function postEventImage(token, id, formData) {
   return post(url, {
     token,
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'multipart/form-data',
     },
-    body: formData
-  })
+    body: formData,
+  });
 }
 
 export async function parseEvents(events = []) {

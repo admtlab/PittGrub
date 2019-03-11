@@ -12,7 +12,7 @@ export default class FeatureStore {
   @action setFeatures(newFeatures) {
     console.log('setting features');
     console.log(newFeatures);
-    this.features = {...this.features, ...newFeatures};
+    this.features = { ...this.features, ...newFeatures };
     console.log(this.features);
   }
 }

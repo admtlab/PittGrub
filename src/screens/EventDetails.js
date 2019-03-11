@@ -1,10 +1,10 @@
-import { acceptEvent, unacceptEvent } from '../api/event';
-import { colors } from '../config/styles';
-import { parseDateRange } from '../common/time';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Icon } from 'react-native-elements';
+import { acceptEvent, unacceptEvent } from '../api/event';
+import { parseDateRange } from '../common/time';
+import { colors } from '../config/styles';
 
 
 @inject('tokenStore')
@@ -15,14 +15,14 @@ export default class EventDetails extends Component {
     image: null,
   };
 
-  _acceptEvent = async () => {
+  acceptEvent = async () => {
     const { event } = this.props.navigation.state.params;
     this.setState({ loading: true });
     const token = await this.props.tokenStore.getOrFetchAccessToken();
     acceptEvent(token, event.id)
-    .then(() => event.accepted = true)
-    .catch(this.handleError)
-    .finally(() => this.setState({ loading: false }));
+      .then(() => { event.accepted = true; })
+      .catch(this.handleError)
+      .finally(() => this.setState({ loading: false }));
   }
 
   removeEvent = async () => {
@@ -30,9 +30,9 @@ export default class EventDetails extends Component {
     this.setState({ loading: true });
     const token = await this.props.tokenStore.getOrFetchAccessToken();
     unacceptEvent(token, event.id)
-    .then(() => event.accepted = false)
-    .catch(this.handleError)
-    .finally(() => this.setState({ loading: false }));
+      .then(() => { event.accepted = false; })
+      .catch(this.handleError)
+      .finally(() => this.setState({ loading: false }));
   }
 
   handleError = () => {
@@ -43,29 +43,29 @@ export default class EventDetails extends Component {
     );
   }
 
-  _foodPreference = (pref) => (
-    <View key={pref.id} style={[styles.headerView, {marginLeft: 10, marginBottom: 5}]}>
-      <Icon name='check-circle' color='#009688' />
+  foodPreference = pref => (
+    <View key={pref.id} style={[styles.headerView, { marginLeft: 10, marginBottom: 5 }]}>
+      <Icon name="check-circle" color="#009688" />
       <Text style={{ fontSize: 18, fontWeight: '300', paddingLeft: 5 }}>
         {pref.name}
       </Text>
     </View>
   );
 
-  _foodPreferenceDetails = (prefs) => (
+  foodPreferenceDetails = prefs => (
     <Fragment>
       {prefs.length > 2 ? (
-        <View marginHorizontal={20} alignItems='center'>
+        <View marginHorizontal={20} alignItems="center">
           <View style={{ flexDirection: 'row' }}>
-            {prefs.slice(0,2).map(this._foodPreference)}
+            {prefs.slice(0, 2).map(this.foodPreference)}
           </View>
           <View style={{ flexDirection: 'row' }}>
-            {prefs.slice(2,4).map(this._foodPreference)}
+            {prefs.slice(2, 4).map(this.foodPreference)}
           </View>
         </View>
       ) : (
-        <View flexDirection='row' marginHorizontal={20} alignItems='center'>
-          {prefs.map(this._foodPreference)}
+        <View flexDirection="row" marginHorizontal={20} alignItems="center">
+          {prefs.map(this.foodPreference)}
         </View>
       )}
     </Fragment>
@@ -81,26 +81,26 @@ export default class EventDetails extends Component {
           title={title}
           image={image ? image : undefined}
           titleStyle={styles.title}
-          imageStyle={{height: 300}}
+          imageStyle={{ height: 300 }}
         >
-          <View alignItems='center'>
-            <Text style={[styles.details, {marginBottom: 15}]}>{description}</Text>
+          <View alignItems="center">
+            <Text style={[styles.details, { marginBottom: 15 }]}>{description}</Text>
           </View>
-          <View style={{ flex: 1, flexDirection: accepted ? 'row' : 'column', justifyContent: 'space-evenly'}}>
+          <View style={{ flex: 1, flexDirection: accepted ? 'row' : 'column', justifyContent: 'space-evenly' }}>
             <Button
-              title='INTERESTED'
+              title="INTERESTED"
               icon={accepted && !this.state.loading ? { name: 'done' } : null}
-              onPress={this._acceptEvent}
+              onPress={this.acceptEvent}
               loading={this.state.loading}
               borderRadius={8}
-              backgroundColor='#03A9F4'
+              backgroundColor="#03A9F4"
               disabled={accepted}
             />
             {accepted && (
               <Button
-              alignItems='center'
-              alignContent='center'
-                title='REMOVE'
+                alignItems="center"
+                alignContent="center"
+                title="REMOVE"
                 icon={{ name: 'delete' }}
                 onPress={this.removeEvent}
                 borderRadius={8}
@@ -109,13 +109,13 @@ export default class EventDetails extends Component {
                 disabled={this.state.loading}
               />
             )}
-        </View>
+          </View>
         </Card>
-        <Card title='Details' titleStyle={styles.cardTitle}>
+        <Card title="Details" titleStyle={styles.cardTitle}>
           <View marginBottom={20}>
             <View style={styles.headerView}>
               <Text style={styles.header}>Location</Text>
-              <Icon name='location-pin' type='entypo' size={20} color={colors.darkGrey} marginLeft={5} />
+              <Icon name="location-pin" type="entypo" size={20} color={colors.darkGrey} marginLeft={5} />
             </View>
             <Text style={styles.details}>{address}</Text>
             <Text style={styles.details}>{location}</Text>
@@ -124,21 +124,21 @@ export default class EventDetails extends Component {
           <View marginBottom={20}>
             <View style={styles.headerView}>
               <Text style={styles.header}>Date and Time</Text>
-              <Icon name='access-time' size={20} color={colors.darkGrey} marginLeft={5} />
+              <Icon name="access-time" size={20} color={colors.darkGrey} marginLeft={5} />
             </View>
             <Text style={styles.details}>{parseDateRange(start_date, end_date)}</Text>
           </View>
 
           <View style={styles.headerView}>
             <Text style={styles.header}>Organizer</Text>
-            <Icon name='person' type='octicons' size={20} color={colors.darkGrey} marginLeft={5} />
+            <Icon name="person" type="octicons" size={20} color={colors.darkGrey} marginLeft={5} />
           </View>
           <Text style={styles.details}>{name}</Text>
           <Text style={styles.details}>{affiliation}</Text>
         </Card>
 
-        <Card title='Food Preferences' titleStyle={styles.cardTitle} containerStyle={{marginBottom: 20}}>
-          {this._foodPreferenceDetails(food_preferences)}
+        <Card title="Food Preferences" titleStyle={styles.cardTitle} containerStyle={{ marginBottom: 20 }}>
+          {this.foodPreferenceDetails(food_preferences)}
         </Card>
       </ScrollView>
     );
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   cardTitle: {
-    fontSize: 20
+    fontSize: 20,
   },
   headerView: {
     flex: 1,

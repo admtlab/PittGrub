@@ -34,5 +34,5 @@ export const globalStyles = StyleSheet.create({
     flex: 1,
     paddingTop: Constants.statusBarHeight,
     // backgroundColor: colors.background,
-  }
+  },
 });

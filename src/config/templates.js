@@ -1,7 +1,7 @@
 import { Constants } from 'expo';
 
 
-export const supportEmail = (userId) => `
+export const supportEmail = userId => `
 
   ____________________________________________
   Please enter support inquiry above the line

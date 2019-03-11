@@ -14,7 +14,7 @@ export const captureImage = async (settings) => {
 export const parseRawImage = (image) => {
   image = image.base64 || image;
   return Buffer.from(image, 'base64');
-}
+};
 
 export async function registerForCamera() {
   console.log('registering');

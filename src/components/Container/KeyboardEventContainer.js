@@ -3,11 +3,10 @@ import React, { Component } from 'react';
 
 
 export default class EntryForm extends Component {
-
   componentDidMount() {
     // add keyboard listeners on mount
-    this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
-    this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
+    this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+    this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
   }
 
   componentWillUnmount() {
@@ -16,11 +15,11 @@ export default class EntryForm extends Component {
     this.keyboardWillHideListener.remove();
   }
 
-  _keyboardWillShow = (event) => {
+  keyboardWillShow = (event) => {
     this.props.keyboardWillShow(event);
   }
 
-  _keyboardWillHide = (event) => {
+  keyboardWillHide = (event) => {
     this.props.keyboardWillHide(event);
   }
 

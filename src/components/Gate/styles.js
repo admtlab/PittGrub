@@ -1,5 +1,5 @@
-import { colors } from '../../config/styles';
 import { Dimensions, StyleSheet } from 'react-native';
+import { colors } from '../../config/styles';
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,7 +18,7 @@ export default StyleSheet.create({
     color: colors.softGrey,
     marginLeft: 40,
     marginRight: 40,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   gateView: {
     flex: 1,
