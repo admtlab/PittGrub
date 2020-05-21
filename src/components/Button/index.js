@@ -1,9 +1,8 @@
-/* @flow */
-
+import BackButton from './BackButton';
 import Button from './Button';
 import ButtonIconLeft from './ButtonIconLeft';
 import ButtonIconRight from './ButtonIconRight';
-import BackButton from './BackButton';
-import NextButton from './NextButton';
+import PrimaryButton from './PrimaryButton';
 
-export { Button, ButtonIconLeft, ButtonIconRight, BackButton, NextButton };
+
+export { BackButton, Button, ButtonIconLeft, ButtonIconRight, PrimaryButton };

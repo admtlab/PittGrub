@@ -1,8 +1,6 @@
-/* @flow */
-
-import React from 'react';
 import PropTypes from 'prop-types';
-import { ViewPropTypes, Text } from 'react-native';
+import React from 'react';
+import { Text, ViewPropTypes } from 'react-native';
 import { Button } from 'react-native-elements';
 import styles from './styles';
 import { colors } from '../../config/styles';
@@ -10,6 +8,7 @@ import { colors } from '../../config/styles';
 
 const StyledButton = (props) => {
   const { text, onPress, buttonStyle, textStyle, ...childProps } = props;
+
   return (
     <Button
       title={text}
@@ -17,8 +16,7 @@ const StyledButton = (props) => {
       buttonStyle={[styles.button, buttonStyle]}
       textStyle={[styles.text, textStyle]}
       color={colors.text}
-      containerViewStyle={{backgroundColor: 'transparent'}}
-      large
+      containerViewStyle={{ backgroundColor: 'transparent' }}
       raised
       {...childProps}
     />

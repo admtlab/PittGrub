@@ -1,91 +1,96 @@
-/* @flow */
-
-import React from 'react';
-import { AppState, AppRegistry, StyleSheet } from 'react-native';
-import { Notifications } from 'expo';
+import { AppLoading, Asset, Notifications } from 'expo';
+import { Provider } from 'mobx-react/native';
+import React, { Component } from 'react';
+import { loadData, validateToken } from './api/auth';
+import { handleNotification } from './api/notification';
 import Route from './config/routes';
-// import Welcome from './containers/Welcome';
-import sleep from './lib/sleep';
-import { storeToken } from './lib/auth';
-import { registerForPushNotifications, handleNotification } from './lib/notifications';
+import stores from './stores';
 
-
-// window size
-// var { width, height } = Dimensions.get('window')
-
-
-class App extends React.Component {
+export default class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      isReady: false,
-      appState: null,
-      notification: {},
+      currentScreen: '',
+      loaded: false,
+      valid: false,
     };
+    console.log('loading index');
 
-    this._handleNotification = handleNotification.bind(this);
-  };
+    console.log(props);
 
-  static navigationOptions = {
-    title: 'Welcome',
-  };
-
-  _onNavigationStateChange = (prevState, newState) => {
-    this.setState({ ...this.state, route_index: newState.index });
-  }
-
-  componentWillMount() {
-    sleep(3000);
-    this.setState({ isReady: true, appState: 'active' });
-    this._notificationSubscription = Notifications.addListener(this._handleNotification);
-    // storeToken(null);
-    // storeUser(null);
+    this.loadData = this.loadData.bind(this);
+    this.navigationStateChange = this.navigationStateChange.bind(this);
+    this.notificationListener = handleNotification.bind(this);
   }
 
   componentDidMount() {
-    // Track app state (active, background)
-    AppState.addEventListener('change', state => {
-      this.setState({ appState: state });
-      console.log('AppState is ', state);
-    });
+    this.notificationSubscription = Notifications.addListener(this.notificationSubscription);
+  }
+
+  componentWillUnmount() {
+    this.notificationSubscription.remove();
+  }
+
+  notificationSubscription = (notification) => {
+    stores.eventStore.fetchEvents();
+    return this.notificationListener(notification, stores.eventStore, stores.tokenStore.refreshToken, stores.userStore.account.id);
+  };
+
+  loadData = async () => (
+    // check refresh token validity
+    stores.tokenStore.loadRefreshToken()
+      .then(() => stores.tokenStore.refreshToken && validateToken(stores.tokenStore.refreshToken))
+      .then((valid) => {
+        this.setState({ valid });
+        // load data if valid
+        if (valid) {
+          return loadData(stores.tokenStore.refreshToken)
+            .then((data) => {
+              stores.tokenStore.setAccessToken(data.token);
+              stores.userStore.setUser(data.user);
+            }).then(() => stores.userStore.loadUserProfile());
+        }
+        return Promise.resolve();
+      })
+  );
+
+  loadResources = async () => (
+    Promise.all([
+      this.loadData(),
+      Asset.loadAsync([require('../assets/background-dark.png')])
+    ])
+  );
+
+  navigationStateChange = (route) => {
+    if (route.hasOwnProperty('index')) {
+      this.navigationStateChange(route.routes[route.index]);
+    } else {
+      console.log(`Navigated to: ${route.routeName}`);
+      this.setState({ currentScreen: route.routeName });
+    }
   }
 
   render() {
-    // Register for push notifications early to 
-    // alert user when they've been accepted
-    // May be too early here
-    // registerForPushNotifications();
+    if (!this.state.loaded) {
+      // prepare app until loaded
+      return (
+        <AppLoading
+          startAsync={this.loadResources}
+          onFinish={() => this.setState({ loaded: true })}
+          onError={console.warn}
+        />
+      );
+    }
 
-    // Routing starts with AppNav
-    return (<Route
-      onNavigationStateChange={(prevState, newState) => {
-        this._onNavigationStateChange(prevState, newState);
-      }}
-      screenProps={this.state}
-    />);
+    // launch app
+    return (
+      <Provider {...stores}>
+        <Route
+          screenProps={{ validSession: this.state.valid, currentScreen: this.state.currentScreen }}
+          onNavigationStateChange={this.navigationStateChange}
+        />
+      </Provider>
+    );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    height: 40,
-    backgroundColor: 'rgba(204, 204, 204, 0.6)',
-    paddingHorizontal: 10,
-    color: '#333333',
-    marginBottom: 10,
-    marginRight: 60,
-    marginLeft: 40,
-    alignItems: 'center',
-    textAlign: 'center',
-    borderRadius: 20
-  }
-});
-
-AppRegistry.registerComponent("main", () => App);

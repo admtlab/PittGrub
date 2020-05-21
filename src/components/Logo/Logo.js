@@ -1,18 +1,17 @@
-/* @flow */
-
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import { Animated } from 'react-native';
 import styles from './styles';
-import { colors } from '../../config/styles';
+import metrics from '../../config/metrics';
 
 
 const Logo = (props) => {
-  const { size, ...childProps } = props;
+  const { size, style, ...childProps } = props;
   return (
     <Animated.Text
-      style={[styles.logo, {fontSize: size}]}
-      {...childProps}>
+      style={[styles.logo, style, { fontSize: size }]}
+      {...childProps}
+    >
       PittGrub
     </Animated.Text>
   );
@@ -21,12 +20,12 @@ const Logo = (props) => {
 Logo.propTypes = {
   size: PropTypes.oneOfType([
     PropTypes.object,
-    PropTypes.number
+    PropTypes.number,
   ]),
 };
 
 Logo.defaultProps = {
-  size: 94,
+  size: metrics.logoSizeLarge,
 };
 
 export default Logo;

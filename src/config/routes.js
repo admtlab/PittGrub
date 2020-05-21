@@ -1,182 +1,174 @@
-/* @flow */
-
 import React from 'react';
-import { TabNavigator, StackNavigator } from 'react-navigation';
-import CardStackStyleInterpolator from 'react-navigation/src/views/CardStack/CardStackStyleInterpolator';
 import { Icon } from 'react-native-elements';
-import CreateEvent from '../containers/CreateEvent';
-import Events from '../containers/Events'
-import EventDetail from '../containers/EventDetail';
-import Home from '../containers/Home';
-import LoginScreen from '../containers/Login';
-import PasswordReset from '../containers/PasswordReset';
-import Profile from '../containers/Profile';
-import Signup from '../containers/Signup';
-import Verification from '../containers/Verification';
-import Waiting from '../containers/Waiting';
-import Welcome from '../containers/Welcome';
-import metrics from './metrics';
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import About from '../screens/About';
+import CreateEvent from '../screens/CreateEvent';
+import Entrance from '../screens/Entrance';
+import Events from '../screens/Events';
+import EventDetails from '../screens/EventDetails';
+import FoodPreferenceSettings from '../screens/FoodPreferenceSettings';
+import Login from '../screens/Login';
+import Home from '../screens/Home';
+import HostSignup from '../screens/HostSignup';
+import HostTraining from '../screens/HostTraining';
+import HostTrainingReview from '../screens/HostTrainingReview';
+import PasswordReset from '../screens/PasswordReset';
+import ProfileSettings from '../screens/ProfileSettings';
+import Settings from '../screens/Settings';
+import Signup from '../screens/Signup';
+import Verification from '../screens/Verification';
 
 
-const StackNavigatorConfig = {
-  transitionConfig: () => {
-    return {
-      screenInterpolator: CardStackStyleInterpolator.forInitial
-    }
-  }
-  // transitionConfig: () => ({
-  // 	transitionSpec: {
-  // 		duration: 0,
-  // 		timing: Animated.timing,
-  // 		easing: Easing.step0,
-  // 	},
-  // }),
+const fade = ({ position, scene }) => {
+  const { index } = scene;
+  const opacity = position.interpolate({
+    inputRange: [index - 0.7, index, index + 0.7],
+    outputRange: [0.3, 1, 0.3],
+  });
+
+  return {
+    opacity,
+    transform: [{ translateX: 0 }, { translateY: 0 }],
+  };
 };
 
-export const HomeNav = StackNavigator({
+const headerTitleStyle = { fontSize: 22 };
+
+// eslint-disable-next-line react/prop-types
+function tabBarIcon({ tintColor }, name) {
+  return <Icon name={name} size={30} color={tintColor} />;
+}
+
+const EntryNav = createStackNavigator({
+  Entrance: { screen: Entrance },
+  Login: { screen: Login },
+  HostSignup: { screen: HostSignup },
+  HostTraining: { screen: HostTraining },
+  PasswordReset: { screen: PasswordReset },
+  Signup: { screen: Signup },
+  Verification: { screen: Verification },
+}, {
+  headerMode: 'none',
+  navigationOptions: {
+    gesturesEnabled: false,
+  },
+  transitionConfig: () => ({
+    screenInterpolator: props => fade(props),
+  }),
+});
+
+const HomeNav = createStackNavigator({
   Home: {
     screen: Home,
-    navigationOptions:({navigation}) => ({
-      title: 'PittGrub',
+    navigationOptions: () => ({
+      headerTitle: 'PittGrub',
+      headerTitleStyle,
       headerBackTitle: 'Home',
-    })
+      tabBarIcon: i => tabBarIcon(i, 'home'),
+    }),
   },
-  EventDetail: {
-    screen: EventDetail,
-    navigationOptions: ({navigation}) => ({
-      title: `Event Details`,
-    })
+  EventDetails: {
+    screen: EventDetails,
+    navigationOptions: () => ({
+      title: 'Event Details',
+      headerTitleStyle,
+    }),
   },
-})
+});
 
-export const EventNav = StackNavigator({
+const EventNav = createStackNavigator({
   Events: {
     screen: Events,
-    navigationOptions: {
-      title: 'Events'
-    },
+    navigationOptions: () => ({
+      title: 'Events',
+      headerTitleStyle,
+    }),
+  },
+  EventDetails: {
+    screen: EventDetails,
+    navigationOptions: () => ({
+      title: 'Event Details',
+      headerTitleStyle,
+    }),
   },
   CreateEvent: {
     screen: CreateEvent,
-    navigationOptions: {
-      title: 'Create Event'
-    }
+    navigationOptions: () => ({
+      title: 'Create Event',
+      headerTitleStyle,
+    }),
   },
-  EventDetail: {
-    screen: EventDetail,
-    navigationOptions: ({navigation}) => ({
-      title: 'Event Details'
-    })
-  }
 });
 
-export const WelcomeNav = StackNavigator({
-  Welcome: {
-    screen: Welcome,
-    navigationOptions: {
-      title: 'Enter',
-      header: false,
-    }
+const SettingsNav = createStackNavigator({
+  Settings: {
+    screen: Settings,
+    navigationOptions: () => ({
+      title: 'Settings',
+      headerTitleStyle,
+    }),
   },
-  Signup: {
-    screen: Signup,
-    navigationOptions: {
-      title: 'Signup',
-      header: false,
-    }
+  About: {
+    screen: About,
+    navigationOptions: () => ({
+      title: 'About',
+      headerTitleStyle,
+    }),
   },
-  Login: {
-    screen: LoginScreen,
-    navigationOptions: {
-      title: 'Login',
-      header: false,
-    }
+  ProfileSettings: {
+    screen: ProfileSettings,
+    navigationOptions: () => ({
+      title: 'Profile Settings',
+      headerTitleStyle,
+    }),
   },
-  PasswordReset: {
-    screen: PasswordReset,
-    navigationOptions: {
-      title: 'Password Reset',
-      header: false,
-    }
+  FoodPreferenceSettings: {
+    screen: FoodPreferenceSettings,
+    navigationOptions: () => ({
+      title: 'Food Preference Settings',
+      headerTitleStyle,
+    }),
   },
-  Verification: {
-    screen: Verification,
-    navigationOptions: {
-      title: 'Verification',
-      header: false,
-    }
-  },
-  Waiting: {
-    screen: Waiting,
-    navigationOptions: {
-      title: 'Pending',
-      header: false,
-    }
-  }
+  HostTrainingReview: { screen: HostTrainingReview },
 });
 
-export const TabNav = TabNavigator({
+const MainNav = createBottomTabNavigator({
   HomeTab: {
     screen: HomeNav,
-    navigationOptions: {
+    navigationOptions: () => ({
       tabBarLabel: 'Home',
-      tabBarIcon: ({ tintColor }) =>
-        <Icon
-          name="home"
-          size={metrics.tabBarIconHeight}
-          color={tintColor}
-        />,
-    },
+      tabBarIcon: i => tabBarIcon(i, 'home'),
+    }),
   },
-  EventsTab: {
+  EventTab: {
     screen: EventNav,
-    navigationOptions: {
+    navigationOptions: () => ({
       tabBarLabel: 'Events',
-      tabBarIcon: ({ tintColor }) =>
-        <Icon
-          name="event-note"
-          size={metrics.tabBarIconHeight}
-          color={tintColor}
-        />,
-    },
+      tabBarIcon: i => tabBarIcon(i, 'event-note'),
+    }),
   },
-  ProfileTab: {
-    screen: Profile,
-    navigationOptions: {
-      tabBarLabel: 'Profile',
-      tabBarIcon: ({ tintColor }) =>
-        <Icon
-          name="account-circle"
-          size={metrics.tabBarIconHeight}
-          color={tintColor}
-        />,
-    }
-  }}, {
-    initialRouteName: 'HomeTab',
-  }, {
-    tabBarOptions: {
-      style: {
-        height: metrics.tabBarHeight
-      }
-    },
+  SettingsTab: {
+    screen: SettingsNav,
+    navigationOptions: () => ({
+      tabBarLabel: 'Settings',
+      tabBarIcon: i => tabBarIcon(i, 'account-circle'),
+    }),
   },
-);
-
-export const AppNav = StackNavigator({
-  Entrance: {
-    screen: WelcomeNav,
-    navigationOptions: {
-      header: false
-    }
-  },
-  Main: {
-    screen: TabNav,
-    navigationOptions: {
-      header: false,
-      gesturesEnabled: false
-    }
-  }}, {
-    initialRouteName: 'Entrance',
 });
+
+const AppNav = createStackNavigator({
+  Entrance: { screen: EntryNav },
+  Main: { screen: MainNav },
+}, {
+  headerMode: 'none',
+  initialRouteName: 'Entrance',
+  navigationOptions: {
+    gesturesEnabled: false,
+  },
+  transitionConfig: () => ({
+    screenInterpolator: props => fade(props),
+  }),
+});
+
 
 export default AppNav;
